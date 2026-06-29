@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ACKO — Image Usage Guidelines</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+<style>
+/* ───────────────────────────────────────────────
+   DESIGN TOKENS  —  ACKO 2025 brand
+─────────────────────────────────────────────── */
+:root{
+  --purple:       #5B2BE0;
+  --purple-dark:  #3D1AA3;
+  --purple-mid:   #7B4FEB;
+  --purple-light: #EDE8FF;
+  --purple-pale:  #F5F2FF;
+  --green:        #0BCF00;
+  --green-dark:   #08A800;
+  --green-bg:     #E6FDE4;
+  --pink:         #FF4D8D;
+  --ink:          #0D0B1E;
+  --ink-mid:      #1C1A2E;
+  --text:         #2A2840;
+  --muted:        #6B6880;
+  --light-muted:  #9896A8;
+  --surface:      #F8F6FF;
+  --white:        #FFFFFF;
+  --border:       #E4DFFF;
+  --red:          #D92B3A;
+  --red-bg:       #FFF0F1;
+  --amber:        #CC7700;
+  --r:            14px;
+  --r-sm:         9px;
+  --font:         'Inter', system-ui, sans-serif;
+  --max:          1100px;
+}
+
+/* ───────────────────────────────────────────────  RESET */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:16px;-webkit-font-smoothing:antialiased}
+body{font-family:var(--font);color:var(--text);background:var(--white);overflow-x:hidden;line-height:1.6}
+img{display:block;max-width:100%}
+a{text-decoration:none;color:inherit}
+ul{list-style:none}
+
+/* ───────────────────────────────────────────────  SCROLL BAR */
+#bar{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--purple),var(--pink),var(--green));z-index:9999;transition:width .08s linear}
+
+/* ───────────────────────────────────────────────  ANCHOR OFFSET */
+section[id]{scroll-margin-top:68px}
+
+/* ───────────────────────────────────────────────  NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:1000;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;background:rgba(13,11,30,.94);backdrop-filter:blur(18px);border-bottom:1px solid rgba(91,43,224,.2)}
+.nav-logo{font-size:20px;font-weight:900;letter-spacing:-.5px;color:var(--white)}
+.nav-logo b{color:var(--white)}
+.nav-links{display:flex;gap:4px}
+.nav-links a{color:rgba(255,255,255,.55);font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:6px 10px;border-radius:6px;transition:all .18s}
+.nav-links a:hover,.nav-links a.active{color:var(--white);background:rgba(91,43,224,.3)}
+.nav-pill{background:var(--purple);color:var(--white)!important;border-radius:100px!important;padding:6px 14px!important}
+.nav-pill:hover{background:var(--purple-mid)!important}
+
+/* ───────────────────────────────────────────────  LAYOUT HELPERS */
+.wrap{max-width:var(--max);margin:0 auto}
+.sec{padding:88px 40px}
+.sec-sm{padding:56px 40px}
+.bg-dark{background:var(--ink)}
+.bg-mid{background:var(--ink-mid)}
+.bg-surface{background:var(--surface)}
+.bg-white{background:var(--white)}
+.bg-purple{background:var(--purple)}
+
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--purple-mid);margin-bottom:10px}
+.eyebrow.green{color:var(--green)}
+.eyebrow.white{color:rgba(255,255,255,.5)}
+.h1{font-size:clamp(42px,6vw,80px);font-weight:900;letter-spacing:-.035em;line-height:.97;color:var(--text)}
+.h2{font-size:clamp(28px,3.5vw,44px);font-weight:900;letter-spacing:-.03em;line-height:1.05;color:var(--text)}
+.h3{font-size:20px;font-weight:800;letter-spacing:-.02em;color:var(--text)}
+.h4{font-size:15px;font-weight:700;letter-spacing:-.01em;color:var(--text)}
+.white{color:var(--white)!important}
+.lead{font-size:16px;color:var(--muted);line-height:1.75;max-width:580px;margin-top:14px}
+
+/* ───────────────────────────────────────────────  HERO */
+.hero{min-height:100vh;display:grid;grid-template-columns:1fr 280px;align-items:center;gap:60px;padding:100px 40px 80px;background:var(--ink);position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;width:700px;height:700px;background:radial-gradient(circle,rgba(91,43,224,.3) 0%,transparent 70%);top:-200px;right:-100px;pointer-events:none;border-radius:50%}
+.hero::after{content:'';position:absolute;width:350px;height:350px;background:radial-gradient(circle,rgba(11,207,0,.12) 0%,transparent 70%);bottom:60px;left:60px;pointer-events:none;border-radius:50%}
+.hero-left{position:relative;z-index:1}
+.hero-tag{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--green);margin-bottom:28px}
+.hero-tag::before{content:'';width:28px;height:2px;background:var(--green);border-radius:2px;display:block}
+.hero-title{font-size:clamp(52px,7.5vw,100px);font-weight:900;letter-spacing:-.04em;line-height:.93;color:var(--white);margin-bottom:28px}
+.hero-title .grad{background:linear-gradient(130deg,var(--purple-mid) 0%,var(--pink) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-desc{font-size:17px;color:rgba(255,255,255,.5);line-height:1.75;max-width:500px;margin-bottom:48px}
+.hero-stats{display:flex;gap:40px}
+.stat-n{font-size:38px;font-weight:900;letter-spacing:-.04em;color:var(--white);line-height:1}
+.stat-n span{color:var(--purple-mid)}
+.stat-l{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-top:5px}
+.hero-right{position:relative;z-index:1;display:flex;flex-direction:column;gap:8px}
+.chapter-link{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:100px;padding:10px 18px;font-size:12px;font-weight:600;color:rgba(255,255,255,.5);transition:all .2s;white-space:nowrap}
+.chapter-link:hover{background:rgba(91,43,224,.25);border-color:rgba(91,43,224,.5);color:var(--white)}
+.chapter-link .n{font-size:10px;color:var(--purple-mid);font-weight:800}
+
+/* ───────────────────────────────────────────────  SECTION HEADERS */
+.sec-header{margin-bottom:48px}
+.sec-header .h2{margin-top:8px}
+
+/* ───────────────────────────────────────────────  PRINCIPLES */
+.principles-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.p-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:32px 28px;position:relative;overflow:hidden;transition:transform .22s,box-shadow .22s}
+.p-card::after{content:'';position:absolute;inset:0 0 auto 0;height:3px;background:linear-gradient(90deg,var(--purple),var(--pink))}
+.p-card:hover{transform:translateY(-4px);box-shadow:0 20px 48px rgba(91,43,224,.1)}
+.p-num{font-size:60px;font-weight:900;letter-spacing:-.05em;line-height:1;color:var(--purple-light);margin-bottom:12px}
+.p-icon{font-size:26px;margin-bottom:16px}
+.p-title{font-size:16px;font-weight:800;letter-spacing:-.015em;color:var(--text);margin-bottom:8px}
+.p-desc{font-size:13.5px;color:var(--muted);line-height:1.65}
+
+/* ───────────────────────────────────────────────  5-SECOND TEST */
+.test-banner{background:linear-gradient(135deg,var(--purple) 0%,var(--purple-dark) 100%);border-radius:var(--r);padding:44px 52px;display:flex;justify-content:space-between;align-items:center;gap:40px;margin-top:56px;position:relative;overflow:hidden}
+.test-banner::before{content:'';position:absolute;width:280px;height:280px;background:rgba(255,255,255,.06);border-radius:50%;right:-60px;top:-80px}
+.test-left h3{font-size:24px;font-weight:900;letter-spacing:-.02em;color:var(--white);margin-bottom:6px}
+.test-left p{font-size:14px;color:rgba(255,255,255,.6);margin-bottom:18px}
+.ship-pill{display:inline-flex;align-items:center;gap:6px;background:var(--green);color:var(--ink);font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:8px 18px;border-radius:100px}
+.test-checks{display:flex;flex-direction:column;gap:10px;position:relative;z-index:1}
+.tcheck{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:100px;padding:10px 18px;font-size:13px;font-weight:600;color:var(--white)}
+.tcheck-n{width:22px;height:22px;background:var(--purple-mid);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0}
+
+/* ───────────────────────────────────────────────  DO / DON'T */
+.dd-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.do-col{background:var(--green-bg);border:1.5px solid rgba(11,207,0,.22);border-radius:var(--r);padding:32px 28px}
+.dont-col{background:var(--red-bg);border:1.5px solid rgba(217,43,58,.18);border-radius:var(--r);padding:32px 28px}
+.dd-head{display:flex;align-items:center;gap:9px;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin-bottom:22px}
+.do-col .dd-head{color:var(--green-dark)}
+.dont-col .dd-head{color:var(--red)}
+.dd-badge{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0}
+.do-col .dd-badge{background:var(--green);color:var(--ink)}
+.dont-col .dd-badge{background:var(--red);color:var(--white)}
+.rule-list li{display:flex;align-items:flex-start;gap:9px;padding:10px 0;border-bottom:1px solid rgba(0,0,0,.06);font-size:13.5px;color:var(--text);line-height:1.55}
+.rule-list li:last-child{border-bottom:none;padding-bottom:0}
+.rule-list li::before{content:'—';font-size:11px;font-weight:700;margin-top:2px;flex-shrink:0}
+.do-col .rule-list li::before{color:var(--green-dark)}
+.dont-col .rule-list li::before{color:var(--red)}
+
+/* ───────────────────────────────────────────────  EXAMPLE SCENARIO */
+.scenario{background:linear-gradient(135deg,rgba(91,43,224,.07),rgba(255,77,141,.04));border:1.5px solid var(--border);border-radius:var(--r);padding:28px 32px;margin-bottom:16px}
+.scenario-eyebrow{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--purple-mid);margin-bottom:8px}
+.scenario-body{font-size:15px;font-weight:500;color:var(--text);line-height:1.6}
+.ex-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.ex-card{border-radius:var(--r);padding:28px}
+.ex-card.ok{background:var(--green-bg);border:1.5px solid rgba(11,207,0,.22)}
+.ex-card.no{background:var(--red-bg);border:1.5px solid rgba(217,43,58,.18)}
+.ex-verdict{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.ex-card.ok .ex-verdict{color:var(--green-dark)}
+.ex-card.no .ex-verdict{color:var(--red)}
+.ex-body{font-size:13.5px;color:var(--text);line-height:1.65}
+
+/* ───────────────────────────────────────────────  CASTING AXES */
+.axes-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:32px}
+.axis-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r);padding:22px 18px;text-align:center;transition:all .2s}
+.axis-card:hover{border-color:var(--purple-mid);box-shadow:0 8px 24px rgba(91,43,224,.09);transform:translateY(-2px)}
+.axis-icon{font-size:26px;margin-bottom:10px}
+.axis-name{font-size:13px;font-weight:800;color:var(--text);margin-bottom:5px}
+.axis-desc{font-size:12px;color:var(--muted);line-height:1.5}
+
+/* ───────────────────────────────────────────────  MOMENTS */
+.moments{display:flex;flex-direction:column;gap:8px;margin-top:32px}
+.moment{display:grid;grid-template-columns:170px 1fr 80px;border-radius:var(--r-sm);overflow:hidden;border:1px solid var(--border);transition:all .2s}
+.moment:hover{box-shadow:0 4px 16px rgba(91,43,224,.08)}
+.m-name{background:var(--purple-light);color:var(--purple-dark);font-size:13px;font-weight:800;padding:18px 20px;display:flex;align-items:center}
+.m-desc{padding:18px 22px;font-size:13.5px;color:var(--muted);display:flex;align-items:center;line-height:1.5}
+.m-free{padding:18px 14px;text-align:center;font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;display:flex;align-items:center;justify-content:center}
+.f-hi{color:var(--green-dark)}.f-mid{color:var(--amber)}.f-lo{color:var(--red)}
+
+/* ───────────────────────────────────────────────  COMPLIANCE */
+.comp-rows{display:flex;flex-direction:column;gap:8px}
+.comp-row{display:grid;grid-template-columns:200px 1fr;border-radius:var(--r-sm);overflow:hidden;border:1px solid var(--border)}
+.comp-label{background:var(--purple);color:var(--white);font-size:12px;font-weight:700;padding:18px 20px;display:flex;align-items:center;line-height:1.35}
+.comp-rule{padding:18px 22px;font-size:13.5px;color:var(--muted);display:flex;align-items:center;line-height:1.5}
+
+/* ───────────────────────────────────────────────  TIERS */
+.tiers-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.tier{border-radius:var(--r);border:1px solid var(--border);overflow:hidden;transition:transform .22s,box-shadow .22s}
+.tier:hover{transform:translateY(-4px);box-shadow:0 20px 48px rgba(91,43,224,.1)}
+.tier-top{padding:22px 26px;color:var(--white)}
+.tier-top.hero{background:var(--purple)}
+.tier-top.supp{background:linear-gradient(135deg,#CC7700,#E8A000)}
+.tier-top.func{background:#555}
+.tier-name{font-size:20px;font-weight:900;letter-spacing:-.02em;margin-bottom:3px}
+.tier-tag{font-size:10px;font-weight:600;opacity:.7;text-transform:uppercase;letter-spacing:.08em}
+.tier-body{background:var(--white);padding:24px 26px}
+.tier-desc{font-size:13.5px;color:var(--muted);line-height:1.6;margin-bottom:14px}
+.tier-uses{font-size:12px;font-weight:600;color:var(--purple-mid);line-height:1.65}
+.tier-uses span{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:4px}
+
+/* ───────────────────────────────────────────────  AI FAILURES */
+.fail-table{width:100%;border-collapse:separate;border-spacing:0 7px}
+.fail-table thead th{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:0 18px 10px;color:rgba(255,255,255,.35);text-align:left}
+.fail-table td{padding:16px 18px;font-size:13.5px;line-height:1.5}
+.fail-table td:first-child{background:rgba(217,43,58,.15);color:#FF9898;font-weight:600;border-radius:var(--r-sm) 0 0 var(--r-sm);border:1px solid rgba(217,43,58,.2);border-right:none;width:38%}
+.fail-table td:last-child{background:rgba(11,207,0,.1);color:#7EE87E;border-radius:0 var(--r-sm) var(--r-sm) 0;border:1px solid rgba(11,207,0,.15);border-left:none}
+
+/* ───────────────────────────────────────────────  JUDGMENT */
+.judg-stack{display:flex;flex-direction:column;gap:8px}
+.judg-row{display:grid;grid-template-columns:60px 190px 1fr;border-radius:var(--r-sm);overflow:hidden;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);transition:all .2s}
+.judg-row:hover{background:rgba(255,255,255,.07)}
+.judg-n{display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:var(--white)}
+.judg-n.c1{background:var(--purple)}.judg-n.c2{background:linear-gradient(135deg,#CC7700,#E8A000)}.judg-n.c3{background:#3D7FCC}.judg-n.c4{background:#555}
+.judg-label{padding:18px 20px;font-size:14px;font-weight:800;display:flex;align-items:center}
+.judg-label.c1{color:var(--purple-mid)}.judg-label.c2{color:#E8A000}.judg-label.c3{color:#7EB8FF}.judg-label.c4{color:rgba(255,255,255,.45)}
+.judg-desc{padding:18px 22px;font-size:13.5px;color:rgba(255,255,255,.45);display:flex;align-items:center;line-height:1.5}
+
+/* ───────────────────────────────────────────────  ★ PROMPTS SECTION  ★ */
+
+/* Framework card */
+.framework-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:40px}
+.fw-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;transition:all .22s}
+.fw-card:hover{border-color:var(--purple-mid);box-shadow:0 8px 24px rgba(91,43,224,.1);transform:translateY(-2px)}
+.fw-top{padding:16px 18px 0;display:flex;align-items:center;gap:8px}
+.fw-num{width:26px;height:26px;background:var(--purple);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:var(--white);flex-shrink:0}
+.fw-label{font-size:13px;font-weight:800;color:var(--purple-dark);letter-spacing:-.01em}
+.fw-body{padding:12px 18px 18px;font-size:12px;color:var(--muted);line-height:1.6}
+.fw-example{font-size:11px;font-style:italic;color:var(--purple-mid);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);line-height:1.5}
+
+/* Prompt cards */
+.prompts-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.prompt-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;transition:all .22s}
+.prompt-card:hover{border-color:var(--purple-mid);box-shadow:0 12px 40px rgba(91,43,224,.1)}
+.prompt-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.prompt-meta{flex:1}
+.prompt-tag{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-mid);background:var(--purple-pale);padding:4px 10px;border-radius:100px;margin-bottom:8px}
+.prompt-title{font-size:17px;font-weight:800;letter-spacing:-.015em;color:var(--text);margin-bottom:4px}
+.prompt-desc{font-size:12.5px;color:var(--muted);line-height:1.5}
+.prompt-moment-badge{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:5px 12px;border-radius:100px;white-space:nowrap;flex-shrink:0;margin-top:2px}
+.mb-care{background:rgba(217,43,58,.1);color:var(--red)}
+.mb-life{background:rgba(11,207,0,.12);color:var(--green-dark)}
+.mb-travel{background:rgba(91,43,224,.1);color:var(--purple)}
+.mb-purchase{background:rgba(204,119,0,.12);color:var(--amber)}
+
+/* Anatomy breakdown inside prompt card */
+.prompt-anatomy{padding:20px 24px;display:flex;flex-direction:column;gap:8px;border-bottom:1px solid var(--border)}
+.anatomy-row{display:grid;grid-template-columns:90px 1fr;gap:10px;align-items:baseline}
+.anat-label{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--purple-mid);padding-top:1px}
+.anat-val{font-size:12.5px;color:var(--text);line-height:1.55}
+
+/* Full prompt text (collapsed by default) */
+.prompt-full{padding:0 24px;overflow:hidden;max-height:0;transition:max-height .35s ease,padding .35s ease}
+.prompt-full.open{max-height:600px;padding:20px 24px}
+.prompt-text{font-size:12px;color:var(--text);line-height:1.8;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:16px 18px;font-family:'Courier New',monospace;white-space:pre-wrap;word-break:break-word}
+
+/* Toggle */
+.prompt-toggle{width:100%;padding:14px 24px;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;color:var(--purple-mid);letter-spacing:.04em;text-transform:uppercase;transition:background .2s}
+.prompt-toggle:hover{background:var(--purple-pale)}
+.toggle-icon{font-size:14px;transition:transform .3s}
+.toggle-icon.open{transform:rotate(180deg)}
+
+/* What makes it work */
+.prompt-insights{padding:16px 24px 20px}
+.insight-title{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.insight-tags{display:flex;flex-wrap:wrap;gap:6px}
+.ins-tag{font-size:11px;font-weight:600;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:4px 12px;transition:all .2s}
+.ins-tag:hover{border-color:var(--purple-mid);color:var(--purple);background:var(--purple-pale)}
+
+/* Template builder */
+.template-box{background:var(--ink-mid);border-radius:var(--r);padding:36px;margin-top:40px;position:relative;overflow:hidden}
+.template-box::before{content:'';position:absolute;width:300px;height:300px;background:radial-gradient(circle,rgba(91,43,224,.25) 0%,transparent 70%);right:-60px;top:-60px;border-radius:50%}
+.template-label{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--green);margin-bottom:16px;position:relative;z-index:1}
+.template-title{font-size:20px;font-weight:900;letter-spacing:-.02em;color:var(--white);margin-bottom:20px;position:relative;z-index:1}
+.template-text{font-size:13px;line-height:2.1;color:rgba(255,255,255,.8);position:relative;z-index:1;font-family:'Courier New',monospace;background:rgba(0,0,0,.25);border-radius:var(--r-sm);padding:20px 22px;margin-bottom:20px}
+.template-text .slot{background:rgba(91,43,224,.35);color:var(--purple-mid);padding:2px 6px;border-radius:4px;font-weight:700;font-style:normal}
+.template-notes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;position:relative;z-index:1}
+.tn-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--r-sm);padding:16px}
+.tn-title{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--purple-mid);margin-bottom:6px}
+.tn-body{font-size:12px;color:rgba(255,255,255,.5);line-height:1.6}
+
+/* Rules from prompts */
+.prules-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:32px}
+.prule{background:var(--white);border:1px solid var(--border);border-radius:var(--r-sm);padding:20px 22px;display:flex;align-items:flex-start;gap:12px;transition:all .2s}
+.prule:hover{border-color:var(--purple-mid);box-shadow:0 4px 16px rgba(91,43,224,.07)}
+.prule-icon{font-size:20px;flex-shrink:0;margin-top:1px}
+.prule-title{font-size:13px;font-weight:800;color:var(--text);margin-bottom:4px;letter-spacing:-.01em}
+.prule-desc{font-size:12.5px;color:var(--muted);line-height:1.55}
+
+/* ───────────────────────────────────────────────  CHECKLIST */
+.cklist-cols{display:grid;grid-template-columns:1fr 1fr;gap:48px}
+.cklist-group{margin-bottom:32px}
+.ckg-title{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--purple);padding-bottom:10px;border-bottom:2px solid var(--border);margin-bottom:14px}
+.cki{display:flex;align-items:flex-start;gap:11px;padding:9px 0;border-bottom:1px solid var(--border);font-size:13.5px;color:var(--text);line-height:1.5}
+.cki:last-child{border-bottom:none}
+.ckbox{width:19px;height:19px;border:2px solid var(--border);border-radius:5px;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .18s}
+.ckbox:hover{border-color:var(--purple-mid)}
+.ckbox.on{background:var(--purple);border-color:var(--purple)}
+.ckbox.on::after{content:'✓';font-size:10px;color:var(--white);font-weight:900}
+
+/* ───────────────────────────────────────────────  CLOSING */
+.closing{background:var(--ink);padding:100px 40px;position:relative;overflow:hidden}
+.closing::before{content:'';position:absolute;width:500px;height:500px;background:radial-gradient(circle,rgba(91,43,224,.22) 0%,transparent 70%);right:-80px;bottom:-80px;border-radius:50%}
+.closing-inner{max-width:700px;position:relative;z-index:1}
+.closing-bar{width:48px;height:3px;background:linear-gradient(90deg,var(--purple),var(--pink));border-radius:3px;margin-bottom:24px}
+.closing-q{font-size:clamp(34px,5vw,60px);font-weight:900;letter-spacing:-.035em;line-height:1.05;color:var(--white);margin-bottom:22px}
+.closing-q .grad{background:linear-gradient(130deg,var(--purple-mid),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.closing-sub{font-size:16px;color:rgba(255,255,255,.4);line-height:1.75;max-width:500px}
+
+/* ───────────────────────────────────────────────  FOOTER */
+footer{background:#060412;padding:28px 40px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(91,43,224,.18)}
+footer p{font-size:12px;color:rgba(255,255,255,.28)}
+.foot-logo{font-size:17px;font-weight:900;color:rgba(255,255,255,.2);letter-spacing:-.5px}
+
+/* ───────────────────────────────────────────────  DIVIDER */
+.divider{height:1px;background:var(--border);margin:56px 0}
+.sec-divider{border:none;height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:0}
+
+/* ───────────────────────────────────────────────  FADE-UP ANIMATION */
+.fu{opacity:0;transform:translateY(24px);transition:opacity .55s ease,transform .55s ease}
+.fu.in{opacity:1;transform:translateY(0)}
+.fu.d1{transition-delay:.08s}.fu.d2{transition-delay:.16s}.fu.d3{transition-delay:.24s}.fu.d4{transition-delay:.32s}.fu.d5{transition-delay:.40s}
+
+/* ───────────────────────────────────────────────  RESPONSIVE */
+@media(max-width:960px){
+  .nav{padding:0 20px}.nav-links{display:none}
+  .sec,.closing{padding:64px 20px}
+  .hero{grid-template-columns:1fr;padding:90px 20px 64px}.hero-right{display:none}
+  .principles-grid{grid-template-columns:1fr 1fr}
+  .dd-grid,.ex-grid,.prompts-grid,.tiers-grid,.cklist-cols{grid-template-columns:1fr}
+  .framework-grid{grid-template-columns:repeat(3,1fr)}
+  .axes-grid{grid-template-columns:repeat(3,1fr)}
+  .template-notes{grid-template-columns:1fr}
+  .prules-grid{grid-template-columns:1fr}
+  footer{flex-direction:column;gap:8px;text-align:center;padding:20px}
+}
+@media(max-width:600px){
+  .principles-grid,.framework-grid,.axes-grid{grid-template-columns:1fr 1fr}
+  .test-banner{flex-direction:column;padding:28px}
+  .moment{grid-template-columns:130px 1fr;}.m-free{display:none}
+  .comp-row{grid-template-columns:1fr}.comp-label{padding:12px 18px}
+  .judg-row{grid-template-columns:48px 1fr}.judg-desc{display:none}
+  .anatomy-row{grid-template-columns:80px 1fr}
+}
+</style>
+</head>
+<body>
+
+<div id="bar"></div>
+
+<!-- ═══════════════  NAV ══════════════════════════════════════════ -->
+<nav class="nav">
+  <div class="nav-logo">ACK<b>O</b></div>
+  <ul class="nav-links">
+    <li><a href="#principles">Principles</a></li>
+    <li><a href="#people">People</a></li>
+    <li><a href="#look">Look &amp; Feel</a></li>
+    <li><a href="#prompts">Prompt Guide</a></li>
+    <li><a href="#ai">AI Rules</a></li>
+    <li><a href="#compliance">Compliance</a></li>
+    <li><a href="#checklist" class="nav-pill">Checklist</a></li>
+  </ul>
+</nav>
+
+<!-- ═══════════════  HERO ══════════════════════════════════════════ -->
+<section class="hero" id="top">
+  <div class="hero-left">
+    <div class="hero-tag">Brand Resource · v2.0</div>
+    <h1 class="hero-title">Image<br><span class="grad">Usage</span><br>Guidelines</h1>
+    <p class="hero-desc">A complete reference for anyone creating, briefing, or approving images at ACKO — covering principles, rules, real prompt examples, and a self-check before you ship.</p>
+    <div class="hero-stats">
+      <div><div class="stat-n">6</div><div class="stat-l">Principles</div></div>
+      <div><div class="stat-n">7</div><div class="stat-l">Prompt examples</div></div>
+      <div><div class="stat-n">5<span>sec</span></div><div class="stat-l">Recognition test</div></div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <a href="#principles" class="chapter-link"><span class="n">01</span> The Six Principles</a>
+    <a href="#people" class="chapter-link"><span class="n">02</span> People &amp; Casting</a>
+    <a href="#place" class="chapter-link"><span class="n">03</span> Place &amp; Setting</a>
+    <a href="#look" class="chapter-link"><span class="n">04</span> Look &amp; Feel</a>
+    <a href="#prompts" class="chapter-link"><span class="n">05</span> Prompt Guidelines</a>
+    <a href="#ai" class="chapter-link"><span class="n">06</span> AI Rules</a>
+    <a href="#compliance" class="chapter-link"><span class="n">07</span> Compliance</a>
+    <a href="#tiers" class="chapter-link"><span class="n">08</span> Image Tiers</a>
+    <a href="#checklist" class="chapter-link"><span class="n">09</span> Checklist</a>
+  </div>
+</section>
+
+<!-- ═══════════════  PRINCIPLES ═══════════════════════════════════ -->
+<section class="sec bg-surface" id="principles">
+  <div class="wrap">
+    <div class="sec-header fu">
+      <div class="eyebrow">Part 01</div>
+      <h2 class="h2">The Six Principles</h2>
+      <p class="lead">Every image at ACKO — photographed, illustrated, or AI-generated — must pass all six. These are the <em>why</em> behind every decision that follows.</p>
+    </div>
+    <div class="principles-grid">
+      <div class="p-card fu"><div class="p-icon">🤝</div><div class="p-num">01</div><div class="p-title">Warm, not clinical</div><div class="p-desc">Soft natural light. Familiar, lived-in moments. No sterile boardrooms, stiff stock smiles, or cold corporate polish.</div></div>
+      <div class="p-card fu d1"><div class="p-icon">☀️</div><div class="p-num">02</div><div class="p-title">Bright and modern</div><div class="p-desc">Light-filled contemporary scenes. Nothing dated or heavy. Should look like it was made this year, not five years ago.</div></div>
+      <div class="p-card fu d2"><div class="p-icon">🎯</div><div class="p-num">03</div><div class="p-title">Disciplined, not decorative</div><div class="p-desc">Composed and considered. Clean frames, room around the subject. Warmth lives in the moment captured, not decoration.</div></div>
+      <div class="p-card fu d3"><div class="p-icon">😄</div><div class="p-num">04</div><div class="p-title">Playful in spirit, not execution</div><div class="p-desc">A small laugh, an easy gesture — but the craft stays grown-up. No quirky props, no visual gags, no exaggerated angles.</div></div>
+      <div class="p-card fu d4"><div class="p-icon">👤</div><div class="p-num">05</div><div class="p-title">Real, not cartoon</div><div class="p-desc">Real people, real objects, real environments. No mascots, no animated characters. ACKO is human, not a character.</div></div>
+      <div class="p-card fu d5"><div class="p-icon">⚡</div><div class="p-num">06</div><div class="p-title">Not traditional insurance</div><div class="p-desc">Within five seconds, a stranger sees a modern brand — not a legacy insurer or a PSU ad. If it could be anyone's, it's wrong.</div></div>
+    </div>
+    <div class="test-banner fu">
+      <div class="test-left">
+        <h3>The Five-Second Test</h3>
+        <p>Before anything ships. Look at it for five seconds and answer all four.</p>
+        <div class="ship-pill">✓ Four yeses → Ship it</div>
+      </div>
+      <div class="test-checks">
+        <div class="tcheck"><span class="tcheck-n">1</span>Does it pass all six principles?</div>
+        <div class="tcheck"><span class="tcheck-n">2</span>Is it honest about what ACKO actually delivers?</div>
+        <div class="tcheck"><span class="tcheck-n">3</span>Is it free of visible AI errors?</div>
+        <div class="tcheck"><span class="tcheck-n">4</span>Would a stranger see a modern brand within five seconds?</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════  PEOPLE ════════════════════════════════════════ -->
+<section class="sec bg-white" id="people">
+  <div class="wrap">
+    <div class="sec-header fu">
+      <div class="eyebrow">Part 02 · People</div>
+      <h2 class="h2">Who We Show &amp; How</h2>
+      <p class="lead">Diversity is the default, not the exception. Cast deliberately across five axes — every campaign should cover at least three.</p>
+    </div>
+    <div class="dd-grid fu">
+      <div class="do-col">
+        <div class="dd-head"><span class="dd-badge">✓</span> Do</div>
+        <ul class="rule-list">
+          <li>Show real-looking Indian people across skin tones, ages, regions, body types, and abilities</li>
+          <li>Cast across ≥3 axes per campaign: skin tone, age, region, body type, life stage</li>
+          <li>Capture mid-action moments — buckling a seatbelt, scrolling a phone, packing a bag</li>
+          <li>Use gentle expressions — small smiles, calm eyes, natural body language</li>
+          <li>Dress people in contemporary, regionally honest Indian clothing</li>
+          <li>Show older adults, people with disabilities, and larger body types as regular subjects</li>
+        </ul>
+      </div>
+      <div class="dont-col">
+        <div class="dd-head"><span class="dd-badge">✗</span> Don't</div>
+        <ul class="rule-list">
+          <li>Use celebrities, public figures, or recognisable lookalikes</li>
+          <li>Show forced 'happy family' poses lined up at the camera</li>
+          <li>Default to light-skinned, urban, 25-year-old models</li>
+          <li>Show plastic AI skin, melted hands, or distorted eyes</li>
+          <li>Show real ACKO employees, customers, or partners without written consent</li>
+          <li>Dress people in clothing or contexts they wouldn't actually wear</li>
+        </ul>
+      </div>
+    </div>
+    <div class="axes-grid fu">
+      <div class="axis-card"><div class="axis-icon">🎨</div><div class="axis-name">Skin Tone</div><div class="axis-desc">Full Indian spectrum, weighted realistically. Don't default to fair.</div></div>
+      <div class="axis-card"><div class="axis-icon">🗺️</div><div class="axis-name">Region</div><div class="axis-desc">North, South, East, West, Northeast — visible in clothing and setting.</div></div>
+      <div class="axis-card"><div class="axis-icon">🎂</div><div class="axis-name">Age</div><div class="axis-desc">Millennials, Gen X, older adults — not just 25-year-olds.</div></div>
+      <div class="axis-card"><div class="axis-icon">🏃</div><div class="axis-name">Body Type</div><div class="axis-desc">Different builds, heights, abilities — all represented.</div></div>
+      <div class="axis-card"><div class="axis-icon">🏠</div><div class="axis-name">Life Stage</div><div class="axis-desc">Single, parent, caregiver, retiree — each opens different moments.</div></div>
+    </div>
+    <div style="margin-top:48px">
+      <div class="h3 fu" style="margin-bottom:16px">Example — Health Campaign</div>
+      <div class="scenario fu">
+        <div class="scenario-eyebrow">📋 Campaign Brief</div>
+        <div class="scenario-body">ACKO is running a health insurance campaign targeting families in Tier-2 cities.</div>
+      </div>
+      <div class="ex-grid fu">
+        <div class="ex-card ok"><div class="ex-verdict">✓ Approved</div><div class="ex-body">A Tamil Nadu woman in her late 40s — slightly greying hair, wearing a cotton salwar — sitting in a government hospital waiting room, glancing at her phone with calm, composed eyes. Morning light from a window. Candid framing. No poses, no direct-to-camera smile.</div></div>
+        <div class="ex-card no"><div class="ex-verdict">✗ Rejected</div><div class="ex-body">A fair-skinned 25-year-old woman with perfect makeup, grinning broadly at the camera in a clean modern apartment. Generic stock-photo energy. Could belong to any insurer anywhere in the world. No Indian context, no real moment.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════  PLACE ═════════════════════════════════════════ -->
+<section class="sec bg-surface" id="place">
+  <div class="wrap">
+    <div class="sec-header fu">
+      <div class="eyebrow">Part 02 · Place</div>
+      <h2 class="h2">Where Things Happen</h2>
+      <p class="lead">Settings feel lived-in and current. Indian cues — number plates, signage, architecture — belong wherever they'd naturally appear.</p>
+    </div>
+    <div class="dd-grid fu">
+      <div class="do-col">
+        <div class="dd-head"><span class="dd-badge">✓</span> Do</div>
+        <ul class="rule-list">
+          <li>Use real Indian settings — homes, streets, hospitals, vehicles, offices</li>
+          <li>Show right-hand drive cars and Indian number plates</li>
+          <li>Include Indian signage and street details where natural</li>
+          <li>Keep settings lived-in and current, not aspirational or staged</li>
+          <li>Match the setting to the moment: calm for care, active for daily life</li>
+        </ul>
+      </div>
+      <div class="dont-col">
+        <div class="dd-head"><span class="dd-badge">✗</span> Don't</div>
+        <ul class="rule-list">
+          <li>Use foreign settings passed off as Indian (left-hand drive, foreign hospitals)</li>
+          <li>Use empty studio backgrounds when a real setting tells the story better</li>
+          <li>Show outdated environments — old PSU offices, dated interiors, dated tech</li>
+          <li>Include real brand names, hospital names, or competitor visuals</li>
+        </ul>
+      </div>
+    </div>
+    <div style="margin-top:48px" class="fu">
+      <div class="h3" style="margin-bottom:16px">Insurance Moments</div>
+      <p style="font-size:14px;color:var(--muted);margin-bottom:20px">Every ACKO image falls into one of these. The moment changes casting, mood, and setting.</p>
+      <div class="moments">
+        <div class="moment"><div class="m-name">Pre-purchase</div><div class="m-desc">Research, comparing, deciding — quiet and considered. Someone scrolling, talking to family.</div><div class="m-free f-mid">Medium</div></div>
+        <div class="moment"><div class="m-name">Active Life</div><div class="m-desc">Driving, commuting, travelling — day-to-day routines ACKO quietly sits behind.</div><div class="m-free f-hi">High</div></div>
+        <div class="moment"><div class="m-name">Care</div><div class="m-desc">Hospital visits, doctor consultations, roadside support, recovery. Most restraint needed.</div><div class="m-free f-lo">Low</div></div>
+        <div class="moment"><div class="m-name">Reassurance</div><div class="m-desc">Post-claim, post-support — someone calmly carrying on. The exhale, the quiet relief.</div><div class="m-free f-mid">Medium</div></div>
+        <div class="moment"><div class="m-name">Internal / Brand</div><div class="m-desc">ACKO team at work, partners, behind-the-scenes. Most creative freedom.</div><div class="m-free f-hi">High</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════  LOOK & FEEL ══════════════════════════════════ -->
+<section class="sec bg-white" id="look">
+  <div class="wrap">
+    <div class="sec-header fu">
+      <div class="eyebrow">Part 02 · Look &amp; Feel</div>
+      <h2 class="h2">Colour, Light &amp; Composition</h2>
+      <p class="lead">Warmth lives in the moment we capture — not in filters or decoration around it.</p>
+    </div>
+    <div class="dd-grid fu">
+      <div class="do-col">
+        <div class="dd-head"><span class="dd-badge">✓</span> Do</div>
+        <ul class="rule-list">
+          <li>Soft, natural daylight as the default — golden hour and warm indoor light both work</li>
+          <li>Natural, honest skin tones — amber and peach grading, slightly desaturated</li>
+          <li>One clear subject — room to breathe around it, clean background</li>
+          <li>Shallow depth of field (f/2.8 range) — sharp subject, softly blurred background</li>
+          <li>Test composition across 1:1, 9:16, 16:9, and 4:5 before finalising</li>
+          <li>Gentle film grain for warmth and authenticity</li>
+        </ul>
+      </div>
+      <div class="dont-col">
+        <div class="dd-head"><span class="dd-badge">✗</span> Don't</div>
+        <ul class="rule-list">
+          <li>Use neon colours, muddy darks, or clashing palettes</li>
+          <li>Over-saturate or apply heavy orange/yellow filters</li>
+          <li>Use harsh studio light, hard shadows, or glossy "AI render" finishes</li>
+          <li>Crop in ways that break faces, hands, or key context</li>
+          <li>Show fear, shock, panic, blood, distress, or accident gore</li>
+          <li>Show ecstatic, theatrical, or exaggerated emotions</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════  ★ PROMPT GUIDELINES ★ ════════════════════════ -->
+<section class="sec bg-surface" id="prompts">
+  <div class="wrap">
+    <div class="sec-header fu">
+      <div class="eyebrow">Part 03 · Prompt Guidelines</div>
+      <h2 class="h2">Writing Prompts That Work</h2>
+      <p class="lead">Every strong ACKO prompt has five building blocks. Miss any one of them and the image drifts — wrong tone, wrong setting, wrong energy. These come directly from prompts that have been approved and used.</p>
+    </div>
+
+    <!-- 5-part framework -->
+    <div class="framework-grid fu">
+      <div class="fw-card">
+        <div class="fw-top"><div class="fw-num">1</div><div class="fw-label">Subject</div></div>
+        <div class="fw-body">Who is in frame. Be specific about ethnicity, age range, and clothing. Not "a woman" — name the context.
+          <div class="fw-example">e.g. "A young Indian woman in her early thirties wearing a casual light blue shirt"</div>
+        </div>
+      </div>
+      <div class="fw-card">
+        <div class="fw-top"><div class="fw-num">2</div><div class="fw-label">Action</div></div>
+        <div class="fw-body">What they're doing. Mid-motion beats posed. The action should feel like a moment you walked into.
+          <div class="fw-example">e.g. "standing calmly beside his car, phone gently held to her ear, listening attentively"</div>
+        </div>
+      </div>
+      <div class="fw-card">
+        <div class="fw-top"><div class="fw-num">3</div><div class="fw-label">Setting</div></div>
+        <div class="fw-body">Where it happens — Indian context, always specified. Mention specific Indian visual cues.
+          <div class="fw-example">e.g. "clean, well-lit Indian car service workshop" or "quiet residential street"</div>
+        </div>
+      </div>
+      <div class="fw-card">
+        <div class="fw-top"><div class="fw-num">4</div><div class="fw-label">Mood &amp; Expression</div></div>
+        <div class="fw-body">The emotional register. ACKO's band: composed, calm, trusting, quietly reassured. Never distressed.
+          <div class="fw-example">e.g. "composed and trusting, as if being guided through the next steps"</div>
+        </div>
+      </div>
+      <div class="fw-card">
+        <div class="fw-top"><div class="fw-num">5</div><div class="fw-label">Light &amp; Grade</div></div>
+        <div class="fw-body">Lighting style, colour grade, and technical feel. This line is nearly identical across all approved prompts.
+          <div class="fw-example">e.g. "soft diffused natural light, warm golden hour tones, amber and peach grading, gentle film grain"</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rules extracted from prompts -->
+    <div class="h3 fu" style="margin:48px 0 8px">10 Rules Extracted From Real Prompts</div>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:0" class="fu">These patterns appear consistently across every approved ACKO prompt. They're not arbitrary — they're what makes the images feel like ACKO.</p>
+    <div class="prules-grid fu">
+      <div class="prule"><div class="prule-icon">📐</div><div><div class="prule-title">Always specify 16:9 widescreen banner</div><div class="prule-desc">All approved prompts use "16:9 widescreen banner" as the format. This is the default output format for banners and campaigns.</div></div></div>
+      <div class="prule"><div class="prule-icon">📸</div><div><div class="prule-title">50mm lens at f/2.8 — every time</div><div class="prule-desc">This technical spec produces the shallow depth of field and cinematic feel ACKO images are known for. Never specify wide-angle or fish-eye.</div></div></div>
+      <div class="prule"><div class="prule-icon">🎭</div><div><div class="prule-title">Always say "Candid documentary feel, not posed"</div><div class="prule-desc">This phrase is in every approved prompt. It prevents the AI from defaulting to stock-photo stiffness and keeps moments natural.</div></div></div>
+      <div class="prule"><div class="prule-icon">🌅</div><div><div class="prule-title">The standard grading line — copy it exactly</div><div class="prule-desc">"Soft diffused natural light, warm golden hour tones, amber and peach color grading, slightly desaturated, gentle film grain." Use this verbatim.</div></div></div>
+      <div class="prule"><div class="prule-icon">💆</div><div><div class="prule-title">Always add "no heavy makeup"</div><div class="prule-desc">Without this, AI tools default to over-styled faces. This single phrase keeps skin natural and relatable.</div></div></div>
+      <div class="prule"><div class="prule-icon">🏠</div><div><div class="prule-title">End with the aesthetic anchor</div><div class="prule-desc">"Middle-class Indian aesthetic, modern but understated." This is the brand's tone in three words — always close with it.</div></div></div>
+      <div class="prule"><div class="prule-icon">😌</div><div><div class="prule-title">Describe calm, not distress</div><div class="prule-desc">Even in stressful moments (accident, stolen car, lost passport), the subject is composed and engaged — never panicked. ACKO is the reassurance, not the drama.</div></div></div>
+      <div class="prule"><div class="prule-icon">🚗</div><div><div class="prule-title">Add Indian vehicle cues explicitly</div><div class="prule-desc">When a car is in frame, specify "compact silver sedan with an Indian number plate." AI tools default to Western cars. Always name it.</div></div></div>
+      <div class="prule"><div class="prule-icon">🌫️</div><div><div class="prule-title">Always blur the background</div><div class="prule-desc">"Background softly blurred" appears in every prompt. It keeps the subject clear and prevents the setting from competing for attention.</div></div></div>
+      <div class="prule"><div class="prule-icon">🎬</div><div><div class="prule-title">Open with the shot format</div><div class="prule-desc">Start every prompt with "Cinematic photorealistic lifestyle photograph, 16:9 widescreen banner, shot on 50mm lens at f/2.8, shallow depth of field." This primes the model correctly.</div></div></div>
+    </div>
+
+    <!-- Template -->
+    <div class="template-box fu">
+      <div class="template-label">Master Template</div>
+      <div class="template-title">Copy, fill the slots, ship it</div>
+      <div class="template-text">Cinematic photorealistic lifestyle photograph, 16:9 widescreen banner, shot on 50mm lens at f/2.8, shallow depth of field. <em class="slot">[Subject: age, gender, clothing, ethnicity]</em>, <em class="slot">[Action: what they're doing — mid-motion]</em>. <em class="slot">[Supporting characters or objects if needed]</em>. <em class="slot">[Expression: one composed, calm descriptor]</em>. Softly blurred <em class="slot">[Indian setting description]</em> in the background. Soft diffused natural light, warm golden hour tones, amber and peach color grading, slightly desaturated, gentle film grain. Candid documentary feel, not posed. Background softly blurred. Realistic skin texture, natural composed expressions, no heavy makeup. Middle-class Indian aesthetic, modern but understated.</div>
+      <div class="template-notes">
+        <div class="tn-card"><div class="tn-title">Subject slot</div><div class="tn-body">Always specify: gender, approximate age, what they're wearing, and one behavioural cue. "A young Indian man in his early thirties wearing a casual light blue shirt and dark jeans."</div></div>
+        <div class="tn-card"><div class="tn-title">Setting slot</div><div class="tn-body">Indian context, always. Name it specifically: "clean, well-lit Indian car service workshop", "quiet residential street", "modern Indian clinic". Avoid generic or abstract settings.</div></div>
+        <div class="tn-card"><div class="tn-title">The grading line</div><div class="tn-body">Never rewrite this. "Soft diffused natural light, warm golden hour tones, amber and peach color grading, slightly desaturated, gentle film grain." This is what makes ACKO images look like ACKO.</div></div>
+      </div>
+    </div>
+
+    <!-- 7 Prompt examples -->
+    <div class="h3 fu" style="margin:64px 0 8px">7 Approved Prompts — Anatomy Breakdown</div>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:28px" class="fu">Each prompt below shows the five-part anatomy alongside the full approved text. Expand any card to read the complete prompt.</p>
+
+    <div class="prompts-grid">
+
+      <!-- 1: Garage Visit -->
+      <div class="prompt-card fu">
+        <div class="prompt-header">
+          <div class="prompt-meta">
+            <div class="prompt-tag">🔧 Motor · Care</div>
+            <div class="prompt-title">Garage Visit</div>
+            <div class="prompt-desc">Man calmly explaining a dent to his mechanic at a service workshop</div>
+          </div>
+          <div class="prompt-moment-badge mb-care">Care moment</div>
+        </div>
+        <div class="prompt-anatomy">
+          <div class="anatomy-row"><div class="anat-label">Subject</div><div class="anat-val">Young Indian man, early thirties, light blue shirt and dark jeans</div></div>
+          <div class="anatomy-row"><div class="anat-label">Action</div><div class="anat-val">Gesturing toward his car while in relaxed conversation with a mechanic</div></div>
+          <div class="anatomy-row"><div class="anat-label">Setting</div><div class="anat-val">Clean, well-lit Indian car service workshop — tools on pegboard, another car in background</div></div>
+          <div class="anatomy-row"><div class="anat-label">Mood</div><div class="anat-val">Composed, easy — "the quiet rapport of a problem already being handled"</div></div>
+          <div class="anatomy-row"><div class="anat-label">Light</div><div class="anat-val">Soft diffused natural light from a large open shutter, warm golden hour, amber &amp; peach grade</div></div>
+        </div>
+        <div class="prompt-insights">
+          <div class="insight-title">What makes it work</div>
+          <div class="insight-tags">
+            <span class="ins-tag">Calm, not distressed</span>
+            <span class="ins-tag">Indian number plate on car</span>
+            <span class="ins-tag">Minor dent — "subtle and understated"</span>
+            <span class="ins-tag">Supporting character (mechanic)</span>
+            <span class="ins-tag">Candid documentary</span>
+          </div>
+        </div>
+        <div class="prompt-full" id="p1">
+          <div class="prompt-text">Cinematic photorealistic lifestyle photograph, 16:9 widescreen banner, shot on 50mm lens at f/2.8, shallow depth of field. A young Indian man in his early thirties wearing a casual light blue shirt and dark jeans, standing inside a clean, well-lit car service workshop, having a relaxed conversation with a friendly mechanic in a navy work uniform. The man is gesturing gently with one hand toward his car parked just beside them, explaining something calmly. The mechanic listens attentively with a small reassuring nod. The car — a compact silver sedan with an Indian number plate — has a subtle, minor dent on the front bumper, understated and barely noticeable. Both men have composed, easy expressions, the quiet rapport of a problem already being handled. Softly blurred modern Indian car workshop interior with neatly arranged tools on a pegboard, another car being worked on in the far background, and warm overhead lighting. Soft diffused natural light streaming in from a large open shutter on the left, warm golden hour tones, amber and peach color grading, slightly desaturated, gentle film grain. Candid documentary feel, not posed. Background softly blurred. Realistic skin texture, natural composed expressions, no heavy makeup. Middle-class Indian aesthetic, modern but understated.</div>
+        </div>
+        <button class="prompt-toggle" onclick="togglePrompt('p1',this)">View full prompt <span class="toggle-icon" id="ti-p1">▾</span></button>
+      </div>
+
+      <!-- 2: Minor Accident -->
+      <div class="prompt-card fu d1">
+        <div class="prompt-header">
+          <div class="prompt-meta">
+            <div class="prompt-tag">🚗 Motor · Reassurance</div>
+            <div class="prompt-title">Minor Accident</div>
+            <div class="prompt-desc">Woman calmly on a call by her dented car on a residential street</div>
+          </div>
+          <div class="prompt-moment-badge mb-care">Care moment</div>
+        </div>
+        <div class="prompt-anatomy">
+          <div class="anatomy-row"><div class="anat-label">Subject</div><div class="anat-val">Young Indian woman, early thirties, casual light blue shirt</div></div>
+          <div class="anatomy-row"><div class="anat-label">Action</div><div class="anat-val">Phone to ear, listening attentively with a small reassured nod</div></div>
+          <div class="anatomy-row"><div class="anat-label">Setting</div><div class="anat-val">Quiet residential Indian street, leafy neighbourhood, car with minor dent</div></div>
+          <div class="anatomy-row"><div class="anat-label">Mood</div><div class="anat-val">"Composed and trusting, as if being guided through the next steps"</div></div>
+          <div class="anatomy-row"><div class="anat-label">Light</div><div class="anat-val">Warm light filtering through trees, golden hour, amber &amp; peach grade</div></div>
+        </div>
+        <div class="prompt-insights">
+          <div class="insight-title">What makes it work</div>
+          <div class="insight-tags">
+            <span class="ins-tag">Reassurance without drama</span>
+            <span class="ins-tag">Dent is subtle, not the hero</span>
+            <span class="ins-tag">ACKO implied = the voice on the phone</span>
+            <span class="ins-tag">Leafy Indian street</span>
+          </div>
+        </div>
+        <div class="prompt-full" id="p2">
+          <div class="prompt-text">Cinematic photorealistic lifestyle photograph, 16:9 widescreen banner, shot on 50mm lens at f/2.8, shallow depth of field. A young Indian women in her early thirties wearing a casual light blue shirt, standing calmly beside his compact sedan on a quiet residential street, phone gently held to her ear, listening attentively with a small reassured nod. The car has a minor dent on the front bumper, subtle and understated. Her expression is composed and trusting, as if being guided through the next steps. Softly blurred leafy Indian neighbourhood in the background with warm light filtering through the trees. Soft diffused natural light, warm golden hour tones, amber and peach color grading, slightly desaturated, gentle film grain. Candid documentary feel, not posed. Background softly blurred. Realistic skin texture, natural composed expression, no heavy makeup. Middle-class Indian aesthetic, modern but understated.</div>
+        </div>
+        <button class="prompt-toggle" onclick="togglePrompt('p2',this)">View full prompt <span class="toggle-icon" id="ti-p2">▾</span></button>
+      </div>
+
+      <!-- 3: Health Checkup -->
+      <div class="prompt-card fu">
+        <div class="prompt-header">
+          <div class="prompt-meta">
+            <div class="prompt-tag">🏥 Health · Care</div>
+            <div class="prompt-title">Health Checkup</div>
+            <div class="prompt-desc">Young family at a doctor's consultation in a modern Indian clinic</div>
+          </div>
+          <div class="prompt-moment-badge mb-care">Care moment</div>
+        </div>
+        <div class="prompt-anatomy">
+          <div class="anatomy-row"><div class="anat-label">Subject</div><div class="anat-val">Young Indian couple with their toddler son, across from a friendly doctor</div></div>
+          <div class="anatomy-row"><div class="anat-label">Action</div><div class="anat-val">Mother holding child on her lap; father leaning forward listening attentively</div></div>
+          <div class="anatomy-row"><div class="anat-label">Setting</div><div class="anat-val">Warmly lit modern Indian clinic, soft beige wall, small medical chart</div></div>
+          <div class="anatomy-row"><div class="anat-label">Mood</div><div class="anat-val">Engaged, attentive, calm — "natural expressions, middle-class Indian aesthetic"</div></div>
+          <div class="anatomy-row"><div class="anat-label">Light</div><div class="anat-val">Soft diffused window light, warm amber and peach grade, gentle film grain</div></div>
+        </div>
+        <div class="prompt-insights">
+          <div class="insight-title">What makes it work</div>
+          <div class="insight-tags">
+            <span class="ins-tag">Three-generation casting</span>
+            <span class="ins-tag">Doctor = friendly, not authoritative</span>
+            <span class="ins-tag">Indian clinic interior</span>
+            <span class="ins-tag">Care without fear or distress</span>
+          </div>
+        </div>
+        <div class="prompt-full" id="p3">
+          <div class="prompt-text">Cinematic photorealistic lifestyle photograph, 16:9 widescreen banner, shot on 50mm lens at f/2.8, shallow depth of field. A young Indian couple with their toddler son sitting across from a friendly male doctor in a white coat, the mother holding the child on her lap, the father leaning slightly forward listening attentively. Clean, warmly lit modern Indian clinic with a soft beige wall and a small medical chart in the background. Soft diffused window light, warm amber and peach color grading, slightly desaturated, gentle film grain. Candid documentary feel. Realistic skin texture, natural expressions, middle-class Indian aesthetic.</div>
+        </div>
+        <button class="prompt-toggle" onclick="togglePrompt('p3',this)">View full prompt <span class="toggle-icon" id="ti-p3">▾</span></button>
+      </div>
+
+      <!-- 4: Passport Lost -->
+      <div class="prompt-card fu d1">
+        <div class="prompt-header">
+          <div class="prompt-meta">
+            <div class="prompt-tag">✈️ Travel · Distress</div>
+            <div class="prompt-title">Passport Lost</div>
+            <div class="prompt-desc">Man rummaging anxiously through his bag at an airport — the one exception where worry is shown</div>
+          </div>
+          <div class="prompt-moment-badge mb-travel">Travel moment</div>
+        </div>
+        <div class="prompt-anatomy">
+          <div class="anatomy-row"><div class="anat-label">Subject</div><div class="anat-val">Young Indian man, late twenties, casual beige linen shirt, at an airport bench</div></div>
+          <div class="anatomy-row"><div class="anat-label">Action</div><div class="anat-val">Hands rummaging anxiously through an open backpack, travel documents spilling out</div></div>
+          <div class="anatomy-row"><div class="anat-label">Setting</div><div class="anat-val">Airport or hotel lobby bench, large glass windows suggesting a terminal, travellers blurred behind</div></div>
+          <div class="anatomy-row"><div class="anat-label">Mood</div><div class="anat-val">"Worried and distressed expression as he realises something is missing" — the one permitted anxiety shot</div></div>
+          <div class="anatomy-row"><div class="anat-label">Light</div><div class="anat-val">Soft diffused natural light from large windows, warm golden hour tones</div></div>
+        </div>
+        <div class="prompt-insights">
+          <div class="insight-title">What makes it work</div>
+          <div class="insight-tags">
+            <span class="ins-tag">Exception: worry is the hook</span>
+            <span class="ins-tag">Anxiety is the before — ACKO is the after</span>
+            <span class="ins-tag">Airport context is universal</span>
+            <span class="ins-tag">Cabin suitcase = middle-class travel</span>
+          </div>
+        </div>
+        <div class="prompt-full" id="p4">
+          <div class="prompt-text">Cinematic photorealistic lifestyle photograph, 16:9 widescreen banner, shot on 50mm lens at f/2.8, shallow depth of field. A young Indian man in his late twenties wearing a casual beige linen shirt, seated on a bench at an airport or hotel lobby, hands rummaging anxiously through an open backpack on his lap, travel documents and a boarding pass spilling slightly out, a worried and distressed expression on his face as he realises something is missing. A small wheeled cabin suitcase rests beside his feet; softly blurred travellers and large glass windows in the background suggest an airport terminal. Soft diffused natural light from large windows on the left, warm golden hour tones, amber and peach color grading, slightly desaturated, gentle film grain. Candid documentary feel, not posed. Background softly blurred. Realistic skin texture, natural worried expression, no heavy makeup. Middle-class Indian aesthetic, modern but understated.</div>
+        </div>
+        <button class="prompt-toggle" onclick="togglePrompt('p4',this)">View full prompt <span class="toggle-icon" id="ti-p4">▾</span></button>
+      </div>
+
+      <!-- 5: Baggage Lost -->
+      <div class="prompt-card fu">
+        <div class="prompt-header">
+          <div class="prompt-meta">
+            <div class="prompt-tag">🧳 Travel · Reassurance</div>
+            <div class="prompt-title">Baggage Lost</div>
+            <div class="prompt-desc">Woman at an airline service desk, calmly getting assistance from a staff member</div>
+          </div>
+          <div class="prompt-moment-badge mb-travel">Travel moment</div>
+        </div>
+        <div class="prompt-anatomy">
+          <div class="anatomy-row"><div class="anat-label">Subject</div><div class="anat-val">Young Indian woman, comfortable travel kurta, at an airline service desk</div></div>
+          <div class="anatomy-row"><div class="anat-label">Action</div><div class="anat-val">Listening attentively to staff, boarding pass and ID held in hand</div></div>
+          <div class="anatomy-row"><div class="anat-label">Setting</div><div class="anat-val">Airport interior, warm light, travellers softly blurred in background</div></div>
+          <div class="anatomy-row"><div class="anat-label">Mood</div><div class="anat-val">"Calm and engaged" — problem is being solved, not panicked about</div></div>
+          <div class="anatomy-row"><div class="anat-label">Light</div><div class="anat-val">Soft diffused natural light from windows, warm golden hour, amber &amp; peach grade</div></div>
+        </div>
+        <div class="prompt-insights">
+          <div class="insight-title">What makes it work</div>
+          <div class="insight-tags">
+            <span class="ins-tag">Resolution, not crisis</span>
+            <span class="ins-tag">Staff = helpful, not harried</span>
+            <span class="ins-tag">Travel kurta = regionally honest</span>
+            <span class="ins-tag">Boarding pass as prop = authentic detail</span>
+          </div>
+        </div>
+        <div class="prompt-full" id="p5">
+          <div class="prompt-text">Cinematic photorealistic lifestyle photograph, 16:9 widescreen banner, shot on 50mm lens at f/2.8, shallow depth of field. A young Indian woman in a comfortable travel kurta standing at an airline service desk, in a relaxed conversation with a friendly uniformed staff member behind the counter who is looking at a screen and gesturing helpfully. The woman listens attentively, boarding pass and ID gently held in her hand. Her expression is calm and engaged. Softly blurred airport interior with warm light and a few travellers in the background. Soft diffused natural light from the windows, warm golden hour tones, amber and peach color grading, slightly desaturated, gentle film grain. Candid documentary feel, not posed. Background softly blurred. Realistic skin texture, natural composed expression, no heavy makeup. Middle-class Indian aesthetic, modern but understated.</div>
+        </div>
+        <button class="prompt-toggle" onclick="togglePrompt('p5',this)">View full prompt <span class="toggle-icon" id="ti-p5">▾</span></button>
+      </div>
+
+      <!-- 6: Renewal / Policy Purchase -->
+      <div class="prompt-card fu d1">
+        <div class="prompt-header">
+          <div class="prompt-meta">
+            <div class="prompt-tag">📋 Purchase · Pre-buy</div>
+            <div class="prompt-title">Renewal / Policy Purchase</div>
+            <div class="prompt-desc">Son and elderly father reviewing insurance together at the family dining table</div>
+          </div>
+          <div class="prompt-moment-badge mb-purchase">Pre-purchase</div>
+        </div>
+        <div class="prompt-anatomy">
+          <div class="anatomy-row"><div class="anat-label">Subject</div><div class="anat-val">Young Indian man, early thirties, seated beside his elderly father at a dining table</div></div>
+          <div class="anatomy-row"><div class="anat-label">Action</div><div class="anat-val">Son gesturing as he explains something on a tablet tilted toward his father</div></div>
+          <div class="anatomy-row"><div class="anat-label">Setting</div><div class="anat-val">Warm Indian family home — wooden cabinet, small potted plant, soft window light</div></div>
+          <div class="anatomy-row"><div class="anat-label">Mood</div><div class="anat-val">"The quiet rapport of two generations sorting something out together"</div></div>
+          <div class="anatomy-row"><div class="anat-label">Light</div><div class="anat-val">Soft diffused window light, warm golden hour tones, amber &amp; peach grade</div></div>
+        </div>
+        <div class="prompt-insights">
+          <div class="insight-title">What makes it work</div>
+          <div class="insight-tags">
+            <span class="ins-tag">Two-generation casting</span>
+            <span class="ins-tag">Tea cup as home anchor</span>
+            <span class="ins-tag">Tablet = modern but family-scale</span>
+            <span class="ins-tag">"Quiet rapport" — not a pitch, a conversation</span>
+          </div>
+        </div>
+        <div class="prompt-full" id="p6">
+          <div class="prompt-text">Cinematic photorealistic lifestyle photograph, 16:9 widescreen banner, shot on 50mm lens at f/2.8, shallow depth of field. A young Indian man in his early thirties seated beside his elderly father at the dining table of their family home, both looking thoughtfully at a tablet the son is holding slightly tilted toward his father. The son is gesturing gently as he explains something, while the father listens with a calm, engaged expression, a cup of tea resting beside him. The quiet rapport of two generations sorting something out together. Softly blurred warm Indian family home interior with a wooden cabinet, a small potted plant, and a window letting in soft light in the background. Soft diffused natural light from a window, warm golden hour tones, amber and peach color grading, slightly desaturated, gentle film grain. Candid documentary feel, not posed. Background softly blurred. Realistic skin texture, natural composed expressions, no heavy makeup. Middle-class Indian aesthetic, modern but understated.</div>
+        </div>
+        <button class="prompt-toggle" onclick="togglePrompt('p6',this)">View full prompt <span class="toggle-icon" id="ti-p6">▾</span></button>
+      </div>
+
+      <!-- 7: Car Stolen -->
+      <div class="prompt-card fu" style="grid-column:1 / -1;max-width:600px">
+        <div class="prompt-header">
+          <div class="prompt-meta">
+            <div class="prompt-tag">🚔 Motor · Post-incident</div>
+            <div class="prompt-title">Car Stolen</div>
+            <div class="prompt-desc">Man calmly filing a report at a police station — process, not panic</div>
+          </div>
+          <div class="prompt-moment-badge mb-care">Care moment</div>
+        </div>
+        <div class="prompt-anatomy">
+          <div class="anatomy-row"><div class="anat-label">Subject</div><div class="anat-val">Young Indian man, casual shirt, seated at a police station desk</div></div>
+          <div class="anatomy-row"><div class="anat-label">Action</div><div class="anat-val">Calmly going through paperwork with a friendly uniformed officer</div></div>
+          <div class="anatomy-row"><div class="anat-label">Setting</div><div class="anat-val">Clean, well-lit Indian police station, soft beige wall, notice board in background</div></div>
+          <div class="anatomy-row"><div class="anat-label">Mood</div><div class="anat-val">"Composed and engaged, the unhurried look of someone simply taking the next step"</div></div>
+          <div class="anatomy-row"><div class="anat-label">Light</div><div class="anat-val">Standard ACKO grading — warm, soft, desaturated, film grain</div></div>
+        </div>
+        <div class="prompt-insights">
+          <div class="insight-title">What makes it work</div>
+          <div class="insight-tags">
+            <span class="ins-tag">Process framing — not crime scene</span>
+            <span class="ins-tag">Officer is friendly, not intimidating</span>
+            <span class="ins-tag">Phone on desk = ACKO has already helped</span>
+            <span class="ins-tag">"Simply taking the next step" = calm agency</span>
+          </div>
+        </div>
+        <div class="prompt-full" id="p7">
+          <div class="prompt-text">Cinematic photorealistic lifestyle photograph, 16:9 widescreen banner, shot on 50mm lens at f/2.8, shallow depth of field. A young Indian man in a casual shirt seated across a wooden desk from a friendly uniformed officer at a clean, well-lit police station, calmly going through some paperwork together. His phone rests on the desk beside him. His expression is composed and engaged, the unhurried look of someone simply taking the next step. Softly blurred modest Indian police station interior with a soft beige wall and a notice board in the background. Soft diffused natural light, warm golden hour tones, amber and peach color grading, slightly desaturated, gentle film grain. Candid documentary feel, not posed. Background softly blurred. Realistic skin texture, natural composed expressions, no heavy makeup. Middle-class Indian aesthetic, modern but understated.</div>
+        </div>
+        <button class="prompt-toggle" onclick="togglePrompt('p7',this)">View full prompt <span class="toggle-icon" id="ti-p7">▾</span></button>
+      </div>
+
+    </div><!-- /prompts-grid -->
+  </div>
+</section>
+
+<!-- ═══════════════  AI RULES ══════════════════════════════════════ -->
+<section class="sec bg-dark" id="ai">
+  <div class="wrap">
+    <div class="sec-header fu">
+      <div class="eyebrow white">Part 04 · AI Generation</div>
+      <h2 class="h2 white">AI Image Rules</h2>
+      <p class="lead white">Most ACKO imagery is AI-generated. These rules keep output safe, consistent, and legally clean.</p>
+    </div>
+    <div class="dd-grid fu">
+      <div class="do-col">
+        <div class="dd-head"><span class="dd-badge">✓</span> Do</div>
+        <ul class="rule-list">
+          <li>Use approved tools only, on commercial-use plans</li>
+          <li>Follow the five-part prompt framework — Subject, Action, Setting, Mood, Light</li>
+          <li>Inspect every image: hands, eyes, text on signs, repeating patterns</li>
+          <li>Save the prompt, tool name, and seed alongside the final asset</li>
+          <li>Label images 'Illustrative' if they could be mistaken for a real event</li>
+          <li>Human review before publishing — always</li>
+        </ul>
+      </div>
+      <div class="dont-col">
+        <div class="dd-head"><span class="dd-badge">✗</span> Don't</div>
+        <ul class="rule-list">
+          <li>Reference copyrighted styles ("in the style of Pixar", "like Studio Ghibli")</li>
+          <li>Name competitors, athletes, or public figures in prompts</li>
+          <li>Use unlicensed reference photos in image-to-image tools</li>
+          <li>Publish AI images with visible errors — even small ones</li>
+          <li>Auto-publish without a human review step</li>
+        </ul>
+      </div>
+    </div>
+    <div style="margin-top:40px" class="fu">
+      <h3 class="h3 white" style="margin-bottom:20px">Common Failures &amp; Fixes</h3>
+      <table class="fail-table">
+        <thead><tr><th>Failure</th><th>Fix</th></tr></thead>
+        <tbody>
+          <tr><td>Plastic, perfect skin</td><td>Add "natural skin texture, slight imperfections, candid" to the prompt.</td></tr>
+          <tr><td>Wrong or melted hands</td><td>Generate at higher resolution; crop hands out; or regenerate with explicit hand placement.</td></tr>
+          <tr><td>Off or uncanny eyes</td><td>Regenerate or use a touch-up tool. Never publish as-is — even subtle wrongness reads.</td></tr>
+          <tr><td>Generic Western setting</td><td>Add Indian cues: vehicle type, signage language, clothing, architecture.</td></tr>
+          <tr><td>Stock-photo smile</td><td>Specify "candid, mid-conversation, unposed".</td></tr>
+          <tr><td>Garbled signage or text</td><td>Remove in post, or specify "no visible text" in the prompt.</td></tr>
+          <tr><td>Identical faces across a campaign</td><td>Vary prompts deliberately on age, region, and body type.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════  COMPLIANCE ════════════════════════════════════ -->
+<section class="sec bg-surface" id="compliance">
+  <div class="wrap">
+    <div class="sec-header fu">
+      <div class="eyebrow">Part 05 · Compliance</div>
+      <h2 class="h2">IRDAI &amp; Legal Requirements</h2>
+      <p class="lead">Non-negotiable. No creative exception overrides these.</p>
+    </div>
+    <div class="comp-rows fu">
+      <div class="comp-row"><div class="comp-label">No false promises</div><div class="comp-rule">Images cannot promise what the policy doesn't deliver.</div></div>
+      <div class="comp-row"><div class="comp-label">Disclaimer visible</div><div class="comp-rule">The standard IRDAI disclaimer must appear alongside any benefit claim.</div></div>
+      <div class="comp-row"><div class="comp-label">Written consent</div><div class="comp-rule">No real customers, employees, or public figures without written consent.</div></div>
+      <div class="comp-row"><div class="comp-label">Legal review</div><div class="comp-rule">Anything tied to a product claim goes through legal review before publishing.</div></div>
+      <div class="comp-row"><div class="comp-label">Approval records</div><div class="comp-rule">Keep records of prompts, tools, and approvals for every image.</div></div>
+      <div class="comp-row"><div class="comp-label">Scope check</div><div class="comp-rule">Don't update images across markets without checking the original approval scope.</div></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════  CHECKLIST ══════════════════════════════════════ -->
+<section class="sec bg-surface" id="checklist">
+  <div class="wrap">
+    <div class="sec-header fu">
+      <div class="eyebrow">Part 06 · Self-Check</div>
+      <h2 class="h2">Before Anything Ships</h2>
+      <p class="lead">Run through this before sending for review. Click each item to check it off.</p>
+    </div>
+    <div class="cklist-cols fu">
+      <div>
+        <div class="cklist-group">
+          <div class="ckg-title">People</div>
+          <div class="cki"><div class="ckbox" onclick="this.classList.toggle('on')"></div>Real-looking Indian people, diverse by default</div>
+          <div class="cki"><div class="ckbox" onclick="this.classList.toggle('on')"></div>Cast across ≥3 axes: skin tone, age, region, body type, life stage</div>
+          <div class="cki"><div class="ckbox" onclick="this.classList.toggle('on')"></div>Mid-action moments, not stiff poses</div>
+          <div class="cki"><div class="ckbox" onclick="this.classList.toggle('on')"></div>Contemporary, regionally honest Indian clothing</div>
+          <div class="cki"><div class="ckbox" onclick="this.classList.toggle('on')"></div>No AI artefacts — hands, eyes, and skin all look right</div>
+        </div>
+        <div class="cklist-group">
+          <div class="ckg-title">Place &amp; Setting</div>
+          <div class="cki"><div class="ckbox" onclick="this.classList.toggle('on')"></div>Real Indian context — homes, streets, hospitals, vehicles</div>
+          <div class="cki"><div class="ckbox" onclick="this.classList.toggle('on')"></div>Right-hand drive, Indian number plates if vehicles present</div>
+          <div class="cki"><div class="ckbox" onclick="this.classList.toggle('on')"></div>No foreign settings, no outdated environments</div>
+          <div class="cki"><div class="ckbox" onclick="this.classList.toggle('on')"></div>No real brand names or competitor visuals</div>
+        </div>
+        <div class="cklist-group">
+          <div class="ckg-title">Look &amp; Feel</div>
+          <div class="cki"><div class="ckbox" onclick="this.classList.toggle('on')"></div>Soft, natural daylight — no harsh studio light</div>
+          <div class="cki"><div class="ckbox" onclick="this.classList.toggle('on')"></div>Natural skin tones — amber &amp; peach grade, slightly desaturated</div>
+          <div class="cki"><div class="ckbox" onclick="this.classList.toggle('on')"></div>One clear subject, room to breathe, background blurred</div>
+          <div class="cki"><div class="ckbox" onclick="this.classList.toggle('on')"></div>Tested across 1:1, 9:16, 16:9, and 4:5</div>
+        </div>
+      </div>
+      <div>
+        <div class="cklist-group">
+          <div class="ckg-title">Prompts &amp; AI</div>
+          <div class="cki"><div class="ckbox" onclick="this.classList.toggle('on')"></div>Approved tool on commercial-use plan</div>
+          <div class="cki"><div class="ckbox" onclick="this.classList.toggle('on')"></div>Full 5-part prompt used: Subject · Action · Setting · Mood · Light</div>
+          <div class="cki"><div class="ckbox" onclick="this.classList.toggle('on')"></div>Standard grading line included verbatim</div>
+          <div class="cki"><div class="ckbox" onclick="this.classList.toggle('on')"></div>"Candid documentary feel, not posed" included</div>
+          <div class="cki"><div class="ckbox" onclick="this.classList.toggle('on')"></div>Inspected for hands, eyes, text, signage errors</div>
+          <div class="cki"><div class="ckbox" onclick="this.classList.toggle('on')"></div>Prompt, tool name, and seed saved with asset</div>
+          <div class="cki"><div class="ckbox" onclick="this.classList.toggle('on')"></div>Human review complete — not auto-published</div>
+        </div>
+        <div class="cklist-group">
+          <div class="ckg-title">Compliance &amp; Legal</div>
+          <div class="cki"><div class="ckbox" onclick="this.classList.toggle('on')"></div>Image is honest about what ACKO delivers</div>
+          <div class="cki"><div class="ckbox" onclick="this.classList.toggle('on')"></div>IRDAI disclaimer visible alongside any benefit claim</div>
+          <div class="cki"><div class="ckbox" onclick="this.classList.toggle('on')"></div>Written consent obtained for any real person</div>
+          <div class="cki"><div class="ckbox" onclick="this.classList.toggle('on')"></div>Legal sign-off for any product claim image</div>
+        </div>
+        <div class="cklist-group">
+          <div class="ckg-title">Process</div>
+          <div class="cki"><div class="ckbox" onclick="this.classList.toggle('on')"></div>Image tier set at brief stage</div>
+          <div class="cki"><div class="ckbox" onclick="this.classList.toggle('on')"></div>This self-check complete before sending for review</div>
+          <div class="cki"><div class="ckbox" onclick="this.classList.toggle('on')"></div>Final asset saved in correct folder with proper naming</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════  CLOSING ════════════════════════════════════════ -->
+<section class="closing">
+  <div class="closing-inner">
+    <div class="closing-bar"></div>
+    <div class="closing-q">The point of these guidelines isn't control — it's <span class="grad">consistency.</span></div>
+    <p class="closing-sub">ACKO has a personality. Every image is a chance to make that personality recognisable in five seconds. Every shortcut chips away at it.</p>
+  </div>
+</section>
+
+<!-- ═══════════════  FOOTER ════════════════════════════════════════ -->
+<footer>
+  <p>© 2024 ACKO Technology &amp; Insurance Ltd. — Brand Image Usage Guidelines v2.0</p>
+  <div class="foot-logo">ACKO</div>
+</footer>
+
+<script>
+// Progress bar
+const bar = document.getElementById('bar');
+window.addEventListener('scroll', () => {
+  const p = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+  bar.style.width = (p * 100) + '%';
+}, { passive: true });
+
+// Fade-up observer
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); } });
+}, { threshold: 0.08, rootMargin: '0px 0px -32px 0px' });
+document.querySelectorAll('.fu').forEach(el => obs.observe(el));
+
+// Nav active
+const secs = document.querySelectorAll('section[id]');
+const links = document.querySelectorAll('.nav-links a');
+window.addEventListener('scroll', () => {
+  let cur = '';
+  secs.forEach(s => { if (window.scrollY >= s.offsetTop - 90) cur = s.id; });
+  links.forEach(a => {
+    const active = a.getAttribute('href') === '#' + cur;
+    if (!a.classList.contains('nav-pill')) {
+      a.classList.toggle('active', active);
+    }
+  });
+}, { passive: true });
+
+// Prompt toggle
+function togglePrompt(id, btn) {
+  const el = document.getElementById(id);
+  const icon = btn.querySelector('.toggle-icon');
+  const isOpen = el.classList.contains('open');
+  el.classList.toggle('open', !isOpen);
+  icon.classList.toggle('open', !isOpen);
+  btn.querySelector('.toggle-icon').textContent = isOpen ? '▾' : '▴';
+}
+</script>
+</body>
+</html>
