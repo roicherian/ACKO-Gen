@@ -47,17 +47,49 @@ ALLOWED_EMAIL_DOMAIN = "acko.tech"
 SESSION_TTL_SECONDS = 12 * 60 * 60  # 12 hours
 SESSION_SECRET_FILE = os.path.join(HTML_DIR, ".session_secret")
 ALLOWLIST_FILE = os.path.join(HTML_DIR, "allowed_emails.json")
+PENDING_FILE = os.path.join(HTML_DIR, "pending_requests.json")
 
 
-def get_allowed_emails():
-    """Emails marked 'Yes' in the permission sheet, synced into allowed_emails.json.
-    Fails safe: if the file is missing or unreadable, nobody is allowed in."""
+def get_permissions():
+    """Reads allowed_emails.json, synced from the permission sheet's Emails/Permissions
+    columns. Returns (approved_set, denied_set). Fails safe: if the file is missing or
+    unreadable, both sets are empty — nobody is allowed in, nobody is hard-denied either
+    (they'll just show as pending until the sync catches up).
+
+    Back-compat: older syncs wrote {"emails": [...]} meaning approved-only.
+    """
     try:
         with open(ALLOWLIST_FILE, "r") as f:
             data = json.load(f)
-        return {e.strip().lower() for e in data.get("emails", [])}
+        approved = {e.strip().lower() for e in data.get("approved", data.get("emails", []))}
+        denied = {e.strip().lower() for e in data.get("denied", [])}
+        return approved, denied
     except Exception:
-        return set()
+        return set(), set()
+
+
+def get_allowed_emails():
+    """Back-compat helper — just the approved set."""
+    approved, _denied = get_permissions()
+    return approved
+
+
+def record_pending_request(email):
+    """Note a login attempt from an email with no decision yet, so the next sheet sync
+    can mark the 'Request Pending' column for them. Idempotent — safe to call every attempt."""
+    try:
+        with open(PENDING_FILE, "r") as f:
+            data = json.load(f)
+    except Exception:
+        data = {"requests": []}
+    existing = {r.get("email", "").lower() for r in data.get("requests", [])}
+    if email not in existing:
+        data.setdefault("requests", []).append({"email": email, "requestedAt": time.time()})
+        try:
+            with open(PENDING_FILE, "w") as f:
+                json.dump(data, f, indent=2)
+        except Exception:
+            pass
 
 
 def get_session_secret():
@@ -216,7 +248,15 @@ class ProxyHandler(BaseHTTPRequestHandler):
             if "@" not in email or not email.endswith("@" + ALLOWED_EMAIL_DOMAIN):
                 self.send_json(403, {"error": f"Access is limited to @{ALLOWED_EMAIL_DOMAIN} email addresses."})
                 return
-            if email not in get_allowed_emails():
+            approved, denied = get_permissions()
+            if email in denied:
+                self.send_json(403, {
+                    "error": "Your access request was declined by Roy Cherian.",
+                    "denied": True,
+                })
+                return
+            if email not in approved:
+                record_pending_request(email)
                 self.send_json(403, {
                     "error": "Your request has been sent to Roy Cherian for approval.",
                     "pending": True,

@@ -601,6 +601,10 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
   border: 3px solid var(--purple-l); border-top-color: var(--purple);
   animation: spin .8s linear infinite;
 }
+.login-denied-icon {
+  width: 40px; height: 40px; margin: 0 auto 14px; color: var(--red);
+}
+.login-denied-icon svg { width: 100%; height: 100%; }
 
 /* SCROLLBAR */
 ::-webkit-scrollbar { width: 4px; }
@@ -646,6 +650,18 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
       <div class="login-sub">
         Your access request for <strong id="pendingEmailLabel"></strong> has been sent to <strong>Roy Cherian</strong>.
         This page will unlock automatically as soon as you're approved.
+      </div>
+      <button class="login-btn-secondary" onclick="cancelPendingLogin()">Use a different email</button>
+    </div>
+
+    <div id="loginDeniedView" class="hidden">
+      <div class="login-denied-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+      </div>
+      <div class="login-title">Access declined</div>
+      <div class="login-sub">
+        Your access request for <strong id="deniedEmailLabel"></strong> was declined by <strong>Roy Cherian</strong>.
+        Reach out to them directly if you think this is a mistake.
       </div>
       <button class="login-btn-secondary" onclick="cancelPendingLogin()">Use a different email</button>
     </div>
@@ -1473,11 +1489,19 @@ function hideLoginGate(email) {
 function showLoginForm() {
   document.getElementById('loginFormView').classList.remove('hidden');
   document.getElementById('loginPendingView').classList.add('hidden');
+  document.getElementById('loginDeniedView').classList.add('hidden');
 }
 function showPendingView(email) {
   document.getElementById('loginFormView').classList.add('hidden');
   document.getElementById('loginPendingView').classList.remove('hidden');
+  document.getElementById('loginDeniedView').classList.add('hidden');
   document.getElementById('pendingEmailLabel').textContent = email;
+}
+function showDeniedView(email) {
+  document.getElementById('loginFormView').classList.add('hidden');
+  document.getElementById('loginPendingView').classList.add('hidden');
+  document.getElementById('loginDeniedView').classList.remove('hidden');
+  document.getElementById('deniedEmailLabel').textContent = email;
 }
 
 async function attemptLogin(email) {
@@ -1518,6 +1542,11 @@ async function submitLogin() {
       startPendingPoll(email);
       return;
     }
+    if (data.denied) {
+      localStorage.removeItem(PENDING_EMAIL_KEY);
+      showDeniedView(email);
+      return;
+    }
     errEl.textContent = data.error || 'Sign-in failed.';
   } catch (e) {
     errEl.textContent = 'Could not reach the local proxy. Is proxy.py running?';
@@ -1537,6 +1566,10 @@ function startPendingPoll(email) {
         setSession(data.token, data.email);
         localStorage.removeItem(PENDING_EMAIL_KEY);
         hideLoginGate(data.email);
+      } else if (data.denied) {
+        stopPendingPoll();
+        localStorage.removeItem(PENDING_EMAIL_KEY);
+        showDeniedView(email);
       }
       // Still pending (or a transient error) — keep waiting silently.
     } catch { /* proxy hiccup — just try again next tick */ }
