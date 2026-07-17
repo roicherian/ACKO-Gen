@@ -25,6 +25,18 @@ HTML_DIR = os.path.dirname(os.path.abspath(__file__))
 ALLOWED_EMAIL_DOMAIN = "acko.tech"
 SESSION_TTL_SECONDS = 12 * 60 * 60  # 12 hours
 SESSION_SECRET_FILE = os.path.join(HTML_DIR, ".session_secret")
+ALLOWLIST_FILE = os.path.join(HTML_DIR, "allowed_emails.json")
+
+
+def get_allowed_emails():
+    """Emails marked 'Yes' in the permission sheet, synced into allowed_emails.json.
+    Fails safe: if the file is missing or unreadable, nobody is allowed in."""
+    try:
+        with open(ALLOWLIST_FILE, "r") as f:
+            data = json.load(f)
+        return {e.strip().lower() for e in data.get("emails", [])}
+    except Exception:
+        return set()
 
 
 def get_session_secret():
@@ -67,8 +79,10 @@ def verify_session(token):
         return False, None
     if payload.get("exp", 0) < time.time():
         return False, None
-    email = payload.get("email", "")
-    if not email.lower().endswith("@" + ALLOWED_EMAIL_DOMAIN):
+    email = payload.get("email", "").lower()
+    if not email.endswith("@" + ALLOWED_EMAIL_DOMAIN):
+        return False, None
+    if email not in get_allowed_emails():
         return False, None
     return True, email
 
@@ -179,6 +193,9 @@ class ProxyHandler(BaseHTTPRequestHandler):
             email = str(data.get("email", "")).strip().lower()
             if "@" not in email or not email.endswith("@" + ALLOWED_EMAIL_DOMAIN):
                 self.send_json(403, {"error": f"Access is limited to @{ALLOWED_EMAIL_DOMAIN} email addresses."})
+                return
+            if email not in get_allowed_emails():
+                self.send_json(403, {"error": "Your email hasn't been granted access yet. Ask an admin to mark 'Yes' for you in the permission sheet."})
                 return
             token = make_session(email)
             self.send_json(200, {"token": token, "email": email, "expiresIn": SESSION_TTL_SECONDS})
