@@ -17,6 +17,8 @@ import urllib.error
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import os
 
+import user_store
+
 PORT = 3458
 MAGNIFIC_BASE = "https://api.magnific.com"
 HTML_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -47,22 +49,10 @@ ALLOWED_EMAIL_DOMAIN = "acko.tech"
 SESSION_TTL_SECONDS = 12 * 60 * 60  # 12 hours
 SESSION_SECRET_FILE = os.path.join(HTML_DIR, ".session_secret")
 
-# TODO: permission storage is being rebuilt as a native in-app DB table with
-# admin-managed permission levels (No access / Full access / Imagen access /
-# Icongen access / Admin), replacing the old Google Sheets sync. Until that
-# lands, this fails safe: nobody is approved, nobody is denied outright.
-def get_permissions():
-    return set(), set()
-
-
-def record_pending_request(email):
-    pass
-
-
-def get_allowed_emails():
-    """Back-compat helper — just the approved set."""
-    approved, _denied = get_permissions()
-    return approved
+user_store.init_db()
+_bootstrap_admin_emails = [e for e in os.environ.get("ADMIN_EMAILS", "").split(",") if e.strip()]
+if _bootstrap_admin_emails:
+    user_store.bootstrap_admins(_bootstrap_admin_emails)
 
 
 def get_session_secret():
@@ -91,7 +81,10 @@ def make_session(email):
 
 
 def verify_session(token):
-    """Returns (True, email) if the session token is valid and unexpired, else (False, None)."""
+    """Returns (True, email) if the session token is valid and unexpired, else (False, None).
+    This only proves identity (a signed-in acko.tech email) — it says nothing about what
+    that user is allowed to do. Permission level is looked up fresh, per gated action, via
+    require_permission() below, never cached in or trusted from the token itself."""
     if not token or "." not in token:
         return False, None
     payload_b64, sig = token.rsplit(".", 1)
@@ -108,7 +101,28 @@ def verify_session(token):
     email = payload.get("email", "").lower()
     if not email.endswith("@" + ALLOWED_EMAIL_DOMAIN):
         return False, None
-    if email not in get_allowed_emails():
+    return True, email
+
+
+def require_permission(email, allowed_levels):
+    """Checks a signed-in user's current permission against a gated feature's allowed
+    set. Returns (ok, error_response_dict_or_None). Marks the user pending (only from
+    'No access', idempotently) when they're blocked for lack of any grant at all."""
+    permission = user_store.get_permission(email)
+    if permission in allowed_levels:
+        return True, None
+    if permission == "No access":
+        user_store.mark_pending(email)
+        return False, {"error": "Your request has been sent for admin approval.", "pending": True}
+    return False, {"error": f"Your current access level ({permission}) doesn't include this feature."}
+
+
+def require_admin(token):
+    """Returns (True, email) if the token is valid AND that user is an Admin, else (False, None)."""
+    ok, email = verify_session(token)
+    if not ok:
+        return False, None
+    if user_store.get_permission(email) != "Admin":
         return False, None
     return True, email
 
@@ -170,17 +184,42 @@ class ProxyHandler(BaseHTTPRequestHandler):
                 self.end_headers()
             return
 
-        # Session check — lets the frontend confirm a stored session is still valid
+        # Session check — lets the frontend confirm a stored session is still valid,
+        # and always returns the user's current (live, never cached) permission level.
         if self.path == "/auth/session":
             ok, email = verify_session(self.headers.get("x-session-token", ""))
-            self.send_json(200, {"valid": ok, "email": email})
+            permission = user_store.get_permission(email) if ok else None
+            self.send_json(200, {"valid": ok, "email": email, "permission": permission})
             return
 
-        # Proxy GET (used for Magnific's async polling endpoint) — requires a valid session
+        # Admin-only: list users whose access request is awaiting a decision.
+        if self.path == "/admin/pending":
+            ok, _email = require_admin(self.headers.get("x-session-token", ""))
+            if not ok:
+                self.send_json(403, {"error": "Admin access required."})
+                return
+            self.send_json(200, {"pending": user_store.list_pending()})
+            return
+
+        # Admin-only: the full user list, for the permission-management table.
+        if self.path == "/admin/users":
+            ok, _email = require_admin(self.headers.get("x-session-token", ""))
+            if not ok:
+                self.send_json(403, {"error": "Admin access required."})
+                return
+            self.send_json(200, {"users": user_store.list_all_users()})
+            return
+
+        # Proxy GET (used for Magnific's async polling endpoint) — requires a valid
+        # session AND a permission level allowed to use the image generator.
         if self.path.startswith("/api/"):
-            ok, _email = verify_session(self.headers.get("x-session-token", ""))
+            ok, email = verify_session(self.headers.get("x-session-token", ""))
             if not ok:
                 self.send_json(401, {"error": "Not signed in. Please sign in with your acko.tech email."})
+                return
+            perm_ok, perm_err = require_permission(email, user_store.IMAGE_GEN_ALLOWED)
+            if not perm_ok:
+                self.send_json(403, perm_err)
                 return
             target, provider = route(self.path)
             if not target:
@@ -209,7 +248,10 @@ class ProxyHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_POST(self):
-        # Login — validates the email domain and issues a signed session token
+        # Login — validates the email domain and issues a signed session token.
+        # Login only proves identity now; it always succeeds for a valid acko.tech
+        # address (creating a 'No access' user record on first sight). Whether that
+        # user can actually do anything is decided per gated feature, not here.
         if self.path == "/auth/login":
             length = int(self.headers.get("Content-Length", 0))
             try:
@@ -221,22 +263,34 @@ class ProxyHandler(BaseHTTPRequestHandler):
             if "@" not in email or not email.endswith("@" + ALLOWED_EMAIL_DOMAIN):
                 self.send_json(403, {"error": f"Access is limited to @{ALLOWED_EMAIL_DOMAIN} email addresses."})
                 return
-            approved, denied = get_permissions()
-            if email in denied:
-                self.send_json(403, {
-                    "error": "Your access request was declined by Roy Cherian.",
-                    "denied": True,
-                })
-                return
-            if email not in approved:
-                record_pending_request(email)
-                self.send_json(403, {
-                    "error": "Your request has been sent to Roy Cherian for approval.",
-                    "pending": True,
-                })
-                return
+            user = user_store.get_or_create_user(email)
             token = make_session(email)
-            self.send_json(200, {"token": token, "email": email, "expiresIn": SESSION_TTL_SECONDS})
+            self.send_json(200, {
+                "token": token, "email": email, "expiresIn": SESSION_TTL_SECONDS,
+                "permission": user["permission"],
+            })
+            return
+
+        # Admin-only: change a user's permission level.
+        if self.path == "/admin/users/update":
+            ok, admin_email = require_admin(self.headers.get("x-session-token", ""))
+            if not ok:
+                self.send_json(403, {"error": "Admin access required."})
+                return
+            length = int(self.headers.get("Content-Length", 0))
+            try:
+                data = json.loads(self.rfile.read(length) or b"{}")
+            except Exception:
+                self.send_json(400, {"error": "Invalid request body."})
+                return
+            target_email = str(data.get("email", "")).strip().lower()
+            new_permission = str(data.get("permission", "")).strip()
+            try:
+                updated = user_store.set_permission(target_email, new_permission, granted_by=admin_email)
+            except ValueError as e:
+                self.send_json(400, {"error": str(e)})
+                return
+            self.send_json(200, {"user": updated})
             return
 
         target, provider = route(self.path)
@@ -245,9 +299,13 @@ class ProxyHandler(BaseHTTPRequestHandler):
             self.end_headers()
             return
 
-        ok, _email = verify_session(self.headers.get("x-session-token", ""))
+        ok, email = verify_session(self.headers.get("x-session-token", ""))
         if not ok:
             self.send_json(401, {"error": "Not signed in. Please sign in with your acko.tech email."})
+            return
+        perm_ok, perm_err = require_permission(email, user_store.IMAGE_GEN_ALLOWED)
+        if not perm_ok:
+            self.send_json(403, perm_err)
             return
 
         length = int(self.headers.get("Content-Length", 0))

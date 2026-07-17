@@ -487,6 +487,47 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
 .gallery-empty { grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; min-height: 50vh; }
 .gallery-empty .empty-view-content { display: flex; flex-direction: column; align-items: center; gap: 14px; max-width: 360px; text-align: center; }
 
+/* ADMIN VIEW */
+.admin-view { flex: 1; display: flex; flex-direction: column; padding: 26px 32px 40px; overflow-y: auto; background: var(--bg); }
+.admin-head { margin-bottom: 18px; }
+.admin-title { font-size: 21px; font-weight: 800; color: var(--text); letter-spacing: -.4px; margin-bottom: 14px; }
+.admin-tabs { display: flex; gap: 8px; }
+.admin-tab {
+  padding: 8px 16px; border-radius: var(--r-sm); border: 1px solid var(--border-s);
+  background: var(--white); font: 600 12.5px/1 'Inter', sans-serif; color: var(--sub);
+  cursor: pointer; transition: all .15s;
+}
+.admin-tab:hover { border-color: var(--purple); color: var(--purple); }
+.admin-tab.active { background: var(--grad); border-color: transparent; color: #fff; box-shadow: var(--shadow-sm); }
+.admin-empty { padding: 40px; text-align: center; color: var(--muted); font-size: 13px; }
+.admin-table {
+  width: 100%; border-collapse: collapse; background: var(--white);
+  border: 1px solid var(--border-s); border-radius: var(--r-md); overflow: hidden;
+}
+.admin-table th {
+  text-align: left; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--muted); padding: 12px 16px; border-bottom: 1px solid var(--border);
+}
+.admin-table td {
+  padding: 12px 16px; font-size: 13px; color: var(--text); border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.admin-table tr:last-child td { border-bottom: none; }
+.admin-table tr:hover td { background: var(--bg); }
+.admin-select {
+  padding: 6px 10px; border: 1px solid var(--border-s); border-radius: 7px;
+  font: 500 12.5px/1 'Inter', sans-serif; color: var(--text); background: var(--white);
+  outline: none; cursor: pointer;
+}
+.admin-select:focus { border-color: var(--purple); }
+.admin-grant-btn {
+  padding: 6px 14px; border-radius: 7px; border: none; background: var(--grad);
+  font: 600 12px/1 'Inter', sans-serif; color: #fff; cursor: pointer; transition: transform .15s;
+}
+.admin-grant-btn:hover { transform: translateY(-1px); }
+.admin-grant-btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+.admin-email-muted { color: var(--muted); font-size: 11.5px; }
+
 /* LIGHTBOX */
 .lightbox {
   position: fixed; inset: 0; z-index: 200; background: rgba(15,12,40,.72);
@@ -590,21 +631,6 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
 }
 .login-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: var(--shadow-md); }
 .login-btn:disabled { opacity: .6; cursor: not-allowed; }
-.login-btn-secondary {
-  margin-top: 14px; padding: 9px 14px; border-radius: var(--r-sm); border: 1px solid var(--border-s);
-  background: none; font: 600 12.5px/1 'Inter', sans-serif; color: var(--sub); cursor: pointer;
-  transition: all .15s;
-}
-.login-btn-secondary:hover { border-color: var(--purple); color: var(--purple); }
-.login-pending-spinner {
-  width: 34px; height: 34px; border-radius: 50%; margin: 0 auto 16px;
-  border: 3px solid var(--purple-l); border-top-color: var(--purple);
-  animation: spin .8s linear infinite;
-}
-.login-denied-icon {
-  width: 40px; height: 40px; margin: 0 auto 14px; color: var(--red);
-}
-.login-denied-icon svg { width: 100%; height: 100%; }
 
 /* SCROLLBAR */
 ::-webkit-scrollbar { width: 4px; }
@@ -642,28 +668,6 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
       <input class="login-input" id="loginEmail" type="email" placeholder="you@acko.tech" autocomplete="email" onkeydown="if(event.key==='Enter')submitLogin()">
       <div class="login-error" id="loginError"></div>
       <button class="login-btn" id="loginBtn" onclick="submitLogin()">Continue</button>
-    </div>
-
-    <div id="loginPendingView" class="hidden">
-      <div class="login-pending-spinner"></div>
-      <div class="login-title">Request sent</div>
-      <div class="login-sub">
-        Your access request for <strong id="pendingEmailLabel"></strong> has been sent to <strong>Roy Cherian</strong>.
-        This page will unlock automatically as soon as you're approved.
-      </div>
-      <button class="login-btn-secondary" onclick="cancelPendingLogin()">Use a different email</button>
-    </div>
-
-    <div id="loginDeniedView" class="hidden">
-      <div class="login-denied-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-      </div>
-      <div class="login-title">Access declined</div>
-      <div class="login-sub">
-        Your access request for <strong id="deniedEmailLabel"></strong> was declined by <strong>Roy Cherian</strong>.
-        Reach out to them directly if you think this is a mistake.
-      </div>
-      <button class="login-btn-secondary" onclick="cancelPendingLogin()">Use a different email</button>
     </div>
   </div>
 </div>
@@ -711,6 +715,10 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
       <a class="nav-item" href="#" data-view="favourites" onclick="navigateTo('favourites');return false">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         Favourites
+      </a>
+      <a class="nav-item hidden" href="#" data-view="admin" id="adminNavItem" onclick="navigateTo('admin');return false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+        Admin
       </a>
     </nav>
 
@@ -964,6 +972,32 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
     <div class="gallery-grid" id="favouritesGrid"></div>
   </div>
 
+  <!-- ADMIN VIEW -->
+  <div id="view-admin" class="admin-view" style="display:none">
+    <div class="admin-head">
+      <div class="admin-title">User Management</div>
+      <div class="admin-tabs">
+        <button class="admin-tab active" id="adminTabBtn-pending" onclick="switchAdminTab('pending')">Pending Requests</button>
+        <button class="admin-tab" id="adminTabBtn-users" onclick="switchAdminTab('users')">All Users</button>
+      </div>
+    </div>
+
+    <div id="adminPanel-pending">
+      <div class="admin-empty hidden" id="adminPendingEmpty">No pending requests right now.</div>
+      <table class="admin-table hidden" id="adminPendingTable">
+        <thead><tr><th>Email</th><th>Requested</th><th>Grant access as</th><th></th></tr></thead>
+        <tbody id="adminPendingBody"></tbody>
+      </table>
+    </div>
+
+    <div id="adminPanel-users" class="hidden">
+      <table class="admin-table" id="adminUsersTable">
+        <thead><tr><th>Email</th><th>Permission</th><th>Requested</th><th>Granted</th><th>Granted by</th></tr></thead>
+        <tbody id="adminUsersBody"></tbody>
+      </table>
+    </div>
+  </div>
+
 </div>
 
 <!-- LIGHTBOX -->
@@ -1174,8 +1208,9 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
 
 <script>
 // ─── NAVIGATION ───────────────────────────────────────────────────────────────
-const VIEWS = ['generate', 'history', 'collections', 'favourites'];
+const VIEWS = ['generate', 'history', 'collections', 'favourites', 'admin'];
 function navigateTo(view) {
+  if (view === 'admin' && currentPermission !== 'Admin') return; // client-side convenience only — server enforces this regardless
   VIEWS.forEach(v => {
     const el = document.getElementById('view-' + v);
     if (el) el.style.display = v === view ? (v === 'generate' ? 'contents' : 'flex') : 'none';
@@ -1183,7 +1218,8 @@ function navigateTo(view) {
   document.querySelectorAll('.nav-item').forEach(el => {
     el.classList.toggle('active', el.dataset.view === view);
   });
-  if (view !== 'generate') renderGallery(view);
+  if (view === 'admin') loadAdminData();
+  else if (view !== 'generate') renderGallery(view);
 }
 
 // ─── LIBRARY STORE (history / favourites / collections) ───────────────────────
@@ -1263,6 +1299,130 @@ function renderGallery(kind) {
       </div>
     </div>`;
   }).join('');
+}
+
+// ─── ADMIN UI ───────────────────────────────────────────────────────────────────
+// Client-side gating here is convenience only (hide the nav item, bounce back to
+// Generate). The real protection is server-side: every /admin/* call below is
+// re-checked by proxy.py's require_admin() regardless of what this UI shows.
+const PERMISSION_LEVELS = ['No access', 'Full access', 'Imagen access', 'Icongen access', 'Admin'];
+
+function switchAdminTab(tab) {
+  document.getElementById('adminTabBtn-pending').classList.toggle('active', tab === 'pending');
+  document.getElementById('adminTabBtn-users').classList.toggle('active', tab === 'users');
+  document.getElementById('adminPanel-pending').classList.toggle('hidden', tab !== 'pending');
+  document.getElementById('adminPanel-users').classList.toggle('hidden', tab !== 'users');
+}
+
+async function adminFetch(path, options) {
+  const res = await fetch(proxyUrl(path), {
+    ...options,
+    headers: { ...(options && options.headers), 'x-session-token': getSessionToken() },
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
+  return data;
+}
+
+async function loadAdminData() {
+  try {
+    const [{ pending }, { users }] = await Promise.all([
+      adminFetch('/admin/pending'),
+      adminFetch('/admin/users'),
+    ]);
+    renderAdminPending(pending);
+    renderAdminUsers(users);
+  } catch (e) {
+    document.getElementById('adminPendingBody').innerHTML = '';
+    document.getElementById('adminUsersBody').innerHTML = '';
+    alert('Could not load admin data: ' + e.message);
+  }
+}
+
+function fmtDate(iso) {
+  if (!iso) return '—';
+  try { return new Date(iso).toLocaleString(); } catch { return iso; }
+}
+
+function permissionOptions(selected) {
+  return PERMISSION_LEVELS.map(p =>
+    `<option value="${p}"${p === selected ? ' selected' : ''}>${p}</option>`
+  ).join('');
+}
+
+function renderAdminPending(pending) {
+  const empty = document.getElementById('adminPendingEmpty');
+  const table = document.getElementById('adminPendingTable');
+  const body = document.getElementById('adminPendingBody');
+  if (!pending.length) {
+    empty.classList.remove('hidden');
+    table.classList.add('hidden');
+    body.innerHTML = '';
+    return;
+  }
+  empty.classList.add('hidden');
+  table.classList.remove('hidden');
+  body.innerHTML = pending.map(u => `
+    <tr>
+      <td>${esc(u.email)}</td>
+      <td class="admin-email-muted">${fmtDate(u.requestedAt)}</td>
+      <td>
+        <select class="admin-select" id="pendingSelect-${esc(u.email)}">${permissionOptions('Full access')}</select>
+      </td>
+      <td>
+        <button class="admin-grant-btn" onclick="grantFromPending('${esc(u.email)}', this)">Grant</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderAdminUsers(users) {
+  const body = document.getElementById('adminUsersBody');
+  body.innerHTML = users.map(u => `
+    <tr>
+      <td>${esc(u.email)}</td>
+      <td>
+        <select class="admin-select" onchange="updateUserPermission('${esc(u.email)}', this.value, this)">
+          ${permissionOptions(u.permission)}
+        </select>
+      </td>
+      <td class="admin-email-muted">${fmtDate(u.requestedAt)}</td>
+      <td class="admin-email-muted">${fmtDate(u.grantedAt)}</td>
+      <td class="admin-email-muted">${u.grantedBy ? esc(u.grantedBy) : '—'}</td>
+    </tr>
+  `).join('');
+}
+
+async function grantFromPending(email, btn) {
+  const select = document.getElementById(`pendingSelect-${email}`);
+  const permission = select.value;
+  btn.disabled = true;
+  try {
+    await adminFetch('/admin/users/update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, permission }),
+    });
+    loadAdminData();
+  } catch (e) {
+    alert('Could not update permission: ' + e.message);
+    btn.disabled = false;
+  }
+}
+
+async function updateUserPermission(email, permission, selectEl) {
+  selectEl.disabled = true;
+  try {
+    await adminFetch('/admin/users/update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, permission }),
+    });
+    loadAdminData();
+  } catch (e) {
+    alert('Could not update permission: ' + e.message);
+    selectEl.disabled = false;
+  }
 }
 
 // Toggle from a gallery card's inline action button
@@ -1460,10 +1620,15 @@ function proxyUrl(path) {
   return onProxy ? path : PROXY + path;
 }
 
-// ─── AUTH (acko.tech email gate) ───────────────────────────────────────────────
+// ─── AUTH (acko.tech email login) ──────────────────────────────────────────────
+// Login only proves identity — it always succeeds for a valid acko.tech address.
+// What that user can actually DO is decided per gated feature/route, live, on
+// every request (see require_permission on the proxy side) — never cached here
+// beyond what's needed to paint the UI (nav visibility, banners).
 const ALLOWED_EMAIL_DOMAIN = 'acko.tech';
 const getSessionToken = () => localStorage.getItem('acko_session_token') || '';
 const getSessionEmail = () => localStorage.getItem('acko_session_email') || '';
+let currentPermission = null;
 
 function setSession(token, email) {
   localStorage.setItem('acko_session_token', token);
@@ -1474,10 +1639,6 @@ function clearSession() {
   localStorage.removeItem('acko_session_email');
 }
 
-const PENDING_EMAIL_KEY = 'acko_pending_email';
-const PENDING_POLL_MS = 20000; // recheck every 20s while waiting for approval
-let pendingPollTimer = null;
-
 function showLoginGate() {
   document.getElementById('loginOverlay').classList.remove('hidden');
 }
@@ -1485,33 +1646,16 @@ function hideLoginGate(email) {
   document.getElementById('loginOverlay').classList.add('hidden');
   document.getElementById('sidebarUserEmail').textContent = email || getSessionEmail();
 }
-
 function showLoginForm() {
   document.getElementById('loginFormView').classList.remove('hidden');
-  document.getElementById('loginPendingView').classList.add('hidden');
-  document.getElementById('loginDeniedView').classList.add('hidden');
-}
-function showPendingView(email) {
-  document.getElementById('loginFormView').classList.add('hidden');
-  document.getElementById('loginPendingView').classList.remove('hidden');
-  document.getElementById('loginDeniedView').classList.add('hidden');
-  document.getElementById('pendingEmailLabel').textContent = email;
-}
-function showDeniedView(email) {
-  document.getElementById('loginFormView').classList.add('hidden');
-  document.getElementById('loginPendingView').classList.add('hidden');
-  document.getElementById('loginDeniedView').classList.remove('hidden');
-  document.getElementById('deniedEmailLabel').textContent = email;
 }
 
-async function attemptLogin(email) {
-  const res = await fetch(proxyUrl('/auth/login'), {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email }),
-  });
-  const data = await res.json();
-  return { ok: res.ok, data };
+function applyPermission(permission) {
+  currentPermission = permission;
+  document.getElementById('adminNavItem').classList.toggle('hidden', permission !== 'Admin');
+  if (permission !== 'Admin' && document.getElementById('view-admin').style.display !== 'none') {
+    navigateTo('generate');
+  }
 }
 
 async function submitLogin() {
@@ -1529,81 +1673,39 @@ async function submitLogin() {
   btn.disabled = true;
   btn.textContent = 'Signing in…';
   try {
-    const { ok, data } = await attemptLogin(email);
-    if (ok) {
-      setSession(data.token, data.email);
-      localStorage.removeItem(PENDING_EMAIL_KEY);
-      hideLoginGate(data.email);
-      return;
-    }
-    if (data.pending) {
-      localStorage.setItem(PENDING_EMAIL_KEY, email);
-      showPendingView(email);
-      startPendingPoll(email);
-      return;
-    }
-    if (data.denied) {
-      localStorage.removeItem(PENDING_EMAIL_KEY);
-      showDeniedView(email);
-      return;
-    }
-    errEl.textContent = data.error || 'Sign-in failed.';
+    const res = await fetch(proxyUrl('/auth/login'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Sign-in failed.');
+    setSession(data.token, data.email);
+    applyPermission(data.permission);
+    hideLoginGate(data.email);
   } catch (e) {
-    errEl.textContent = 'Could not reach the local proxy. Is proxy.py running?';
+    errEl.textContent = e.message.includes('fetch')
+      ? 'Could not reach the local proxy. Is proxy.py running?'
+      : e.message;
   } finally {
     btn.disabled = false;
     btn.textContent = 'Continue';
   }
 }
 
-function startPendingPoll(email) {
-  stopPendingPoll();
-  pendingPollTimer = setInterval(async () => {
-    try {
-      const { ok, data } = await attemptLogin(email);
-      if (ok) {
-        stopPendingPoll();
-        setSession(data.token, data.email);
-        localStorage.removeItem(PENDING_EMAIL_KEY);
-        hideLoginGate(data.email);
-      } else if (data.denied) {
-        stopPendingPoll();
-        localStorage.removeItem(PENDING_EMAIL_KEY);
-        showDeniedView(email);
-      }
-      // Still pending (or a transient error) — keep waiting silently.
-    } catch { /* proxy hiccup — just try again next tick */ }
-  }, PENDING_POLL_MS);
-}
-function stopPendingPoll() {
-  if (pendingPollTimer) { clearInterval(pendingPollTimer); pendingPollTimer = null; }
-}
-function cancelPendingLogin() {
-  stopPendingPoll();
-  localStorage.removeItem(PENDING_EMAIL_KEY);
-  document.getElementById('loginEmail').value = '';
-  document.getElementById('loginError').textContent = '';
+function signOut() {
+  clearSession();
+  showLoginGate();
   showLoginForm();
 }
 
-function signOut() {
-  clearSession();
-  cancelPendingLogin();
-  showLoginGate();
-}
-
-// Verify any stored session is still valid server-side before trusting it
+// Verify any stored session is still valid server-side before trusting it,
+// and pick up the live permission level (nav visibility, gated-feature banners).
 async function checkSession() {
   const token = getSessionToken();
   if (!token) {
     showLoginGate();
-    const pendingEmail = localStorage.getItem(PENDING_EMAIL_KEY);
-    if (pendingEmail) {
-      showPendingView(pendingEmail);
-      startPendingPoll(pendingEmail);
-    } else {
-      showLoginForm();
-    }
+    showLoginForm();
     return;
   }
   try {
@@ -1612,6 +1714,7 @@ async function checkSession() {
     });
     const data = await res.json();
     if (data.valid) {
+      applyPermission(data.permission);
       hideLoginGate(data.email);
     } else {
       clearSession();
@@ -2026,7 +2129,15 @@ async function doAsync(model, prompt, negPrompt, ratio, res, guidance, seed, idx
     headers: { 'Content-Type': 'application/json', 'x-session-token': getSessionToken() },
     body: JSON.stringify(body),
   });
-  if (!createRes.ok) throw new Error(`API ${createRes.status}: ${(await createRes.text()).slice(0,120)}`);
+  if (!createRes.ok) {
+    const errText = await createRes.text();
+    let message = `API ${createRes.status}: ${errText.slice(0,120)}`;
+    try {
+      const errData = JSON.parse(errText);
+      if (errData.error) message = errData.error;
+    } catch { /* not JSON — keep the raw-text fallback message */ }
+    throw new Error(message);
+  }
   const created = await createRes.json();
   const taskId  = (created.data || {}).task_id || (created.data || {}).id;
   if (!taskId) throw new Error('No task_id in response.');

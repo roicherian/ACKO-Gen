@@ -1,2 +1,3 @@
 .env
 .session_secret
+acko_gen.db
