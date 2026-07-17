@@ -69,6 +69,20 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
 .nav-item.active svg { opacity: 1; }
 
 .sidebar-spacer { flex: 1; }
+.sidebar-user {
+  padding: 10px 16px; border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+.sidebar-user-email {
+  font-size: 11px; color: var(--muted); overflow: hidden; text-overflow: ellipsis;
+  white-space: nowrap; min-width: 0;
+}
+.sidebar-signout {
+  flex-shrink: 0; border: none; background: none; color: var(--muted);
+  font: 600 11px/1 'Inter', sans-serif; cursor: pointer; padding: 4px 6px;
+  border-radius: 6px; transition: all .15s;
+}
+.sidebar-signout:hover { background: var(--bg); color: var(--red); }
 .sidebar-key { padding: 12px 16px; border-top: 1px solid var(--border); }
 .key-btn {
   width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border-s);
@@ -576,6 +590,38 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
   #editPreviewImg { width: 100%; flex-basis: auto; }
 }
 
+/* LOGIN GATE */
+.login-overlay {
+  position: fixed; inset: 0; z-index: 300; background: var(--bg);
+  display: flex; align-items: center; justify-content: center; padding: 24px;
+}
+.login-overlay.hidden { display: none; }
+.login-card {
+  width: 380px; max-width: 100%; background: var(--white); border-radius: var(--r-lg);
+  box-shadow: var(--shadow-lg); padding: 36px 32px 32px; display: flex; flex-direction: column;
+  align-items: center; text-align: center; gap: 6px;
+}
+.login-logo { width: 130px; height: auto; margin-bottom: 14px; }
+.login-title { font-size: 18px; font-weight: 800; color: var(--ink); letter-spacing: -.02em; }
+.login-sub { font-size: 12.5px; color: var(--muted); margin-bottom: 18px; line-height: 1.5; }
+.login-input {
+  width: 100%; padding: 11px 13px; border: 1px solid var(--border-s); border-radius: var(--r-sm);
+  font: 400 13.5px/1 'Inter', sans-serif; color: var(--text); outline: none;
+  transition: border-color .15s, box-shadow .15s; margin-bottom: 6px;
+}
+.login-input:focus { border-color: var(--purple); box-shadow: 0 0 0 3px var(--purple-l); }
+.login-error {
+  min-height: 16px; font-size: 11.5px; color: var(--red); margin-bottom: 8px; text-align: left;
+  width: 100%;
+}
+.login-btn {
+  width: 100%; padding: 12px; border-radius: var(--r-md); border: none;
+  background: var(--grad); font: 700 14px/1 'Inter', sans-serif; color: #fff;
+  cursor: pointer; transition: transform .15s, box-shadow .15s; box-shadow: var(--shadow-sm);
+}
+.login-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.login-btn:disabled { opacity: .6; cursor: not-allowed; }
+
 /* SCROLLBAR */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -583,6 +629,36 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
 </style>
 </head>
 <body>
+
+<!-- LOGIN GATE -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-card">
+    <svg class="login-logo" viewBox="0 0 527.58 126.62" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <style>
+          .login-lens { fill: #b59cf5; }
+          .login-wordmark { fill: #28205f; }
+          .login-hex-light { fill: #926ff3; }
+          .login-hex-dark { fill: #4e29bb; }
+        </style>
+      </defs>
+      <g>
+        <path class="login-wordmark" d="M225.37,21.1h22.24l35.44,84.42h-24.74l-6.07-14.97h-32.11l-5.95,14.97h-24.26l35.44-84.42ZM245.59,72.47l-9.28-23.83-9.39,23.83h18.67Z"/>
+        <path class="login-wordmark" d="M277.56,63.55v-.24c0-24.26,18.67-43.29,43.88-43.29,17.01,0,27.95,7.14,35.32,17.36l-17.36,13.44c-4.76-5.95-10.23-9.75-18.2-9.75-11.65,0-19.86,9.87-19.86,22v.24c0,12.49,8.21,22.24,19.86,22.24,8.68,0,13.8-4.04,18.79-10.11l17.36,12.37c-7.85,10.82-18.43,18.79-36.87,18.79-23.78,0-42.93-18.2-42.93-43.05Z"/>
+        <path class="login-wordmark" d="M364.6,21.1h23.07v34.25l28.66-34.25h27.35l-31.51,36.3,32.59,48.12h-27.71l-20.93-31.35-8.44,9.53v21.83h-23.07V21.1Z"/>
+        <path class="login-wordmark" d="M437.91,63.55v-.24c0-23.9,19.27-43.29,44.95-43.29s44.72,19.15,44.72,43.05v.24c0,23.91-19.27,43.29-44.95,43.29s-44.72-19.15-44.72-43.05ZM504.03,63.55v-.24c0-12.01-8.68-22.48-21.41-22.48s-21.05,10.23-21.05,22.24v.24c0,12.01,8.68,22.48,21.29,22.48s21.17-10.23,21.17-22.24Z"/>
+        <path class="login-hex-dark" d="M168.83,44.06v38.35c0,2.94-1.37,5.49-4.14,7.25-34.68,22-60.94,31.24-70.12,33.81-12.67,3.55-19.38,3.18-20.48,3.1-23.13-1.62-62.1-32.45-62.1-32.45,0,0,31.79,7.52,105.26-26.34,13.77-6.35,29.15-13.2,47.02-21.22,0,0,3.9-1.63,4.56-2.5Z"/>
+        <path class="login-hex-light" d="M166.79,42.99c.44-.27,1.03-.64,1.23-1.37.18-.66.1-1.48-.27-2.07-.68-1.08-1.81-1.8-3.06-2.59C130.01,14.97,103.75,5.72,94.56,3.15,81.89-.4,75.18-.03,74.09.05,50.96,1.67,11.99,32.5,11.99,32.5c0,0,31.79-7.52,105.26,26.34,2.36,1.09,4.78,2.19,7.24,3.32l40.13-18.02s1.48-.71,2.17-1.14Z"/>
+        <path class="login-lens" d="M49.22,63.28c.04-8.18,1.1-16.37,3.04-24.46,0,0,.26-1.01.26-1.01-14.47-3.3-25.13-3.99-31.54-3.99-5.29,0-8.09.46-9.05.66-1.72.37-2.94,1.69-3.81,2.81C2.96,43.94,0,53.41,0,63.28H0c0,9.87,2.96,19.34,8.13,25.98.87,1.11,2.08,2.44,3.81,2.81.96.2,3.76.66,9.05.66,6.4,0,17.07-.69,31.54-3.99,0,0-.26-1.01-.26-1.01-1.94-8.09-3-16.28-3.04-24.46Z"/>
+      </g>
+    </svg>
+    <div class="login-title">Sign in to ACKO Image Gen</div>
+    <div class="login-sub">Access is limited to <strong>@acko.tech</strong> email addresses.</div>
+    <input class="login-input" id="loginEmail" type="email" placeholder="you@acko.tech" autocomplete="email" onkeydown="if(event.key==='Enter')submitLogin()">
+    <div class="login-error" id="loginError"></div>
+    <button class="login-btn" id="loginBtn" onclick="submitLogin()">Continue</button>
+  </div>
+</div>
 
 <div class="app">
 
@@ -631,6 +707,10 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
     </nav>
 
     <div class="sidebar-spacer"></div>
+    <div class="sidebar-user">
+      <div class="sidebar-user-email" id="sidebarUserEmail"></div>
+      <button class="sidebar-signout" onclick="signOut()">Sign out</button>
+    </div>
     <div class="sidebar-key">
       <button class="key-btn" onclick="openKeyModal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
@@ -665,7 +745,6 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
           </div>
           <select id="modelSelect" onchange="onModelChange()">
             <optgroup label="ChatGPT">
-              <option value="gpt-image-1">GPT Image 1 (OpenAI direct)</option>
               <option value="gpt-2">GPT 2 (via Magnific)</option>
             </optgroup>
             <optgroup label="Google">
@@ -1100,14 +1179,10 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
       </button>
     </div>
     <div class="key-field">
-      <label>OpenAI API Key <span style="font-weight:400;color:var(--muted)">(for GPT Image 1)</span></label>
-      <input id="openaiKeyInput" type="password" placeholder="sk-…" spellcheck="false">
-    </div>
-    <div class="key-field">
-      <label>Magnific API Key <span style="font-weight:400;color:var(--muted)">(for Nano Banana 2)</span></label>
+      <label>Magnific API Key <span style="font-weight:400;color:var(--muted)">(for Nano Banana 2 &amp; GPT 2)</span></label>
       <input id="apiKeyInput" type="password" placeholder="MS3…" spellcheck="false">
     </div>
-    <button class="key-save" onclick="saveKey()">Save Keys</button>
+    <button class="key-save" onclick="saveKey()">Save Key</button>
   </div>
 </div>
 
@@ -1309,7 +1384,6 @@ async function doRegenerate(item) {
   const model = MODELS[item.modelId] || MODELS['nano-banana'];
   const ratioValue = ratioValueFromLabel(item.ratio);
   const fullPrompt = item.fullPrompt || item.prompt;
-  if (model.provider === 'openai') return doOpenAI(model, fullPrompt, ratioValue);
   return doAsync(model, fullPrompt, DEFAULT_NEG, ratioValue, '2K', 1.2, undefined, 'regen');
 }
 
@@ -1326,9 +1400,7 @@ function openEditModal() {
   editItem = lbItem;
   document.getElementById('editPreviewImg').src = editItem.src;
   document.getElementById('editInstruction').value = '';
-  document.getElementById('editNote').textContent = editItem.provider === 'openai'
-    ? 'Powered by OpenAI image editing — describe exactly what should change in the image.'
-    : "This model doesn't support true inpainting yet — we'll regenerate a new image combining the original prompt with your edit instruction.";
+  document.getElementById('editNote').textContent = "This model doesn't support true inpainting yet — we'll regenerate a new image combining the original prompt with your edit instruction.";
   document.getElementById('editApplyBtn').textContent = 'Apply Edit';
   document.getElementById('editApplyBtn').disabled = false;
   document.getElementById('editOverlay').classList.add('open');
@@ -1350,9 +1422,7 @@ async function applyEdit() {
   btn.textContent = 'Applying…';
 
   try {
-    const imageData = editItem.provider === 'openai'
-      ? await doOpenAIEdit(editItem, instruction)
-      : await doRegenerateEdit(editItem, instruction);
+    const imageData = await doRegenerateEdit(editItem, instruction);
 
     const src = imageData.b64
       ? `data:${imageData.mime || 'image/png'};base64,${imageData.b64}`
@@ -1377,27 +1447,6 @@ async function applyEdit() {
   }
 }
 
-async function doOpenAIEdit(item, instruction) {
-  const blob = await (await fetch(item.src)).blob();
-  const fd = new FormData();
-  fd.append('model', 'gpt-image-1');
-  fd.append('image', blob, 'image.png');
-  // Keep the edit instruction on brand: same technical-correctness + no-clutter
-  // guardrails as a fresh generation, so edited images still comply.
-  fd.append('prompt', `${instruction}. ${BACKGROUND_RULE} ${MASTER_SUFFIX}`);
-
-  const res = await fetch(apiUrl('openai', '/v1/images/edits'), {
-    method: 'POST',
-    headers: { 'x-openai-api-key': getOpenAIKey() },
-    body: fd,
-  });
-  if (!res.ok) throw new Error(`API ${res.status}: ${(await res.text()).slice(0, 150)}`);
-  const data = await res.json();
-  const img = (data.data || [])[0];
-  if (!img || !img.b64_json) throw new Error('No image returned.');
-  return { b64: img.b64_json, mime: 'image/png' };
-}
-
 async function doRegenerateEdit(item, instruction) {
   const model = MODELS[item.modelId] || MODELS['nano-banana'];
   // Reuse the exact full master prompt from the original generation (not just the
@@ -1405,40 +1454,115 @@ async function doRegenerateEdit(item, instruction) {
   const fullPrompt = item.fullPrompt || item.prompt;
   const combinedPrompt = `${fullPrompt} Additional edit instruction: ${instruction}.`;
   const ratioValue = ratioValueFromLabel(item.ratio);
-  if (model.provider === 'openai') return doOpenAI(model, combinedPrompt, ratioValue);
   return doAsync(model, combinedPrompt, DEFAULT_NEG, ratioValue, '2K', 1.2, undefined, 'edit');
 }
 
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
 const MAGNIFIC_KEY = 'MS37c8268acced4d76966a212c97d658de';
 const getKey = () => localStorage.getItem('magnific_key') || MAGNIFIC_KEY;
-const getOpenAIKey = () => localStorage.getItem('openai_key') || '';
 
 // Route calls through local proxy (avoids CORS). Proxy runs on :3458.
 // Falls back to direct if already on the proxy origin.
-// Provider-prefixed so the proxy can route to the right upstream (Magnific vs OpenAI).
+// Provider-prefixed so the proxy can route to the right upstream.
 const PROXY = 'http://localhost:3458';
 const onProxy = location.hostname === 'localhost' && location.port === '3458';
 function apiUrl(provider, path) {
   const base = onProxy ? '/api' : PROXY + '/api';
   return `${base}/${provider}${path}`;
 }
+function proxyUrl(path) {
+  return onProxy ? path : PROXY + path;
+}
+
+// ─── AUTH (acko.tech email gate) ───────────────────────────────────────────────
+const ALLOWED_EMAIL_DOMAIN = 'acko.tech';
+const getSessionToken = () => localStorage.getItem('acko_session_token') || '';
+const getSessionEmail = () => localStorage.getItem('acko_session_email') || '';
+
+function setSession(token, email) {
+  localStorage.setItem('acko_session_token', token);
+  localStorage.setItem('acko_session_email', email);
+}
+function clearSession() {
+  localStorage.removeItem('acko_session_token');
+  localStorage.removeItem('acko_session_email');
+}
+
+function showLoginGate() {
+  document.getElementById('loginOverlay').classList.remove('hidden');
+}
+function hideLoginGate(email) {
+  document.getElementById('loginOverlay').classList.add('hidden');
+  document.getElementById('sidebarUserEmail').textContent = email || getSessionEmail();
+}
+
+async function submitLogin() {
+  const input = document.getElementById('loginEmail');
+  const errEl = document.getElementById('loginError');
+  const btn = document.getElementById('loginBtn');
+  const email = input.value.trim().toLowerCase();
+
+  errEl.textContent = '';
+  if (!email || !email.endsWith('@' + ALLOWED_EMAIL_DOMAIN)) {
+    errEl.textContent = `Please use a valid @${ALLOWED_EMAIL_DOMAIN} email address.`;
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Signing in…';
+  try {
+    const res = await fetch(proxyUrl('/auth/login'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Sign-in failed.');
+    setSession(data.token, data.email);
+    hideLoginGate(data.email);
+  } catch (e) {
+    errEl.textContent = e.message.includes('fetch')
+      ? 'Could not reach the local proxy. Is proxy.py running?'
+      : e.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Continue';
+  }
+}
+
+function signOut() {
+  clearSession();
+  showLoginGate();
+}
+
+// Verify any stored session is still valid server-side before trusting it
+async function checkSession() {
+  const token = getSessionToken();
+  if (!token) { showLoginGate(); return; }
+  try {
+    const res = await fetch(proxyUrl('/auth/session'), {
+      headers: { 'x-session-token': token },
+    });
+    const data = await res.json();
+    if (data.valid) {
+      hideLoginGate(data.email);
+    } else {
+      clearSession();
+      showLoginGate();
+    }
+  } catch {
+    // Proxy unreachable — fall back to trusting the locally stored session
+    // so the UI isn't blocked purely by a transient network hiccup.
+    hideLoginGate();
+  }
+}
 
 // ─── MODEL CATALOGUE ─────────────────────────────────────────────────────────
 const MODELS = {
-  // ChatGPT (OpenAI, called directly)
-  'gpt-image-1': { provider: 'openai',   path: '/v1/images/generations',              supportsRes: false, supportsSubModel: false },
   // ChatGPT (GPT 2, hosted via Magnific — endpoint unconfirmed, following Magnific's standard async pattern)
   'gpt-2':       { provider: 'magnific', path: '/v1/ai/text-to-image/gpt-2',          async: true,  supportsRes: false, supportsSubModel: false, colRatio: true },
   // Google (hosted via Magnific)
   'nano-banana': { provider: 'magnific', path: '/v1/ai/text-to-image/nano-banana-pro-flash', async: true, supportsRes: true, supportsSubModel: false, colRatio: true },
-};
-
-// OpenAI gpt-image-1 only accepts these three sizes — map our aspect ratios to the closest one
-const OPENAI_SIZE = {
-  '1:1': '1024x1024',
-  '9:16': '1024x1536', '4:5': '1024x1536', '3:4': '1024x1536',
-  '16:9': '1536x1024', '4:3': '1536x1024', '3:2': '1536x1024', '2:1': '1536x1024',
 };
 
 // Nano Banana expects colon format; all other models use underscore format
@@ -1674,15 +1798,12 @@ function openAdv()  { document.getElementById('advOverlay').classList.add('open'
 function closeAdv() { document.getElementById('advOverlay').classList.remove('open'); }
 function openKeyModal() {
   document.getElementById('apiKeyInput').value = getKey();
-  document.getElementById('openaiKeyInput').value = getOpenAIKey();
   document.getElementById('keyOverlay').classList.add('open');
 }
 function closeKeyModal() { document.getElementById('keyOverlay').classList.remove('open'); }
 function saveKey() {
-  const v  = document.getElementById('apiKeyInput').value.trim();
-  const ov = document.getElementById('openaiKeyInput').value.trim();
+  const v = document.getElementById('apiKeyInput').value.trim();
   if (v) localStorage.setItem('magnific_key', v);
-  if (ov) localStorage.setItem('openai_key', ov);
   closeKeyModal();
 }
 
@@ -1740,12 +1861,6 @@ async function generate() {
 
   const modelId   = document.getElementById('modelSelect').value;
   const model     = MODELS[modelId];
-
-  if (model.provider === 'openai' && !getOpenAIKey()) {
-    alert('Please add your OpenAI API key first.');
-    openKeyModal();
-    return;
-  }
 
   const num       = parseInt(document.getElementById('numSelect').value);
   const ratio     = document.getElementById('ratioSelect').value;
@@ -1832,32 +1947,12 @@ async function generate() {
 
 async function runGeneration(model, prompt, negPrompt, ratio, res, guidance, seed, idx) {
   try {
-    const imageData = model.provider === 'openai'
-      ? await doOpenAI(model, prompt, ratio)
-      : await doAsync(model, prompt, negPrompt, ratio, res, guidance, seed, idx);
+    const imageData = await doAsync(model, prompt, negPrompt, ratio, res, guidance, seed, idx);
     if (!state.cancelRequested) showImage(idx, imageData);
   } catch(e) {
     if (!state.cancelRequested) showError(idx, e.message);
     throw e;
   }
-}
-
-async function doOpenAI(model, prompt, ratio) {
-  const ratioOpt   = document.getElementById('ratioSelect').selectedOptions[0];
-  const ratioLabel = ratioOpt ? ratioOpt.dataset.label : '16:9';
-  const size = OPENAI_SIZE[ratioLabel] || '1024x1024';
-  const body = { model: 'gpt-image-1', prompt, n: 1, size, quality: 'high' };
-
-  const res = await fetch(apiUrl('openai', model.path), {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-openai-api-key': getOpenAIKey() },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) throw new Error(`API ${res.status}: ${(await res.text()).slice(0,120)}`);
-  const data = await res.json();
-  const img = (data.data || [])[0];
-  if (!img || !img.b64_json) throw new Error('No image returned.');
-  return { b64: img.b64_json, mime: 'image/png' };
 }
 
 async function doAsync(model, prompt, negPrompt, ratio, res, guidance, seed, idx) {
@@ -1870,7 +1965,7 @@ async function doAsync(model, prompt, negPrompt, ratio, res, guidance, seed, idx
 
   const createRes = await fetch(apiUrl('magnific', model.path), {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-magnific-api-key': getKey() },
+    headers: { 'Content-Type': 'application/json', 'x-magnific-api-key': getKey(), 'x-session-token': getSessionToken() },
     body: JSON.stringify(body),
   });
   if (!createRes.ok) throw new Error(`API ${createRes.status}: ${(await createRes.text()).slice(0,120)}`);
@@ -1879,7 +1974,7 @@ async function doAsync(model, prompt, negPrompt, ratio, res, guidance, seed, idx
   if (!taskId) throw new Error('No task_id in response.');
 
   const pollUrl = apiUrl('magnific', model.path + '/' + taskId);
-  const hdrs    = { 'Content-Type': 'application/json', 'x-magnific-api-key': getKey() };
+  const hdrs    = { 'Content-Type': 'application/json', 'x-magnific-api-key': getKey(), 'x-session-token': getSessionToken() };
 
   for (let i = 0; i < 90; i++) {
     if (state.cancelRequested) throw new Error('Cancelled.');
@@ -2006,6 +2101,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   document.getElementById('negPrompt').value = DEFAULT_NEG;
   onModelChange();
+  checkSession();
 });
 </script>
 </body>
