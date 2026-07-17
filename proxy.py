@@ -195,7 +195,10 @@ class ProxyHandler(BaseHTTPRequestHandler):
                 self.send_json(403, {"error": f"Access is limited to @{ALLOWED_EMAIL_DOMAIN} email addresses."})
                 return
             if email not in get_allowed_emails():
-                self.send_json(403, {"error": "Your email hasn't been granted access yet. Ask an admin to mark 'Yes' for you in the permission sheet."})
+                self.send_json(403, {
+                    "error": "Your request has been sent to Roy Cherian for approval.",
+                    "pending": True,
+                })
                 return
             token = make_session(email)
             self.send_json(200, {"token": token, "email": email, "expiresIn": SESSION_TTL_SECONDS})

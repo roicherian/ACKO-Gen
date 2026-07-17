@@ -596,6 +596,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
   display: flex; align-items: center; justify-content: center; padding: 24px;
 }
 .login-overlay.hidden { display: none; }
+.hidden { display: none !important; }
 .login-card {
   width: 380px; max-width: 100%; background: var(--white); border-radius: var(--r-lg);
   box-shadow: var(--shadow-lg); padding: 36px 32px 32px; display: flex; flex-direction: column;
@@ -621,6 +622,17 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
 }
 .login-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: var(--shadow-md); }
 .login-btn:disabled { opacity: .6; cursor: not-allowed; }
+.login-btn-secondary {
+  margin-top: 14px; padding: 9px 14px; border-radius: var(--r-sm); border: 1px solid var(--border-s);
+  background: none; font: 600 12.5px/1 'Inter', sans-serif; color: var(--sub); cursor: pointer;
+  transition: all .15s;
+}
+.login-btn-secondary:hover { border-color: var(--purple); color: var(--purple); }
+.login-pending-spinner {
+  width: 34px; height: 34px; border-radius: 50%; margin: 0 auto 16px;
+  border: 3px solid var(--purple-l); border-top-color: var(--purple);
+  animation: spin .8s linear infinite;
+}
 
 /* SCROLLBAR */
 ::-webkit-scrollbar { width: 4px; }
@@ -652,11 +664,23 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
         <path class="login-lens" d="M49.22,63.28c.04-8.18,1.1-16.37,3.04-24.46,0,0,.26-1.01.26-1.01-14.47-3.3-25.13-3.99-31.54-3.99-5.29,0-8.09.46-9.05.66-1.72.37-2.94,1.69-3.81,2.81C2.96,43.94,0,53.41,0,63.28H0c0,9.87,2.96,19.34,8.13,25.98.87,1.11,2.08,2.44,3.81,2.81.96.2,3.76.66,9.05.66,6.4,0,17.07-.69,31.54-3.99,0,0-.26-1.01-.26-1.01-1.94-8.09-3-16.28-3.04-24.46Z"/>
       </g>
     </svg>
-    <div class="login-title">Sign in to ACKO Image Gen</div>
-    <div class="login-sub">Access is limited to <strong>@acko.tech</strong> email addresses.</div>
-    <input class="login-input" id="loginEmail" type="email" placeholder="you@acko.tech" autocomplete="email" onkeydown="if(event.key==='Enter')submitLogin()">
-    <div class="login-error" id="loginError"></div>
-    <button class="login-btn" id="loginBtn" onclick="submitLogin()">Continue</button>
+    <div id="loginFormView">
+      <div class="login-title">Sign in to ACKO Image Gen</div>
+      <div class="login-sub">Access is limited to <strong>@acko.tech</strong> email addresses.</div>
+      <input class="login-input" id="loginEmail" type="email" placeholder="you@acko.tech" autocomplete="email" onkeydown="if(event.key==='Enter')submitLogin()">
+      <div class="login-error" id="loginError"></div>
+      <button class="login-btn" id="loginBtn" onclick="submitLogin()">Continue</button>
+    </div>
+
+    <div id="loginPendingView" class="hidden">
+      <div class="login-pending-spinner"></div>
+      <div class="login-title">Request sent</div>
+      <div class="login-sub">
+        Your access request for <strong id="pendingEmailLabel"></strong> has been sent to <strong>Roy Cherian</strong>.
+        This page will unlock automatically as soon as you're approved.
+      </div>
+      <button class="login-btn-secondary" onclick="cancelPendingLogin()">Use a different email</button>
+    </div>
   </div>
 </div>
 
@@ -1488,12 +1512,36 @@ function clearSession() {
   localStorage.removeItem('acko_session_email');
 }
 
+const PENDING_EMAIL_KEY = 'acko_pending_email';
+const PENDING_POLL_MS = 20000; // recheck every 20s while waiting for approval
+let pendingPollTimer = null;
+
 function showLoginGate() {
   document.getElementById('loginOverlay').classList.remove('hidden');
 }
 function hideLoginGate(email) {
   document.getElementById('loginOverlay').classList.add('hidden');
   document.getElementById('sidebarUserEmail').textContent = email || getSessionEmail();
+}
+
+function showLoginForm() {
+  document.getElementById('loginFormView').classList.remove('hidden');
+  document.getElementById('loginPendingView').classList.add('hidden');
+}
+function showPendingView(email) {
+  document.getElementById('loginFormView').classList.add('hidden');
+  document.getElementById('loginPendingView').classList.remove('hidden');
+  document.getElementById('pendingEmailLabel').textContent = email;
+}
+
+async function attemptLogin(email) {
+  const res = await fetch(proxyUrl('/auth/login'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  });
+  const data = await res.json();
+  return { ok: res.ok, data };
 }
 
 async function submitLogin() {
@@ -1511,34 +1559,74 @@ async function submitLogin() {
   btn.disabled = true;
   btn.textContent = 'Signing in…';
   try {
-    const res = await fetch(proxyUrl('/auth/login'), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email }),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Sign-in failed.');
-    setSession(data.token, data.email);
-    hideLoginGate(data.email);
+    const { ok, data } = await attemptLogin(email);
+    if (ok) {
+      setSession(data.token, data.email);
+      localStorage.removeItem(PENDING_EMAIL_KEY);
+      hideLoginGate(data.email);
+      return;
+    }
+    if (data.pending) {
+      localStorage.setItem(PENDING_EMAIL_KEY, email);
+      showPendingView(email);
+      startPendingPoll(email);
+      return;
+    }
+    errEl.textContent = data.error || 'Sign-in failed.';
   } catch (e) {
-    errEl.textContent = e.message.includes('fetch')
-      ? 'Could not reach the local proxy. Is proxy.py running?'
-      : e.message;
+    errEl.textContent = 'Could not reach the local proxy. Is proxy.py running?';
   } finally {
     btn.disabled = false;
     btn.textContent = 'Continue';
   }
 }
 
+function startPendingPoll(email) {
+  stopPendingPoll();
+  pendingPollTimer = setInterval(async () => {
+    try {
+      const { ok, data } = await attemptLogin(email);
+      if (ok) {
+        stopPendingPoll();
+        setSession(data.token, data.email);
+        localStorage.removeItem(PENDING_EMAIL_KEY);
+        hideLoginGate(data.email);
+      }
+      // Still pending (or a transient error) — keep waiting silently.
+    } catch { /* proxy hiccup — just try again next tick */ }
+  }, PENDING_POLL_MS);
+}
+function stopPendingPoll() {
+  if (pendingPollTimer) { clearInterval(pendingPollTimer); pendingPollTimer = null; }
+}
+function cancelPendingLogin() {
+  stopPendingPoll();
+  localStorage.removeItem(PENDING_EMAIL_KEY);
+  document.getElementById('loginEmail').value = '';
+  document.getElementById('loginError').textContent = '';
+  showLoginForm();
+}
+
 function signOut() {
   clearSession();
+  cancelPendingLogin();
   showLoginGate();
 }
 
 // Verify any stored session is still valid server-side before trusting it
 async function checkSession() {
   const token = getSessionToken();
-  if (!token) { showLoginGate(); return; }
+  if (!token) {
+    showLoginGate();
+    const pendingEmail = localStorage.getItem(PENDING_EMAIL_KEY);
+    if (pendingEmail) {
+      showPendingView(pendingEmail);
+      startPendingPoll(pendingEmail);
+    } else {
+      showLoginForm();
+    }
+    return;
+  }
   try {
     const res = await fetch(proxyUrl('/auth/session'), {
       headers: { 'x-session-token': token },
@@ -1549,6 +1637,7 @@ async function checkSession() {
     } else {
       clearSession();
       showLoginGate();
+      showLoginForm();
     }
   } catch {
     // Proxy unreachable — fall back to trusting the locally stored session
