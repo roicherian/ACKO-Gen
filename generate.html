@@ -1,0 +1,2012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ACKO Image Gen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --purple: #5B2BE0;
+  --purple-d: #4A22B8;
+  --purple-l: #EDE8FF;
+  --purple-pale: #F7F5FF;
+  --ink: #0D0B1E;
+  --text: #1A1830;
+  --sub: #4A4860;
+  --muted: #9896A8;
+  --border: rgba(0,0,0,.08);
+  --border-s: rgba(0,0,0,.13);
+  --bg: #F0EEF8;
+  --white: #FFFFFF;
+  --sidebar-w: 200px;
+  --green: #16A34A;
+  --red: #DC2626;
+  --orange: #D97706;
+  --purple-2: #7C4DFF;
+  --grad: linear-gradient(135deg, var(--purple) 0%, var(--purple-2) 100%);
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 18px;
+  --shadow-xs: 0 1px 2px rgba(20,10,60,.04);
+  --shadow-sm: 0 2px 8px rgba(20,10,60,.06);
+  --shadow-md: 0 8px 24px rgba(20,10,60,.08);
+  --shadow-lg: 0 20px 48px rgba(20,10,60,.16);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; display: flex; flex-direction: column; overflow: hidden; }
+
+/* APP SHELL */
+.app { display: flex; height: 100vh; overflow: hidden; background: var(--bg); }
+
+/* SIDEBAR */
+.sidebar {
+  width: var(--sidebar-w); flex-shrink: 0;
+  background: var(--white); border-right: 1px solid var(--border);
+  box-shadow: var(--shadow-xs);
+  display: flex; flex-direction: column; padding: 20px 0;
+  position: relative; z-index: 10;
+}
+.sidebar-logo {
+  padding: 16px 16px 18px; display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
+  border-bottom: 1px solid var(--border); margin-bottom: 16px;
+}
+.sidebar-logo-svg { width: 110px; height: auto; display: block; }
+.logo-sub { font-size: 11px; font-weight: 500; color: var(--muted); margin-top: 4px; letter-spacing: .02em; }
+
+.nav-item {
+  display: flex; align-items: center; gap: 10px; padding: 9px 16px;
+  font-size: 13px; font-weight: 500; color: var(--sub); cursor: pointer;
+  transition: all .15s; text-decoration: none;
+  margin: 0 8px; border-radius: var(--r-sm);
+}
+.nav-item:hover { background: var(--bg); color: var(--text); }
+.nav-item.active { background: var(--grad); color: #fff; font-weight: 600; box-shadow: var(--shadow-sm); }
+.nav-item.active svg { color: #fff; }
+.nav-item svg { width: 17px; height: 17px; flex-shrink: 0; opacity: .7; }
+.nav-item.active svg { opacity: 1; }
+
+.sidebar-spacer { flex: 1; }
+.sidebar-key { padding: 12px 16px; border-top: 1px solid var(--border); }
+.key-btn {
+  width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border-s);
+  background: none; font: 500 12px/1 'Inter', sans-serif; color: var(--sub);
+  cursor: pointer; display: flex; align-items: center; gap: 7px; transition: all .15s;
+}
+.key-btn:hover { background: var(--bg); color: var(--purple); }
+.key-btn svg { width: 14px; height: 14px; }
+
+/* CENTER */
+.center {
+  flex: 1; overflow-y: auto; padding: 28px 24px;
+  display: flex; flex-direction: column; gap: 0;
+  min-width: 0;
+  max-width: 620px;
+}
+.center-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 22px;
+}
+.center-title { font-size: 22px; font-weight: 800; color: var(--ink); letter-spacing: -.025em; }
+.center-sub   { font-size: 13px; color: var(--muted); margin-top: 3px; }
+.btn-adv {
+  display: flex; align-items: center; gap: 6px; padding: 7px 13px;
+  border: 1px solid var(--border-s); border-radius: 8px; background: var(--white);
+  font: 500 12px/1 'Inter', sans-serif; color: var(--sub); cursor: pointer;
+  transition: all .15s; white-space: nowrap;
+}
+.btn-adv:hover { border-color: var(--purple); color: var(--purple); }
+.btn-adv svg { width: 14px; height: 14px; }
+
+/* FORM ROW */
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+.form-row.single { grid-template-columns: 1fr; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-label { font-size: 11.5px; font-weight: 600; color: var(--sub); letter-spacing: .01em; }
+
+/* SELECT / INPUT */
+.sel-wrap {
+  position: relative; background: var(--white);
+  border: 1px solid var(--border-s); border-radius: var(--r-sm);
+  display: flex; align-items: center; padding: 0 10px 0 12px;
+  height: 40px; transition: border-color .15s, box-shadow .15s;
+  box-shadow: var(--shadow-xs);
+}
+.sel-wrap:focus-within { border-color: var(--purple); box-shadow: 0 0 0 3px var(--purple-l); }
+.sel-icon { display: flex; align-items: center; margin-right: 8px; color: var(--muted); flex-shrink: 0; }
+.sel-icon svg { width: 15px; height: 15px; }
+.sel-wrap select {
+  flex: 1; border: none; background: none; outline: none;
+  font: 500 13px/1 'Inter', sans-serif; color: var(--text);
+  appearance: none; cursor: pointer;
+}
+.sel-wrap select option { font-weight: 400; }
+.sel-caret { display: flex; align-items: center; color: var(--muted); flex-shrink: 0; margin-left: 4px; }
+.sel-caret svg { width: 14px; height: 14px; }
+
+/* TEXTAREA */
+.prompt-wrap {
+  background: var(--white); border: 1px solid var(--border-s); border-radius: var(--r-md);
+  overflow: hidden; transition: border-color .15s, box-shadow .15s;
+  box-shadow: var(--shadow-xs);
+}
+.prompt-wrap:focus-within { border-color: var(--purple); box-shadow: 0 0 0 3px var(--purple-l); }
+.prompt-wrap textarea {
+  width: 100%; padding: 12px 14px 8px; border: none; outline: none; resize: none;
+  font: 400 13.5px/1.55 'Inter', sans-serif; color: var(--text); background: none;
+  min-height: 110px;
+}
+.prompt-wrap textarea::placeholder { color: var(--muted); }
+.prompt-footer {
+  padding: 6px 12px 10px; display: flex; align-items: center; justify-content: space-between;
+}
+.char-count { font-size: 11px; color: var(--muted); }
+
+/* ACTION BUTTONS */
+.action-row { display: flex; gap: 8px; margin-bottom: 14px; }
+.btn-action {
+  display: flex; align-items: center; gap: 7px; padding: 8px 14px;
+  border: 1px solid var(--border-s); border-radius: var(--r-sm); background: var(--white);
+  font: 500 12.5px/1 'Inter', sans-serif; color: var(--sub); cursor: pointer;
+  transition: all .15s; box-shadow: var(--shadow-xs);
+}
+.btn-action:hover { border-color: var(--purple); color: var(--purple); background: var(--purple-pale); box-shadow: var(--shadow-sm); }
+.btn-action svg { width: 14px; height: 14px; }
+
+/* ENHANCED PROMPT */
+.enhanced-wrap {
+  background: var(--white); border: 1px solid var(--border-s); border-radius: var(--r-md);
+  overflow: hidden; margin-bottom: 14px; box-shadow: var(--shadow-xs);
+}
+.enhanced-head {
+  padding: 10px 14px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.enhanced-title {
+  font-size: 12px; font-weight: 600; color: var(--sub);
+  display: flex; align-items: center; gap: 7px;
+}
+.enhanced-title svg { width: 13px; height: 13px; color: var(--purple); }
+.info-icon {
+  width: 15px; height: 15px; border-radius: 50%; background: var(--bg);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 700; color: var(--muted); cursor: default;
+}
+.enhanced-head-actions { display: flex; align-items: center; gap: 8px; }
+.editable-hint {
+  font-size: 10px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+  color: var(--purple); background: var(--purple-l); padding: 3px 7px; border-radius: 100px;
+}
+.btn-copy-sm {
+  display: flex; align-items: center; gap: 5px; padding: 4px 9px;
+  border: 1px solid var(--border); border-radius: 6px; background: none;
+  font: 500 11px/1 'Inter', sans-serif; color: var(--muted); cursor: pointer;
+  transition: all .15s;
+}
+.btn-copy-sm:hover { border-color: var(--purple); color: var(--purple); }
+.btn-copy-sm svg { width: 12px; height: 12px; }
+.enhanced-body {
+  padding: 12px 14px; font: 400 12.5px/1.6 'Inter', sans-serif; color: var(--sub);
+  min-height: 64px; outline: none; cursor: text; transition: background .15s;
+}
+.enhanced-body:hover { background: var(--purple-pale); }
+.enhanced-body:focus { background: var(--white); box-shadow: inset 0 0 0 2px var(--purple-l); }
+.enhanced-body:empty::before {
+  content: attr(data-placeholder); color: var(--muted); font-style: italic; font-size: 12px;
+}
+
+/* NEGATIVE PROMPT ACCORDION */
+.neg-accordion {
+  background: var(--white); border: 1px solid var(--border-s); border-radius: var(--r-md);
+  overflow: hidden; margin-bottom: 18px; box-shadow: var(--shadow-xs);
+}
+.neg-toggle {
+  width: 100%; padding: 11px 14px; background: none; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: space-between;
+  font: 500 12.5px/1 'Inter', sans-serif; color: var(--sub); transition: color .15s;
+}
+.neg-toggle:hover { color: var(--text); }
+.neg-toggle-left { display: flex; align-items: center; gap: 7px; }
+.neg-toggle-left svg { width: 14px; height: 14px; color: var(--muted); }
+.neg-optional { font-size: 11px; font-weight: 400; color: var(--muted); margin-left: 4px; }
+.neg-caret { width: 14px; height: 14px; transition: transform .2s; color: var(--muted); }
+.neg-caret.open { transform: rotate(180deg); }
+.neg-body { display: none; border-top: 1px solid var(--border); padding: 10px 14px 12px; }
+.neg-body.open { display: block; }
+.neg-body textarea {
+  width: 100%; border: 1px solid var(--border-s); border-radius: 7px; outline: none;
+  padding: 9px 11px; font: 400 11.5px/1.55 'Inter', sans-serif; color: var(--text);
+  background: var(--bg); min-height: 72px; resize: vertical;
+  transition: border-color .15s;
+}
+.neg-body textarea:focus { border-color: var(--purple); background: var(--white); }
+.neg-note { font-size: 10.5px; color: var(--muted); margin-top: 5px; font-style: italic; }
+
+/* DIVERSITY / ADVANCED (in advanced modal) */
+.adv-overlay {
+  position: fixed; inset: 0; background: rgba(15,10,40,.45); backdrop-filter: blur(3px); z-index: 200;
+  display: none; align-items: center; justify-content: center;
+}
+.adv-overlay.open { display: flex; }
+.adv-modal {
+  background: var(--white); border-radius: var(--r-lg); width: 520px; max-height: 80vh;
+  overflow-y: auto; box-shadow: var(--shadow-lg);
+  padding: 22px 24px;
+}
+.adv-modal-head {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;
+}
+.adv-modal-title { font-size: 16px; font-weight: 700; color: var(--ink); }
+.btn-close {
+  width: 30px; height: 30px; border-radius: 7px; border: 1px solid var(--border-s);
+  background: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  color: var(--muted); transition: all .15s;
+}
+.btn-close:hover { background: var(--bg); color: var(--text); }
+.btn-close svg { width: 14px; height: 14px; }
+.adv-section { margin-bottom: 18px; }
+.adv-sec-title { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.adv-sec-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.adv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.adv-field { display: flex; flex-direction: column; gap: 5px; }
+.adv-label { font-size: 11px; font-weight: 600; color: var(--sub); }
+.adv-select, .adv-input {
+  padding: 8px 10px; border: 1px solid var(--border-s); border-radius: var(--r-sm);
+  font: 400 13px/1 'Inter', sans-serif; color: var(--text); background: var(--white);
+  outline: none; transition: border-color .15s, box-shadow .15s;
+}
+.adv-select:focus, .adv-input:focus { border-color: var(--purple); box-shadow: 0 0 0 3px var(--purple-l); }
+.adv-input { font-size: 12px; }
+.pills-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.apill {
+  padding: 6px 12px; border-radius: 100px; border: 1.5px solid var(--border-s);
+  font-size: 11.5px; font-weight: 500; color: var(--sub); background: var(--white);
+  cursor: pointer; transition: all .13s;
+}
+.apill:hover { border-color: var(--purple); color: var(--purple); box-shadow: var(--shadow-xs); }
+.apill.on { border-color: transparent; background: var(--grad); color: #fff; font-weight: 600; box-shadow: var(--shadow-sm); }
+.adv-save {
+  width: 100%; padding: 12px; border-radius: var(--r-md); border: none;
+  background: var(--grad); font: 600 14px/1 'Inter', sans-serif; color: #fff;
+  cursor: pointer; transition: transform .15s, box-shadow .15s; margin-top: 4px;
+  box-shadow: var(--shadow-sm);
+}
+.adv-save:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+
+/* TOGGLE SWITCH (No Characters, etc.) */
+.toggle-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 12px 14px; border: 1px solid var(--border-s); border-radius: var(--r-md);
+  background: var(--white); box-shadow: var(--shadow-xs); transition: border-color .15s;
+}
+.toggle-row.on { border-color: var(--purple); background: var(--purple-pale); }
+.toggle-text { display: flex; flex-direction: column; gap: 2px; }
+.toggle-title { font-size: 13px; font-weight: 600; color: var(--text); }
+.toggle-desc { font-size: 11px; color: var(--muted); }
+.switch { position: relative; width: 40px; height: 23px; flex-shrink: 0; cursor: pointer; }
+.switch input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+.switch-track {
+  position: absolute; inset: 0; border-radius: 100px; background: var(--border-s);
+  transition: background .18s;
+}
+.switch-thumb {
+  position: absolute; top: 2.5px; left: 2.5px; width: 18px; height: 18px; border-radius: 50%;
+  background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .18s;
+}
+.switch input:checked + .switch-track { background: var(--grad); }
+.switch input:checked + .switch-track .switch-thumb { transform: translateX(17px); }
+
+/* GENERATE BUTTON */
+.btn-gen {
+  width: 100%; padding: 14px; border-radius: var(--r-md); border: none;
+  background: var(--grad);
+  font: 700 14.5px/1 'Inter', sans-serif; color: #fff;
+  cursor: pointer; transition: all .18s;
+  display: flex; align-items: center; justify-content: center; gap: 9px;
+  box-shadow: var(--shadow-md);
+}
+.btn-gen:hover:not(:disabled) { transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+.btn-gen:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-gen svg { width: 16px; height: 16px; }
+.btn-spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.3); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* RIGHT PANEL */
+.right {
+  flex: 1; overflow-y: auto; padding: 28px 24px;
+  display: flex; flex-direction: column; gap: 16px; min-width: 320px;
+}
+.right-head {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.right-title { font-size: 15px; font-weight: 700; color: var(--ink); display: flex; align-items: center; gap: 8px; }
+.status-pill {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 10px; border-radius: 100px; border: 1px solid var(--border-s);
+  background: var(--white); font-size: 11px; font-weight: 500; color: var(--muted);
+}
+.status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border-s); }
+.status-dot.working { background: var(--orange); animation: pulse 1s ease-in-out infinite; }
+.status-dot.done    { background: var(--green); }
+.status-dot.err     { background: var(--red); }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+
+.btn-clear {
+  display: flex; align-items: center; gap: 6px; padding: 6px 12px;
+  border: 1px solid var(--border-s); border-radius: 7px; background: var(--white);
+  font: 500 12px/1 'Inter', sans-serif; color: var(--sub); cursor: pointer;
+  transition: all .15s;
+}
+.btn-clear:hover { border-color: var(--red); color: var(--red); }
+.btn-clear svg { width: 13px; height: 13px; }
+
+/* PROGRESS CARD */
+.progress-card {
+  background: var(--white); border: 1px solid var(--border); border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 40px 24px 36px; display: flex; flex-direction: column; align-items: center;
+  gap: 16px; text-align: center; position: relative;
+}
+.progress-card.hidden { display: none; }
+.progress-ring { position: relative; width: 120px; height: 120px; }
+.progress-ring svg { transform: rotate(-90deg); }
+.ring-bg { fill: none; stroke: var(--bg); stroke-width: 8; }
+.ring-fill { fill: none; stroke: var(--purple); stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset .4s ease; }
+.ring-pct {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 800; color: var(--ink); letter-spacing: -.03em;
+}
+.progress-title { font-size: 16px; font-weight: 700; color: var(--ink); }
+.progress-sub   { font-size: 12.5px; color: var(--muted); margin-top: -8px; }
+.progress-cancel {
+  display: flex; align-items: center; gap: 7px; padding: 8px 16px;
+  border: 1px solid var(--border-s); border-radius: 8px; background: none;
+  font: 500 12.5px/1 'Inter', sans-serif; color: var(--sub); cursor: pointer;
+  transition: all .15s;
+}
+.progress-cancel:hover { border-color: var(--red); color: var(--red); }
+.progress-cancel svg { width: 13px; height: 13px; }
+
+/* RESULTS */
+.results-section { flex: 1; }
+.results-head { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+.results-sub  { font-size: 11.5px; color: var(--muted); margin-bottom: 14px; }
+.results-grid { display: grid; gap: 10px; }
+.results-grid.n1 { grid-template-columns: 1fr; }
+.results-grid.n2 { grid-template-columns: 1fr 1fr; }
+.results-grid.n3 { grid-template-columns: 1fr 1fr 1fr; }
+.results-grid.n4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+/* IMAGE CARD */
+.img-card {
+  border-radius: 10px; overflow: hidden; border: 1px solid var(--border);
+  background: var(--bg); position: relative; cursor: zoom-in;
+  aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center;
+}
+.img-card.sq   { aspect-ratio: 1/1; }
+.img-card.port { aspect-ratio: 9/16; }
+.img-card.cls  { aspect-ratio: 4/3; }
+.img-card img  { width: 100%; height: 100%; object-fit: cover; display: block; }
+.img-overlay {
+  position: absolute; inset: 0; background: rgba(0,0,0,.5);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+  opacity: 0; transition: opacity .2s;
+}
+.img-card:hover .img-overlay { opacity: 1; }
+.img-zoom-hint {
+  position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 8px;
+  background: rgba(255,255,255,.9); display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity .2s; color: var(--ink); pointer-events: none;
+}
+.img-card:hover .img-zoom-hint { opacity: 1; }
+.img-zoom-hint svg { width: 15px; height: 15px; }
+.btn-dl {
+  padding: 7px 16px; border-radius: 7px; background: var(--white); border: none;
+  font: 600 11.5px/1 'Inter', sans-serif; color: var(--ink); cursor: pointer;
+  display: flex; align-items: center; gap: 6px; transition: transform .15s;
+}
+.btn-dl:hover { transform: scale(1.04); }
+.btn-dl svg { width: 13px; height: 13px; }
+
+/* PLACEHOLDER */
+.img-ph {
+  border-radius: 10px; border: 1.5px dashed rgba(91,43,224,.25);
+  background: var(--purple-pale); display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 8px; aspect-ratio: 16/9;
+}
+.img-ph.sq   { aspect-ratio: 1/1; }
+.img-ph.port { aspect-ratio: 9/16; }
+.img-ph.cls  { aspect-ratio: 4/3; }
+.ph-spinner { width: 24px; height: 24px; border: 2.5px solid rgba(91,43,224,.2); border-top-color: var(--purple); border-radius: 50%; animation: spin .8s linear infinite; }
+.ph-msg { font-size: 11px; color: var(--purple); font-weight: 500; }
+.ph-time { font-size: 10.5px; color: var(--muted); }
+
+/* EMPTY STATE */
+.empty-ph {
+  border-radius: 10px; border: 1.5px dashed var(--border-s);
+  background: var(--white); aspect-ratio: 1/1; max-width: 140px;
+  display: flex; align-items: center; justify-content: center;
+}
+.empty-ph svg { width: 24px; height: 24px; color: var(--border-s); }
+.empty-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 4px; }
+
+/* KEY MODAL */
+.key-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 300;
+  display: none; align-items: center; justify-content: center;
+}
+.key-overlay.open { display: flex; }
+.key-modal { background: var(--white); border-radius: 14px; width: 400px; padding: 22px 24px; }
+.key-modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.key-modal-title { font-size: 15px; font-weight: 700; color: var(--ink); }
+.key-field { margin-bottom: 14px; }
+.key-field label { font-size: 11.5px; font-weight: 600; color: var(--sub); display: block; margin-bottom: 5px; }
+.key-field input {
+  width: 100%; padding: 9px 11px; border: 1px solid var(--border-s); border-radius: 8px;
+  font: 400 13px/1 'Courier New', monospace; color: var(--text); outline: none;
+  transition: border-color .15s;
+}
+.key-field input:focus { border-color: var(--purple); }
+.key-save {
+  width: 100%; padding: 10px; border-radius: 8px; border: none;
+  background: var(--purple); font: 600 13px/1 'Inter', sans-serif; color: #fff;
+  cursor: pointer; transition: background .15s;
+}
+.key-save:hover { background: var(--purple-d); }
+
+/* EMPTY VIEWS */
+.empty-view {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  background: var(--bg); overflow-y: auto;
+}
+.empty-view-content {
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  max-width: 360px; text-align: center; padding: 40px 24px;
+}
+.empty-icon { width: 72px; height: 72px; opacity: 0.45; }
+.empty-icon svg { width: 100%; height: 100%; }
+.empty-title { font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -.3px; }
+.empty-desc { font-size: 13.5px; color: var(--muted); line-height: 1.6; }
+.empty-cta {
+  margin-top: 6px; padding: 10px 24px; border-radius: 10px; border: none;
+  background: var(--purple); color: #fff; font: 600 13px/1 'Inter',sans-serif;
+  cursor: pointer; transition: background .15s;
+}
+.empty-cta:hover { background: var(--purple-d); }
+
+/* GALLERY VIEWS (History / Collections / Favourites) */
+.gallery-view { flex: 1; display: flex; flex-direction: column; padding: 26px 32px 40px; overflow-y: auto; background: var(--bg); }
+.gallery-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; }
+.gallery-title { font-size: 21px; font-weight: 800; color: var(--text); letter-spacing: -.4px; }
+.gallery-sub { font-size: 13px; color: var(--muted); margin-top: 3px; }
+.gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; align-content: start; }
+.gcard {
+  position: relative; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-s);
+  background: #fff; aspect-ratio: 1/1; cursor: pointer; transition: transform .15s, box-shadow .15s;
+}
+.gcard:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,.10); }
+.gcard:hover .img-zoom-hint { opacity: 1; }
+.gcard img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.gcard-actions { position: absolute; top: 8px; right: 8px; display: flex; gap: 6px; opacity: 0; transition: opacity .15s; }
+.gcard:hover .gcard-actions { opacity: 1; }
+.gact {
+  width: 30px; height: 30px; border-radius: 8px; border: none; background: rgba(255,255,255,.94);
+  display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--sub);
+  box-shadow: 0 1px 4px rgba(0,0,0,.15); transition: all .12s;
+}
+.gact:hover { color: var(--text); }
+.gact svg { width: 15px; height: 15px; }
+.gact.on { background: var(--purple); color: #fff; }
+.gact.on svg { fill: #fff; }
+
+/* GALLERY EMPTY STATE (reuses empty-view styling, centered in grid area) */
+.gallery-empty { grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; min-height: 50vh; }
+.gallery-empty .empty-view-content { display: flex; flex-direction: column; align-items: center; gap: 14px; max-width: 360px; text-align: center; }
+
+/* LIGHTBOX */
+.lightbox {
+  position: fixed; inset: 0; z-index: 200; background: rgba(15,12,40,.72);
+  backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding: 40px;
+}
+.lightbox.open { display: flex; }
+.lb-close {
+  position: absolute; top: 22px; right: 26px; width: 40px; height: 40px; border-radius: 50%;
+  border: none; background: rgba(255,255,255,.14); color: #fff; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; transition: background .15s;
+}
+.lb-close:hover { background: rgba(255,255,255,.28); }
+.lb-close svg { width: 20px; height: 20px; }
+.lb-inner {
+  display: flex; gap: 0; background: #fff; border-radius: 16px; overflow: hidden;
+  max-width: 1000px; max-height: 84vh; box-shadow: 0 24px 60px rgba(0,0,0,.4);
+}
+.lb-img-wrap { flex: 1 1 auto; display: flex; align-items: center; justify-content: center; background: #0f0c28; min-width: 0; overflow: hidden; }
+.lb-img-wrap img { max-width: 100%; max-height: 84vh; object-fit: contain; display: block; cursor: zoom-in; transition: transform .2s ease; }
+.lb-img-wrap.zoomed { overflow: auto; cursor: zoom-out; }
+.lb-img-wrap.zoomed img { max-width: none; max-height: none; width: auto; height: 170%; cursor: zoom-out; }
+.lb-meta { flex: 0 0 300px; padding: 26px 24px; display: flex; flex-direction: column; overflow-y: auto; }
+.lb-label { font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.lb-prompt { font-size: 13px; color: var(--text); line-height: 1.6; margin-bottom: 16px; }
+.lb-info { font-size: 12px; color: var(--muted); margin-bottom: auto; padding-bottom: 20px; }
+.lb-actions { display: flex; flex-direction: column; gap: 8px; }
+.lb-btn {
+  display: flex; align-items: center; gap: 9px; padding: 11px 14px; border-radius: 10px;
+  border: 1px solid var(--border-s); background: #fff; color: var(--text);
+  font: 600 13px/1 'Inter', sans-serif; cursor: pointer; transition: all .12s;
+}
+.lb-btn:hover { border-color: var(--purple); color: var(--purple); }
+.lb-btn svg { width: 17px; height: 17px; flex-shrink: 0; }
+.lb-btn.primary { background: var(--purple); border-color: var(--purple); color: #fff; }
+.lb-btn.primary:hover { background: var(--purple-d); color: #fff; }
+.lb-btn.on { background: var(--purple); border-color: var(--purple); color: #fff; }
+.lb-btn.on svg { fill: #fff; }
+@media (max-width: 760px) {
+  .lb-inner { flex-direction: column; max-height: 90vh; }
+  .lb-meta { flex-basis: auto; }
+}
+
+/* EDIT IMAGE MODAL */
+.edit-overlay {
+  position: fixed; inset: 0; background: rgba(15,10,40,.45); backdrop-filter: blur(3px); z-index: 210;
+  display: none; align-items: center; justify-content: center; padding: 24px;
+}
+.edit-overlay.open { display: flex; }
+.edit-modal {
+  background: var(--white); border-radius: var(--r-lg); width: 640px; max-width: 100%;
+  max-height: 88vh; overflow-y: auto; box-shadow: var(--shadow-lg); padding: 22px 24px;
+}
+.edit-modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.edit-modal-body { display: flex; gap: 18px; }
+#editPreviewImg {
+  flex: 0 0 220px; width: 220px; height: 220px; object-fit: cover;
+  border-radius: var(--r-md); background: var(--bg); border: 1px solid var(--border-s);
+}
+.edit-fields { flex: 1; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.edit-textarea {
+  width: 100%; min-height: 100px; padding: 10px 12px; border: 1px solid var(--border-s);
+  border-radius: var(--r-sm); font: 400 13px/1.55 'Inter', sans-serif; color: var(--text);
+  outline: none; resize: vertical; transition: border-color .15s, box-shadow .15s;
+}
+.edit-textarea:focus { border-color: var(--purple); box-shadow: 0 0 0 3px var(--purple-l); }
+.edit-note { font-size: 11.5px; color: var(--muted); line-height: 1.5; }
+@media (max-width: 560px) {
+  .edit-modal-body { flex-direction: column; }
+  #editPreviewImg { width: 100%; flex-basis: auto; }
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-s); border-radius: 99px; }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <!-- Official ACKO logo -->
+      <svg class="sidebar-logo-svg" viewBox="0 0 527.58 126.62" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <style>
+            .acko-lens { fill: #b59cf5; }
+            .acko-wordmark { fill: #28205f; }
+            .acko-hex-light { fill: #926ff3; }
+            .acko-hex-dark { fill: #4e29bb; }
+          </style>
+        </defs>
+        <g>
+          <path class="acko-wordmark" d="M225.37,21.1h22.24l35.44,84.42h-24.74l-6.07-14.97h-32.11l-5.95,14.97h-24.26l35.44-84.42ZM245.59,72.47l-9.28-23.83-9.39,23.83h18.67Z"/>
+          <path class="acko-wordmark" d="M277.56,63.55v-.24c0-24.26,18.67-43.29,43.88-43.29,17.01,0,27.95,7.14,35.32,17.36l-17.36,13.44c-4.76-5.95-10.23-9.75-18.2-9.75-11.65,0-19.86,9.87-19.86,22v.24c0,12.49,8.21,22.24,19.86,22.24,8.68,0,13.8-4.04,18.79-10.11l17.36,12.37c-7.85,10.82-18.43,18.79-36.87,18.79-23.78,0-42.93-18.2-42.93-43.05Z"/>
+          <path class="acko-wordmark" d="M364.6,21.1h23.07v34.25l28.66-34.25h27.35l-31.51,36.3,32.59,48.12h-27.71l-20.93-31.35-8.44,9.53v21.83h-23.07V21.1Z"/>
+          <path class="acko-wordmark" d="M437.91,63.55v-.24c0-23.9,19.27-43.29,44.95-43.29s44.72,19.15,44.72,43.05v.24c0,23.91-19.27,43.29-44.95,43.29s-44.72-19.15-44.72-43.05ZM504.03,63.55v-.24c0-12.01-8.68-22.48-21.41-22.48s-21.05,10.23-21.05,22.24v.24c0,12.01,8.68,22.48,21.29,22.48s21.17-10.23,21.17-22.24Z"/>
+          <path class="acko-hex-dark" d="M168.83,44.06v38.35c0,2.94-1.37,5.49-4.14,7.25-34.68,22-60.94,31.24-70.12,33.81-12.67,3.55-19.38,3.18-20.48,3.1-23.13-1.62-62.1-32.45-62.1-32.45,0,0,31.79,7.52,105.26-26.34,13.77-6.35,29.15-13.2,47.02-21.22,0,0,3.9-1.63,4.56-2.5Z"/>
+          <path class="acko-hex-light" d="M166.79,42.99c.44-.27,1.03-.64,1.23-1.37.18-.66.1-1.48-.27-2.07-.68-1.08-1.81-1.8-3.06-2.59C130.01,14.97,103.75,5.72,94.56,3.15,81.89-.4,75.18-.03,74.09.05,50.96,1.67,11.99,32.5,11.99,32.5c0,0,31.79-7.52,105.26,26.34,2.36,1.09,4.78,2.19,7.24,3.32l40.13-18.02s1.48-.71,2.17-1.14Z"/>
+          <path class="acko-lens" d="M49.22,63.28c.04-8.18,1.1-16.37,3.04-24.46,0,0,.26-1.01.26-1.01-14.47-3.3-25.13-3.99-31.54-3.99-5.29,0-8.09.46-9.05.66-1.72.37-2.94,1.69-3.81,2.81C2.96,43.94,0,53.41,0,63.28H0c0,9.87,2.96,19.34,8.13,25.98.87,1.11,2.08,2.44,3.81,2.81.96.2,3.76.66,9.05.66,6.4,0,17.07-.69,31.54-3.99,0,0-.26-1.01-.26-1.01-1.94-8.09-3-16.28-3.04-24.46Z"/>
+        </g>
+      </svg>
+    </div>
+
+    <nav>
+      <a class="nav-item active" href="#" data-view="generate" onclick="navigateTo('generate');return false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Generate
+      </a>
+      <a class="nav-item" href="#" data-view="history" onclick="navigateTo('history');return false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+        History
+      </a>
+      <a class="nav-item" href="#" data-view="collections" onclick="navigateTo('collections');return false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h18M3 12h18M3 17h18"/></svg>
+        Collections
+      </a>
+      <a class="nav-item" href="#" data-view="favourites" onclick="navigateTo('favourites');return false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        Favourites
+      </a>
+    </nav>
+
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-key">
+      <button class="key-btn" onclick="openKeyModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+        API Key
+      </button>
+    </div>
+  </aside>
+
+  <!-- GENERATE VIEW -->
+  <div id="view-generate" style="display:contents">
+
+  <!-- CENTER FORM -->
+  <main class="center">
+    <div class="center-head">
+      <div>
+        <div class="center-title">ACKO Image Gen</div>
+        <div class="center-sub">Create brand-compliant images with AI</div>
+      </div>
+      <button class="btn-adv" onclick="openAdv()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 1 0 4.93 19.07"/></svg>
+        Advanced Settings
+      </button>
+    </div>
+
+    <!-- Model + Num Images -->
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Model</label>
+        <div class="sel-wrap">
+          <div class="sel-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          <select id="modelSelect" onchange="onModelChange()">
+            <optgroup label="ChatGPT">
+              <option value="gpt-image-1">GPT Image 1 (OpenAI direct)</option>
+              <option value="gpt-2">GPT 2 (via Magnific)</option>
+            </optgroup>
+            <optgroup label="Google">
+              <option value="nano-banana">Nano Banana 2</option>
+            </optgroup>
+          </select>
+          <div class="sel-caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Number of Images</label>
+        <div class="sel-wrap">
+          <div class="sel-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          </div>
+          <select id="numSelect">
+            <option value="1">1 image</option>
+            <option value="2">2 images</option>
+            <option value="3">3 images</option>
+            <option value="4" selected>4 images</option>
+          </select>
+          <div class="sel-caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resolution + Aspect Ratio -->
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Resolution</label>
+        <div class="sel-wrap">
+          <div class="sel-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <select id="resSelect">
+            <option value="1K">1K</option>
+            <option value="2K" selected>2K</option>
+            <option value="4K">4K</option>
+          </select>
+          <div class="sel-caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Aspect Ratio</label>
+        <div class="sel-wrap">
+          <div class="sel-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+          </div>
+          <select id="ratioSelect" onchange="updatePrompt()">
+            <option value="widescreen_16_9" data-label="16:9" selected>16:9 — Widescreen</option>
+            <option value="social_post_4_5" data-label="4:5">4:5 — Social Post</option>
+            <option value="social_story_9_16" data-label="9:16">9:16 — Stories</option>
+            <option value="square_1_1" data-label="1:1">1:1 — Square</option>
+            <option value="classic_4_3" data-label="4:3">4:3 — Classic</option>
+            <option value="traditional_3_4" data-label="3:4">3:4 — Portrait</option>
+            <option value="standard_3_2" data-label="3:2">3:2 — Standard</option>
+            <option value="horizontal_2_1" data-label="2:1">2:1 — Panoramic</option>
+          </select>
+          <div class="sel-caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Prompt -->
+    <div class="form-group" style="margin-bottom:10px">
+      <label class="form-label">Prompt</label>
+      <div class="prompt-wrap">
+        <textarea id="sceneInput" placeholder="Describe the image you want to generate…" oninput="onSceneInput()" maxlength="2000"></textarea>
+        <div class="prompt-footer">
+          <span class="char-count" id="charCount">0 / 2000</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="action-row">
+      <button class="btn-action" onclick="enhancePrompt()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Enhance Prompt
+      </button>
+    </div>
+
+    <!-- Enhanced Prompt -->
+    <div class="enhanced-wrap">
+      <div class="enhanced-head">
+        <div class="enhanced-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Enhanced Prompt
+          <span class="info-icon" title="ACKO brand-compliant prompt built from your scene description — click the text to edit it directly">i</span>
+        </div>
+        <div class="enhanced-head-actions">
+          <span class="editable-hint">Editable</span>
+          <button class="btn-copy-sm" onclick="copyEnhanced()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy
+          </button>
+        </div>
+      </div>
+      <div class="enhanced-body" id="enhancedBody" contenteditable="true" data-placeholder="Your enhanced prompt will appear here… (you can also type your own)" oninput="onEnhancedEdit()"></div>
+    </div>
+
+    <!-- Negative Prompt -->
+    <div class="neg-accordion">
+      <button class="neg-toggle" onclick="toggleNeg()">
+        <div class="neg-toggle-left">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          Negative Prompt
+          <span class="neg-optional">(Optional)</span>
+        </div>
+        <svg class="neg-caret" id="negCaret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="neg-body" id="negBody">
+        <textarea id="negPrompt" placeholder="Describe what you don't want in the image…"></textarea>
+        <div class="neg-note">Prefilled from ACKO guidelines. Edit to override.</div>
+      </div>
+    </div>
+
+    <!-- Generate -->
+    <button class="btn-gen" id="genBtn" onclick="generate()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      <span id="genBtnLabel">Generate Image</span>
+    </button>
+  </main>
+
+  <!-- RIGHT PANEL -->
+  <aside class="right">
+    <div class="right-head">
+      <div class="right-title">
+        Generation
+        <div class="status-pill" id="statusPill">
+          <div class="status-dot" id="statusDot"></div>
+          <span id="statusText">Ready</span>
+        </div>
+      </div>
+      <button class="btn-clear" onclick="clearResults()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+        Clear
+      </button>
+    </div>
+
+    <!-- Progress card -->
+    <div class="progress-card hidden" id="progressCard">
+      <div class="progress-ring">
+        <svg width="120" height="120" viewBox="0 0 120 120">
+          <circle class="ring-bg" cx="60" cy="60" r="52"/>
+          <circle class="ring-fill" id="ringFill" cx="60" cy="60" r="52"
+            stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
+        </svg>
+        <div class="ring-pct" id="ringPct">0%</div>
+      </div>
+      <div class="progress-title">Generating your images…</div>
+      <div class="progress-sub">This may take a few moments.</div>
+      <button class="progress-cancel" onclick="cancelGeneration()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        Cancel Generation
+      </button>
+    </div>
+
+    <!-- Results -->
+    <div class="results-section">
+      <div class="results-head">Results</div>
+      <div class="results-sub" id="resultsSub">Your generated images will appear here once completed.</div>
+      <div class="results-grid n4" id="resultsGrid">
+        <div class="empty-ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+        <div class="empty-ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+        <div class="empty-ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+        <div class="empty-ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+      </div>
+    </div>
+  </aside>
+  </div><!-- /view-generate -->
+
+  <!-- HISTORY VIEW -->
+  <div id="view-history" class="gallery-view" style="display:none">
+    <div class="gallery-head">
+      <div>
+        <div class="gallery-title">History</div>
+        <div class="gallery-sub" id="historyCount"></div>
+      </div>
+      <button class="btn-clear" id="historyClearBtn" onclick="clearGallery('history')" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+        Clear all
+      </button>
+    </div>
+    <div class="gallery-grid" id="historyGrid"></div>
+  </div>
+
+  <!-- COLLECTIONS VIEW -->
+  <div id="view-collections" class="gallery-view" style="display:none">
+    <div class="gallery-head">
+      <div>
+        <div class="gallery-title">Collections</div>
+        <div class="gallery-sub" id="collectionsCount"></div>
+      </div>
+      <button class="btn-clear" id="collectionsClearBtn" onclick="clearGallery('collections')" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+        Clear all
+      </button>
+    </div>
+    <div class="gallery-grid" id="collectionsGrid"></div>
+  </div>
+
+  <!-- FAVOURITES VIEW -->
+  <div id="view-favourites" class="gallery-view" style="display:none">
+    <div class="gallery-head">
+      <div>
+        <div class="gallery-title">Favourites</div>
+        <div class="gallery-sub" id="favouritesCount"></div>
+      </div>
+      <button class="btn-clear" id="favouritesClearBtn" onclick="clearGallery('favourites')" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+        Clear all
+      </button>
+    </div>
+    <div class="gallery-grid" id="favouritesGrid"></div>
+  </div>
+
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="if(event.target===this)closeLightbox()">
+  <button class="lb-close" onclick="closeLightbox()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+  <div class="lb-inner">
+    <div class="lb-img-wrap" id="lbImgWrap"><img id="lbImg" src="" alt="Generated image" onclick="toggleLbZoom()" title="Click to zoom"></div>
+    <div class="lb-meta">
+      <div class="lb-label">Prompt</div>
+      <div class="lb-prompt" id="lbPrompt"></div>
+      <div class="lb-info" id="lbInfo"></div>
+      <div class="lb-actions">
+        <button class="lb-btn" id="lbFav" onclick="lbToggleFav()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          <span>Favourite</span>
+        </button>
+        <button class="lb-btn" id="lbColl" onclick="lbToggleColl()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h5l2 2h9a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+          <span>Add to Collection</span>
+        </button>
+        <button class="lb-btn" onclick="openEditModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+          <span>Edit</span>
+        </button>
+        <button class="lb-btn" id="lbRegen" onclick="lbRegenerate()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          <span>Regenerate</span>
+        </button>
+        <button class="lb-btn primary" onclick="lbDownload()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>Download</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT IMAGE MODAL -->
+<div class="edit-overlay" id="editOverlay" onclick="if(event.target===this)closeEditModal()">
+  <div class="edit-modal">
+    <div class="edit-modal-head">
+      <div class="adv-modal-title">Edit Image</div>
+      <button class="btn-close" onclick="closeEditModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="edit-modal-body">
+      <img id="editPreviewImg" src="" alt="Image to edit">
+      <div class="edit-fields">
+        <label class="adv-label">What would you like to change?</label>
+        <textarea id="editInstruction" class="edit-textarea" placeholder="e.g. Change the shirt colour to navy blue, remove the laptop from the desk, make the background brighter…"></textarea>
+        <div class="edit-note" id="editNote"></div>
+        <button class="adv-save" id="editApplyBtn" onclick="applyEdit()">Apply Edit</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADVANCED SETTINGS MODAL -->
+<div class="adv-overlay" id="advOverlay" onclick="if(event.target===this)closeAdv()">
+  <div class="adv-modal">
+    <div class="adv-modal-head">
+      <div class="adv-modal-title">Advanced Settings</div>
+      <button class="btn-close" onclick="closeAdv()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="adv-section">
+      <label class="toggle-row" id="noCharToggleRow">
+        <div class="toggle-text">
+          <div class="toggle-title">No Characters</div>
+          <div class="toggle-desc">Exclude all people — generate an object, product or environment-only scene.</div>
+        </div>
+        <span class="switch">
+          <input type="checkbox" id="noCharCheckbox" onchange="toggleNoCharacters()">
+          <span class="switch-track"><span class="switch-thumb"></span></span>
+        </span>
+      </label>
+    </div>
+
+    <div class="adv-section" id="cameraAngleSection">
+      <div class="adv-sec-title">Camera Angle</div>
+      <div class="pills-row" id="cameraPills">
+        <div class="apill on" data-val="eye-level" onclick="togglePill(this,'camera')">Eye Level</div>
+        <div class="apill" data-val="low-angle" onclick="togglePill(this,'camera')">Low Angle</div>
+        <div class="apill" data-val="high-angle" onclick="togglePill(this,'camera')">High Angle</div>
+        <div class="apill" data-val="birds-eye" onclick="togglePill(this,'camera')">Bird's Eye</div>
+        <div class="apill" data-val="worms-eye" onclick="togglePill(this,'camera')">Worm's Eye</div>
+        <div class="apill" data-val="over-shoulder" onclick="togglePill(this,'camera')">Over-the-Shoulder</div>
+        <div class="apill" data-val="close-up" onclick="togglePill(this,'camera')">Close-Up</div>
+        <div class="apill" data-val="extreme-close-up" onclick="togglePill(this,'camera')">Extreme Close-Up</div>
+        <div class="apill" data-val="medium-shot" onclick="togglePill(this,'camera')">Medium Shot</div>
+        <div class="apill" data-val="wide-shot" onclick="togglePill(this,'camera')">Wide / Establishing</div>
+        <div class="apill" data-val="dutch-angle" onclick="togglePill(this,'camera')">Dutch Angle</div>
+        <div class="apill" data-val="pov" onclick="togglePill(this,'camera')">POV</div>
+        <div class="apill" data-val="three-quarter" onclick="togglePill(this,'camera')">Three-Quarter</div>
+        <div class="apill" data-val="profile" onclick="togglePill(this,'camera')">Profile / Side</div>
+        <div class="apill" data-val="front-on" onclick="togglePill(this,'camera')">Front-On</div>
+        <div class="apill" data-val="aerial-drone" onclick="togglePill(this,'camera')">Aerial / Drone</div>
+        <div class="apill" data-val="macro" onclick="togglePill(this,'camera')">Macro</div>
+      </div>
+    </div>
+
+    <div class="adv-section" id="momentSection">
+      <div class="adv-sec-title">Insurance Moment</div>
+      <div class="pills-row" id="momentPills">
+        <div class="apill" data-val="pre-purchase" onclick="togglePill(this,'moment')">Pre-purchase</div>
+        <div class="apill on" data-val="care" onclick="togglePill(this,'moment')">Care</div>
+        <div class="apill" data-val="reassurance" onclick="togglePill(this,'moment')">Reassurance</div>
+        <div class="apill" data-val="active-life" onclick="togglePill(this,'moment')">Active Life</div>
+        <div class="apill" data-val="internal-brand" onclick="togglePill(this,'moment')">Internal Brand</div>
+      </div>
+    </div>
+
+    <div class="adv-section">
+      <div class="adv-sec-title">Product Line</div>
+      <div class="pills-row" id="productPills">
+        <div class="apill" data-val="motor" onclick="togglePill(this,'product')">Motor</div>
+        <div class="apill" data-val="health" onclick="togglePill(this,'product')">Health</div>
+        <div class="apill" data-val="travel" onclick="togglePill(this,'product')">Travel</div>
+        <div class="apill" data-val="home" onclick="togglePill(this,'product')">Home</div>
+        <div class="apill on" data-val="general" onclick="togglePill(this,'product')">General</div>
+      </div>
+    </div>
+
+    <div class="adv-section" id="diversitySection">
+      <div class="adv-sec-title">Diversity Axes</div>
+      <div class="adv-grid">
+        <div class="adv-field">
+          <label class="adv-label">Skin Tone</label>
+          <select class="adv-select" id="skinTone">
+            <option value="">Auto</option>
+            <option value="fair-skinned">Fair</option>
+            <option value="wheatish-skinned">Wheatish</option>
+            <option value="medium brown-skinned">Medium Brown</option>
+            <option value="dark brown-skinned">Dark Brown</option>
+          </select>
+        </div>
+        <div class="adv-field">
+          <label class="adv-label">Region</label>
+          <select class="adv-select" id="region">
+            <option value="">Any Indian</option>
+            <option value="North Indian">North Indian</option>
+            <option value="South Indian">South Indian</option>
+            <option value="East Indian">East Indian</option>
+            <option value="West Indian">West Indian</option>
+            <option value="Northeast Indian">Northeast Indian</option>
+          </select>
+        </div>
+        <div class="adv-field">
+          <label class="adv-label">Age</label>
+          <select class="adv-select" id="ageSelect">
+            <option value="">Any</option>
+            <option value="mid-twenties">Mid-twenties</option>
+            <option value="early thirties">Early thirties</option>
+            <option value="mid-forties">Mid-forties</option>
+            <option value="late fifties">Late fifties</option>
+            <option value="elderly, sixties+">60+</option>
+          </select>
+        </div>
+        <div class="adv-field">
+          <label class="adv-label">Life Stage</label>
+          <select class="adv-select" id="lifeStage">
+            <option value="">Any</option>
+            <option value="young professional">Young Professional</option>
+            <option value="newly married couple">Newly Married</option>
+            <option value="parent with young child">Parent</option>
+            <option value="middle-aged homeowner">Homeowner</option>
+            <option value="senior citizen">Senior</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="adv-section">
+      <div class="adv-sec-title">Generation Controls</div>
+      <div class="adv-grid">
+        <div class="adv-field">
+          <label class="adv-label">Guidance Scale <span style="font-weight:400;color:var(--muted)">(0.8–1.5)</span></label>
+          <input class="adv-input" id="guidance" type="text" value="1.2" placeholder="1.2">
+        </div>
+        <div class="adv-field">
+          <label class="adv-label">Seed <span style="font-weight:400;color:var(--muted)">(blank = random)</span></label>
+          <input class="adv-input" id="seed" type="text" placeholder="e.g. 42">
+        </div>
+      </div>
+    </div>
+
+    <div class="adv-section" id="subModelSection">
+      <div class="adv-sec-title">Model Style</div>
+      <div class="pills-row" id="subModelPills">
+        <div class="apill on" data-val="realism" onclick="togglePill(this,'submodel')">Realism</div>
+        <div class="apill" data-val="fluid" onclick="togglePill(this,'submodel')">Fluid</div>
+        <div class="apill" data-val="zen" onclick="togglePill(this,'submodel')">Zen</div>
+        <div class="apill" data-val="flexible" onclick="togglePill(this,'submodel')">Flexible</div>
+        <div class="apill" data-val="super_real" onclick="togglePill(this,'submodel')">Super Real</div>
+        <div class="apill" data-val="editorial_portraits" onclick="togglePill(this,'submodel')">Editorial</div>
+      </div>
+    </div>
+
+    <button class="adv-save" onclick="closeAdv()">Save Settings</button>
+  </div>
+</div>
+
+<!-- API KEY MODAL -->
+<div class="key-overlay" id="keyOverlay" onclick="if(event.target===this)closeKeyModal()">
+  <div class="key-modal">
+    <div class="key-modal-head">
+      <div class="key-modal-title">API Key</div>
+      <button class="btn-close" onclick="closeKeyModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="key-field">
+      <label>OpenAI API Key <span style="font-weight:400;color:var(--muted)">(for GPT Image 1)</span></label>
+      <input id="openaiKeyInput" type="password" placeholder="sk-…" spellcheck="false">
+    </div>
+    <div class="key-field">
+      <label>Magnific API Key <span style="font-weight:400;color:var(--muted)">(for Nano Banana 2)</span></label>
+      <input id="apiKeyInput" type="password" placeholder="MS3…" spellcheck="false">
+    </div>
+    <button class="key-save" onclick="saveKey()">Save Keys</button>
+  </div>
+</div>
+
+<script>
+// ─── NAVIGATION ───────────────────────────────────────────────────────────────
+const VIEWS = ['generate', 'history', 'collections', 'favourites'];
+function navigateTo(view) {
+  VIEWS.forEach(v => {
+    const el = document.getElementById('view-' + v);
+    if (el) el.style.display = v === view ? (v === 'generate' ? 'contents' : 'flex') : 'none';
+  });
+  document.querySelectorAll('.nav-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.view === view);
+  });
+  if (view !== 'generate') renderGallery(view);
+}
+
+// ─── LIBRARY STORE (history / favourites / collections) ───────────────────────
+const STORE_KEYS = { history: 'acko_history', favourites: 'acko_favourites', collections: 'acko_collections' };
+const EMPTY_STATES = {
+  history: {
+    icon: '<svg viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="28" stroke="var(--border-s)" stroke-width="2"/><polyline points="32 18 32 32 40 40" stroke="var(--muted)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    title: 'No history yet', desc: 'Images you generate will appear here. Start creating to build your history.',
+  },
+  collections: {
+    icon: '<svg viewBox="0 0 64 64" fill="none"><rect x="8" y="8" width="20" height="20" rx="3" stroke="var(--border-s)" stroke-width="2"/><rect x="36" y="8" width="20" height="20" rx="3" stroke="var(--border-s)" stroke-width="2"/><rect x="8" y="36" width="20" height="20" rx="3" stroke="var(--border-s)" stroke-width="2"/><rect x="36" y="36" width="20" height="20" rx="3" stroke="var(--border-s)" stroke-width="2"/></svg>',
+    title: 'No collections yet', desc: 'Add generations to a collection to organise and reuse them later.',
+  },
+  favourites: {
+    icon: '<svg viewBox="0 0 64 64" fill="none"><path d="M32 52 L12 34 C6 28 6 18 14 14 C18 12 24 13 28 17 L32 21 L36 17 C40 13 46 12 50 14 C58 18 58 28 52 34 Z" stroke="var(--border-s)" stroke-width="2" stroke-linejoin="round"/></svg>',
+    title: 'No favourites yet', desc: 'Heart images from your generations to save them here for quick access.',
+  },
+};
+
+function storeGet(kind) { try { return JSON.parse(localStorage.getItem(STORE_KEYS[kind])) || []; } catch { return []; } }
+function storeSet(kind, arr) { try { localStorage.setItem(STORE_KEYS[kind], JSON.stringify(arr)); } catch (e) { console.warn('Storage full', e); } }
+function inStore(kind, id) { return storeGet(kind).some(x => x.id === id); }
+function toggleStore(kind, item) {
+  let arr = storeGet(kind);
+  if (arr.some(x => x.id === item.id)) arr = arr.filter(x => x.id !== item.id);
+  else arr.unshift(item);
+  storeSet(kind, arr);
+  return arr.some(x => x.id === item.id);
+}
+
+let itemSeq = 0;
+function newItemId() { return 'img_' + (Date.now().toString(36)) + '_' + (itemSeq++); }
+
+function saveToHistory(item) {
+  const arr = storeGet('history');
+  arr.unshift(item);
+  if (arr.length > 60) arr.length = 60;
+  storeSet('history', arr);
+}
+
+// ─── GALLERY RENDER ───────────────────────────────────────────────────────────
+function renderGallery(kind) {
+  const grid = document.getElementById(kind + 'Grid');
+  const countEl = document.getElementById(kind + 'Count');
+  const clearBtn = document.getElementById(kind + 'ClearBtn');
+  const items = storeGet(kind);
+
+  countEl.textContent = items.length ? `${items.length} image${items.length !== 1 ? 's' : ''}` : '';
+  clearBtn.style.display = items.length ? '' : 'none';
+
+  if (!items.length) {
+    const e = EMPTY_STATES[kind];
+    grid.innerHTML = `<div class="gallery-empty"><div class="empty-view-content">
+      <div class="empty-icon">${e.icon}</div>
+      <div class="empty-title">${e.title}</div>
+      <div class="empty-desc">${e.desc}</div>
+      <button class="empty-cta" onclick="navigateTo('generate')">Start Generating</button>
+    </div></div>`;
+    return;
+  }
+
+  grid.innerHTML = items.map(it => {
+    const fav = inStore('favourites', it.id);
+    const coll = inStore('collections', it.id);
+    return `<div class="gcard" onclick="openLightbox('${it.id}','${kind}')">
+      <img src="${it.src}" alt="Generated image" loading="lazy">
+      <div class="img-zoom-hint">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+      </div>
+      <div class="gcard-actions" onclick="event.stopPropagation()">
+        <button class="gact${fav ? ' on' : ''}" title="Favourite" onclick="cardToggle('favourites','${it.id}','${kind}',this)">
+          <svg viewBox="0 0 24 24" fill="${fav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+        <button class="gact${coll ? ' on' : ''}" title="Add to Collection" onclick="cardToggle('collections','${it.id}','${kind}',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h5l2 2h9a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Toggle from a gallery card's inline action button
+function cardToggle(kind, id, currentView, btn) {
+  const item = findItem(id);
+  if (!item) return;
+  const on = toggleStore(kind, item);
+  btn.classList.toggle('on', on);
+  const svg = btn.querySelector('svg');
+  if (kind === 'favourites') svg.setAttribute('fill', on ? 'currentColor' : 'none');
+  // If we removed an item from the very list we're viewing, re-render to drop it
+  if (currentView === kind && !on) renderGallery(currentView);
+  else if (currentView !== kind) { /* just update counts if that view later opens */ }
+}
+
+// Find an item across all stores (history is the superset, but check all)
+function findItem(id) {
+  for (const kind of ['history', 'favourites', 'collections']) {
+    const found = storeGet(kind).find(x => x.id === id);
+    if (found) return found;
+  }
+  return null;
+}
+
+function clearGallery(kind) {
+  if (!confirm(`Clear all ${kind}? This cannot be undone.`)) return;
+  storeSet(kind, []);
+  renderGallery(kind);
+}
+
+// ─── LIGHTBOX ─────────────────────────────────────────────────────────────────
+let lbItem = null;
+let lbFromView = 'generate';
+function openLightbox(id, fromView) {
+  const item = findItem(id);
+  if (!item) return;
+  lbItem = item;
+  lbFromView = fromView || 'generate';
+  document.getElementById('lbImg').src = item.src;
+  document.getElementById('lbPrompt').textContent = item.prompt || '—';
+  const bits = [];
+  if (item.model) bits.push(item.model);
+  if (item.ratio) bits.push(item.ratio);
+  document.getElementById('lbInfo').textContent = bits.join('  ·  ');
+  syncLbButtons();
+  resetLbZoom();
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); lbItem = null; resetLbZoom(); }
+function toggleLbZoom() {
+  document.getElementById('lbImg').classList.toggle('zoomed');
+  document.getElementById('lbImgWrap').classList.toggle('zoomed');
+}
+function resetLbZoom() {
+  document.getElementById('lbImg').classList.remove('zoomed');
+  document.getElementById('lbImgWrap').classList.remove('zoomed');
+}
+function syncLbButtons() {
+  if (!lbItem) return;
+  const favBtn = document.getElementById('lbFav');
+  const collBtn = document.getElementById('lbColl');
+  const isFav = inStore('favourites', lbItem.id);
+  const isColl = inStore('collections', lbItem.id);
+  favBtn.classList.toggle('on', isFav);
+  favBtn.querySelector('svg').setAttribute('fill', isFav ? 'currentColor' : 'none');
+  favBtn.querySelector('span').textContent = isFav ? 'Favourited' : 'Favourite';
+  collBtn.classList.toggle('on', isColl);
+  collBtn.querySelector('span').textContent = isColl ? 'In Collection' : 'Add to Collection';
+}
+function lbToggleFav() { if (!lbItem) return; toggleStore('favourites', lbItem); syncLbButtons(); refreshOpenView(); }
+function lbToggleColl() { if (!lbItem) return; toggleStore('collections', lbItem); syncLbButtons(); refreshOpenView(); }
+function lbDownload() { if (lbItem) downloadImg(lbItem.imageData || { url: lbItem.src }, 1); }
+
+// Regenerate — produce a fresh, separate image from the same prompt/model/ratio (no edit instruction).
+async function lbRegenerate() {
+  if (!lbItem) return;
+  const item = lbItem;
+  const btn  = document.getElementById('lbRegen');
+  const label = btn.querySelector('span');
+  const origLabel = label.textContent;
+  btn.disabled = true;
+  label.textContent = 'Regenerating…';
+  try {
+    const imageData = await doRegenerate(item);
+    const src = imageData.b64
+      ? `data:${imageData.mime || 'image/png'};base64,${imageData.b64}`
+      : imageData.url;
+    const newItem = {
+      id: newItemId(), src,
+      prompt: item.prompt, fullPrompt: item.fullPrompt, model: item.model, modelId: item.modelId,
+      provider: item.provider, ratio: item.ratio, ts: Date.now(), regeneratedFrom: item.id,
+    };
+    saveToHistory(newItem);
+    refreshOpenView();
+    openLightbox(newItem.id, 'history');
+  } catch (e) {
+    alert('Regenerate failed: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    label.textContent = origLabel;
+  }
+}
+
+async function doRegenerate(item) {
+  const model = MODELS[item.modelId] || MODELS['nano-banana'];
+  const ratioValue = ratioValueFromLabel(item.ratio);
+  const fullPrompt = item.fullPrompt || item.prompt;
+  if (model.provider === 'openai') return doOpenAI(model, fullPrompt, ratioValue);
+  return doAsync(model, fullPrompt, DEFAULT_NEG, ratioValue, '2K', 1.2, undefined, 'regen');
+}
+
+function refreshOpenView() {
+  const active = document.querySelector('.nav-item.active');
+  const v = active ? active.dataset.view : 'generate';
+  if (v !== 'generate') renderGallery(v);
+}
+
+// ─── EDIT IMAGE ───────────────────────────────────────────────────────────────
+let editItem = null;
+function openEditModal() {
+  if (!lbItem) return;
+  editItem = lbItem;
+  document.getElementById('editPreviewImg').src = editItem.src;
+  document.getElementById('editInstruction').value = '';
+  document.getElementById('editNote').textContent = editItem.provider === 'openai'
+    ? 'Powered by OpenAI image editing — describe exactly what should change in the image.'
+    : "This model doesn't support true inpainting yet — we'll regenerate a new image combining the original prompt with your edit instruction.";
+  document.getElementById('editApplyBtn').textContent = 'Apply Edit';
+  document.getElementById('editApplyBtn').disabled = false;
+  document.getElementById('editOverlay').classList.add('open');
+}
+function closeEditModal() { document.getElementById('editOverlay').classList.remove('open'); editItem = null; }
+
+function ratioValueFromLabel(label) {
+  const opt = [...document.getElementById('ratioSelect').options].find(o => o.dataset.label === label);
+  return opt ? opt.value : 'widescreen_16_9';
+}
+
+async function applyEdit() {
+  const instruction = document.getElementById('editInstruction').value.trim();
+  if (!instruction) { alert('Describe what you want to change first.'); return; }
+  if (!editItem) return;
+
+  const btn = document.getElementById('editApplyBtn');
+  btn.disabled = true;
+  btn.textContent = 'Applying…';
+
+  try {
+    const imageData = editItem.provider === 'openai'
+      ? await doOpenAIEdit(editItem, instruction)
+      : await doRegenerateEdit(editItem, instruction);
+
+    const src = imageData.b64
+      ? `data:${imageData.mime || 'image/png'};base64,${imageData.b64}`
+      : imageData.url;
+
+    const newItem = {
+      id: newItemId(), src,
+      prompt: `${editItem.prompt} — edited: ${instruction}`,
+      fullPrompt: `${editItem.fullPrompt || editItem.prompt} Additional edit instruction: ${instruction}.`,
+      model: editItem.model, modelId: editItem.modelId, provider: editItem.provider,
+      ratio: editItem.ratio, ts: Date.now(), editedFrom: editItem.id,
+    };
+    saveToHistory(newItem);
+    closeEditModal();
+    refreshOpenView();
+    openLightbox(newItem.id, 'history');
+  } catch (e) {
+    alert('Edit failed: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Apply Edit';
+  }
+}
+
+async function doOpenAIEdit(item, instruction) {
+  const blob = await (await fetch(item.src)).blob();
+  const fd = new FormData();
+  fd.append('model', 'gpt-image-1');
+  fd.append('image', blob, 'image.png');
+  // Keep the edit instruction on brand: same technical-correctness + no-clutter
+  // guardrails as a fresh generation, so edited images still comply.
+  fd.append('prompt', `${instruction}. ${BACKGROUND_RULE} ${MASTER_SUFFIX}`);
+
+  const res = await fetch(apiUrl('openai', '/v1/images/edits'), {
+    method: 'POST',
+    headers: { 'x-openai-api-key': getOpenAIKey() },
+    body: fd,
+  });
+  if (!res.ok) throw new Error(`API ${res.status}: ${(await res.text()).slice(0, 150)}`);
+  const data = await res.json();
+  const img = (data.data || [])[0];
+  if (!img || !img.b64_json) throw new Error('No image returned.');
+  return { b64: img.b64_json, mime: 'image/png' };
+}
+
+async function doRegenerateEdit(item, instruction) {
+  const model = MODELS[item.modelId] || MODELS['nano-banana'];
+  // Reuse the exact full master prompt from the original generation (not just the
+  // short scene text), so brand/background/technical-correctness rules carry over.
+  const fullPrompt = item.fullPrompt || item.prompt;
+  const combinedPrompt = `${fullPrompt} Additional edit instruction: ${instruction}.`;
+  const ratioValue = ratioValueFromLabel(item.ratio);
+  if (model.provider === 'openai') return doOpenAI(model, combinedPrompt, ratioValue);
+  return doAsync(model, combinedPrompt, DEFAULT_NEG, ratioValue, '2K', 1.2, undefined, 'edit');
+}
+
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+const MAGNIFIC_KEY = 'MS37c8268acced4d76966a212c97d658de';
+const getKey = () => localStorage.getItem('magnific_key') || MAGNIFIC_KEY;
+const getOpenAIKey = () => localStorage.getItem('openai_key') || '';
+
+// Route calls through local proxy (avoids CORS). Proxy runs on :3458.
+// Falls back to direct if already on the proxy origin.
+// Provider-prefixed so the proxy can route to the right upstream (Magnific vs OpenAI).
+const PROXY = 'http://localhost:3458';
+const onProxy = location.hostname === 'localhost' && location.port === '3458';
+function apiUrl(provider, path) {
+  const base = onProxy ? '/api' : PROXY + '/api';
+  return `${base}/${provider}${path}`;
+}
+
+// ─── MODEL CATALOGUE ─────────────────────────────────────────────────────────
+const MODELS = {
+  // ChatGPT (OpenAI, called directly)
+  'gpt-image-1': { provider: 'openai',   path: '/v1/images/generations',              supportsRes: false, supportsSubModel: false },
+  // ChatGPT (GPT 2, hosted via Magnific — endpoint unconfirmed, following Magnific's standard async pattern)
+  'gpt-2':       { provider: 'magnific', path: '/v1/ai/text-to-image/gpt-2',          async: true,  supportsRes: false, supportsSubModel: false, colRatio: true },
+  // Google (hosted via Magnific)
+  'nano-banana': { provider: 'magnific', path: '/v1/ai/text-to-image/nano-banana-pro-flash', async: true, supportsRes: true, supportsSubModel: false, colRatio: true },
+};
+
+// OpenAI gpt-image-1 only accepts these three sizes — map our aspect ratios to the closest one
+const OPENAI_SIZE = {
+  '1:1': '1024x1024',
+  '9:16': '1024x1536', '4:5': '1024x1536', '3:4': '1024x1536',
+  '16:9': '1536x1024', '4:3': '1536x1024', '3:2': '1536x1024', '2:1': '1536x1024',
+};
+
+// Nano Banana expects colon format; all other models use underscore format
+const RATIO_COLON = {
+  'widescreen_16_9':    '16:9',
+  'social_post_4_5':    '4:5',
+  'social_story_9_16':  '9:16',
+  'square_1_1':         '1:1',
+  'classic_4_3':        '4:3',
+  'traditional_3_4':    '3:4',
+  'standard_3_2':       '3:2',
+  'horizontal_2_1':     '2:1',
+};
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let state = {
+  moment: 'care',
+  product: 'general',
+  subModel: 'realism',
+  cameraAngle: 'eye-level',
+  noCharacters: false,
+  cancelRequested: false,
+};
+
+// ─── CAMERA ANGLES ────────────────────────────────────────────────────────────
+const CAMERA_ANGLES = {
+  'eye-level':        'eye-level angle',
+  'low-angle':        'low-angle shot looking up at the subject',
+  'high-angle':       'high-angle shot looking down at the subject',
+  'birds-eye':        "bird's-eye top-down view",
+  'worms-eye':        "worm's-eye view from ground level looking up",
+  'over-shoulder':    'over-the-shoulder framing',
+  'close-up':         'close-up framing',
+  'extreme-close-up': 'extreme close-up framing',
+  'medium-shot':      'medium shot framing',
+  'wide-shot':        'wide establishing shot',
+  'dutch-angle':      'subtle Dutch tilted angle',
+  'pov':              'first-person point-of-view framing',
+  'three-quarter':    'three-quarter view',
+  'profile':          'profile, side-on view',
+  'front-on':         'front-on, straight-on framing',
+  'aerial-drone':     'aerial drone shot from above',
+  'macro':            'macro close-up shot',
+};
+
+// ─── PROMPT DATA ──────────────────────────────────────────────────────────────
+const MOODS = {
+  'pre-purchase':   'calm and quietly focused, slightly weighing something — natural, unforced expression',
+  'active-life':    'easy and self-sufficient, going about their day — a small natural smile',
+  'care':           'composed and engaged, attentive to the person across from them — warm and trusting',
+  'reassurance':    'settled and gently relieved — composed look of someone whose problem is already sorted',
+  'internal-brand': 'warm and professionally confident, at ease in their environment',
+};
+
+const SETTINGS = {
+  motor: {
+    scene: 'a clean, uncluttered modern Indian car service area — one plain wall, a single tidy tool rack, minimal and calm',
+    propsHint: 'if the scene involves a vehicle or mechanic, a plain dark navy work uniform and a single compact Indian hatchback with a state number plate are appropriate',
+    light: 'bright even daylight from a large open shutter — soft natural fill, clean neutral whites',
+  },
+  health: {
+    scene: 'a clean, modern Indian clinic — a plain beige wall and minimal furnishings, a single small green plant',
+    propsHint: 'if the scene involves a doctor or consultation, a white coat and stethoscope are appropriate',
+    light: 'soft diffused window light with gentle neutral overhead fill — bright and clean',
+  },
+  travel: {
+    scene: 'a calm, modern Indian airport interior — clean floor and large windows, minimal and uncrowded',
+    propsHint: 'if the scene involves travel, a single cabin suitcase or boarding pass is appropriate',
+    light: 'soft afternoon daylight through large windows — bright, airy, mostly neutral tone',
+  },
+  home: {
+    scene: 'a warm, tidy Indian family home — a wooden table and a single small potted plant, uncluttered',
+    propsHint: 'if the scene calls for it, a cup of chai or a tablet is appropriate',
+    light: 'soft diffused window light — bright, mostly neutral domestic fill',
+  },
+  general: {
+    scene: 'a real, contemporary Indian setting — a clean, uncluttered home, office or quiet street corner',
+    propsHint: '',
+    light: 'bright clean natural light — mostly neutral, not dramatic',
+  },
+};
+
+// Strict background discipline — minimal, clean, only what the context needs
+const BACKGROUND_RULE = 'Keep the background minimal, clean and uncluttered — softly blurred, with only the few elements the context genuinely needs. No crowds, no rush, no busy scenery, no extra people, props or activity competing for attention.';
+
+// Props must be earned by the scene, never added by default
+const PROPS_RULE = 'Only include props, accessories or objects that the scene description explicitly calls for. Do not add a phone, bag, tablet, or any other item by default — empty hands are correct whenever the scene does not need an object.';
+
+// Master prompt — technical correctness + brand discipline, appended to every prompt
+const MASTER_SUFFIX = 'Ensure technical correctness in every detail: hands, eyes and fingers are anatomically accurate; phone screens, tablet screens, papers and documents are held at natural, correct angles with clean geometry and no garbled text or signage; no melted features, no repeating patterns, no distorted faces. Keep the execution disciplined, honest, and free of any real or implied brands, logos, hospital names or competitor visuals. The final image must feel warm, bright, disciplined, real, and immediately, unmistakably modern.';
+
+const DEFAULT_NEG = 'cluttered background, busy background, crowded scene, crowd, too many people, background rush, messy background, competing props, visual clutter, tilted phone screen, warped screen, distorted screen, bent or curved documents, wrong-angle paper, garbled text, gibberish signage, extra fingers, deformed hands, melted hands, wrong finger count, distorted face, off eyes, posed, stiff, looking at camera, stock photo smile, plastic skin, airbrushed complexion, heavy makeup, Western setting, left-hand drive car, foreign architecture, dark moody tones, hard shadows, neon colours, oversaturated HDR, mascot, cartoon, 3D render, CGI, illustration, visible brand logos, competitor names, text overlay on scene, fear, panic, blood, gore, distress, plain white background, nsfw, heavy orange colour grading, strong amber cast, golden hour glow, overly warm tone, sepia tint, yellow colour cast';
+
+// ─── PROMPT BUILDER ───────────────────────────────────────────────────────────
+function buildPrompt(scene) {
+  const s    = SETTINGS[state.product] || SETTINGS.general;
+  const cam  = CAMERA_ANGLES[state.cameraAngle] || CAMERA_ANGLES['eye-level'];
+
+  // Frame phrase follows the selected aspect ratio
+  const ratioOpt   = document.getElementById('ratioSelect').selectedOptions[0];
+  const ratioLabel = ratioOpt ? (ratioOpt.dataset.label || '16:9') : '16:9';
+  const FRAME = {
+    '16:9': '16:9 widescreen banner', '9:16': '9:16 vertical format',
+    '1:1':  '1:1 square format',      '4:5':  '4:5 portrait format',
+    '4:3':  '4:3 format',             '3:4':  '3:4 portrait format',
+    '3:2':  '3:2 format',             '2:1':  '2:1 wide banner',
+  }[ratioLabel] || `${ratioLabel} format`;
+
+  if (state.noCharacters) {
+    return [
+      `Cinematic photorealistic still-life photograph, ${FRAME}, ${cam}, shot on 50mm lens at f/2.8, shallow depth of field.`,
+      scene ? `${scene}.` : `An object, product or environment relevant to the ACKO brand context.`,
+      `Setting: ${s.scene}.`,
+      BACKGROUND_RULE,
+      PROPS_RULE + (s.propsHint ? ` (${s.propsHint}.)` : ''),
+      `${s.light}. Clean neutral whites, natural honest tones — bright modern commercial photography, never dark, moody or oversaturated.`,
+      'No characters — no people, no human figures, no hands, no faces anywhere in the frame. Object, product or environment only, with room to breathe.',
+      'Soft diffused natural light, mostly neutral true-to-life color, only a subtle 20-30% touch of warmth — not golden hour, not amber or orange, no heavy color cast, gentle film grain.',
+      MASTER_SUFFIX,
+    ].join(' ');
+  }
+
+  const skinTone = document.getElementById('skinTone').value;
+  const region   = document.getElementById('region').value || 'Indian';
+  const age      = document.getElementById('ageSelect').value;
+  const stage    = document.getElementById('lifeStage').value;
+  const mood     = MOODS[state.moment] || MOODS.care;
+
+  const subjectParts = [skinTone, region, 'person', age, stage].filter(Boolean);
+  const subject = subjectParts.join(', ');
+
+  return [
+    `Cinematic photorealistic lifestyle photograph, ${FRAME}, ${cam}, shot on 50mm lens at f/2.8, shallow depth of field.`,
+    scene ? `A ${subject} — ${scene}.` : `A ${subject} in an authentic, contemporary Indian setting.`,
+    `Setting: ${s.scene}.`,
+    BACKGROUND_RULE,
+    PROPS_RULE + (s.propsHint ? ` (${s.propsHint}.)` : ''),
+    `${s.light}. Clean neutral whites, natural honest skin tones with slight imperfections — bright modern Indian commercial photography, never dark, moody or oversaturated.`,
+    `Expression: ${mood}. One clear subject with room to breathe.`,
+    'Candid documentary feel, not posed. Realistic skin texture, no heavy makeup. Middle-class Indian aesthetic, modern but understated.',
+    'Soft diffused natural light, mostly neutral true-to-life color, only a subtle 20-30% touch of warmth — not golden hour, not amber or orange, no heavy color cast, gentle film grain.',
+    MASTER_SUFFIX,
+  ].join(' ');
+}
+
+// ─── ENHANCE PROMPT ──────────────────────────────────────────────────────────
+// The enhanced prompt box is a plain contenteditable div — no inner <span>.
+// `enhancedUserEdited` tracks whether the user has typed into it by hand, so
+// pill/dropdown changes (which call updatePrompt) don't clobber a manual edit.
+let enhancedUserEdited = false;
+
+function enhancePrompt() {
+  const scene = document.getElementById('sceneInput').value.trim();
+  if (!scene) {
+    alert('Please describe a scene first.');
+    return;
+  }
+  const body = document.getElementById('enhancedBody');
+  body.textContent = buildPrompt(scene);
+  enhancedUserEdited = false;
+}
+
+function updatePrompt() {
+  const scene = document.getElementById('sceneInput').value.trim();
+  const body  = document.getElementById('enhancedBody');
+  if (body.textContent.trim() && !enhancedUserEdited) {
+    body.textContent = buildPrompt(scene);
+  }
+}
+
+function onEnhancedEdit() {
+  enhancedUserEdited = true;
+}
+
+function copyEnhanced() {
+  const body = document.getElementById('enhancedBody');
+  const text = body.textContent.trim();
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.btn-copy-sm');
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Copied';
+    setTimeout(() => btn.innerHTML = orig, 1500);
+  });
+}
+
+// ─── INPUT EVENTS ─────────────────────────────────────────────────────────────
+function onSceneInput() {
+  const v = document.getElementById('sceneInput').value;
+  document.getElementById('charCount').textContent = `${v.length} / 2000`;
+}
+
+// ─── MODEL CHANGE ─────────────────────────────────────────────────────────────
+function onModelChange() {
+  const id = document.getElementById('modelSelect').value;
+  const m  = MODELS[id];
+  document.getElementById('subModelSection').style.display = m.supportsSubModel ? '' : 'none';
+  document.getElementById('resSelect').closest('.form-group').style.opacity = m.supportsRes ? '1' : '0.4';
+}
+
+// ─── PILLS ────────────────────────────────────────────────────────────────────
+function togglePill(el, group) {
+  const container = el.parentElement;
+  container.querySelectorAll('.apill').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+  if (group === 'moment')   state.moment      = el.dataset.val;
+  if (group === 'product')  state.product     = el.dataset.val;
+  if (group === 'submodel') state.subModel    = el.dataset.val;
+  if (group === 'camera')   state.cameraAngle = el.dataset.val;
+  updatePrompt();
+}
+
+// ─── NO CHARACTERS ────────────────────────────────────────────────────────────
+function toggleNoCharacters() {
+  state.noCharacters = document.getElementById('noCharCheckbox').checked;
+  document.getElementById('noCharToggleRow').classList.toggle('on', state.noCharacters);
+  ['diversitySection', 'momentSection'].forEach(id => {
+    const el = document.getElementById(id);
+    el.style.opacity = state.noCharacters ? '0.4' : '1';
+    el.style.pointerEvents = state.noCharacters ? 'none' : '';
+  });
+  updatePrompt();
+}
+
+// ─── NEG PROMPT ──────────────────────────────────────────────────────────────
+function toggleNeg() {
+  document.getElementById('negBody').classList.toggle('open');
+  document.getElementById('negCaret').classList.toggle('open');
+}
+
+// ─── MODALS ──────────────────────────────────────────────────────────────────
+function openAdv()  { document.getElementById('advOverlay').classList.add('open'); }
+function closeAdv() { document.getElementById('advOverlay').classList.remove('open'); }
+function openKeyModal() {
+  document.getElementById('apiKeyInput').value = getKey();
+  document.getElementById('openaiKeyInput').value = getOpenAIKey();
+  document.getElementById('keyOverlay').classList.add('open');
+}
+function closeKeyModal() { document.getElementById('keyOverlay').classList.remove('open'); }
+function saveKey() {
+  const v  = document.getElementById('apiKeyInput').value.trim();
+  const ov = document.getElementById('openaiKeyInput').value.trim();
+  if (v) localStorage.setItem('magnific_key', v);
+  if (ov) localStorage.setItem('openai_key', ov);
+  closeKeyModal();
+}
+
+// ─── STATUS ──────────────────────────────────────────────────────────────────
+function setStatus(state_, msg) {
+  document.getElementById('statusDot').className = 'status-dot ' + state_;
+  document.getElementById('statusText').textContent = msg;
+}
+
+// ─── PROGRESS RING ────────────────────────────────────────────────────────────
+const CIRC = 2 * Math.PI * 52; // ≈ 326.7
+function setProgress(pct) {
+  const fill   = document.getElementById('ringFill');
+  const offset = CIRC * (1 - pct / 100);
+  fill.style.strokeDashoffset = offset;
+  document.getElementById('ringPct').textContent = Math.round(pct) + '%';
+}
+
+// ─── CANCEL ──────────────────────────────────────────────────────────────────
+function cancelGeneration() {
+  state.cancelRequested = true;
+  setStatus('err', 'Cancelled');
+  document.getElementById('progressCard').classList.add('hidden');
+}
+
+function clearResults() {
+  document.getElementById('resultsGrid').className = 'results-grid n4';
+  document.getElementById('resultsGrid').innerHTML = Array(4).fill(0).map(() =>
+    `<div class="empty-ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`
+  ).join('');
+  document.getElementById('resultsSub').textContent = 'Your generated images will appear here once completed.';
+  document.getElementById('progressCard').classList.add('hidden');
+  setStatus('', 'Ready');
+}
+
+// ─── GET ASPECT CLASS ────────────────────────────────────────────────────────
+function getAspectCls() {
+  const opt = document.getElementById('ratioSelect').selectedOptions[0];
+  const label = opt ? opt.dataset.label : '16:9';
+  if (label === '9:16' || label === '3:4') return 'port';
+  if (label === '1:1') return 'sq';
+  if (label === '4:3') return 'cls';
+  return '';
+}
+
+// ─── GENERATE ────────────────────────────────────────────────────────────────
+let isGenerating = false;
+let lastGenMeta = { prompt: '', fullPrompt: '', model: '', modelId: '', provider: '', ratio: '' };
+
+async function generate() {
+  if (isGenerating) return;
+
+  const scene = document.getElementById('sceneInput').value.trim();
+  if (!scene) { alert('Please describe a scene first.'); return; }
+
+  const modelId   = document.getElementById('modelSelect').value;
+  const model     = MODELS[modelId];
+
+  if (model.provider === 'openai' && !getOpenAIKey()) {
+    alert('Please add your OpenAI API key first.');
+    openKeyModal();
+    return;
+  }
+
+  const num       = parseInt(document.getElementById('numSelect').value);
+  const ratio     = document.getElementById('ratioSelect').value;
+  const res       = document.getElementById('resSelect').value;
+  const guidance  = parseFloat(document.getElementById('guidance').value) || 1.2;
+  const seedRaw   = document.getElementById('seed').value.trim();
+  const seed      = seedRaw ? parseInt(seedRaw) : undefined;
+  let negPrompt   = document.getElementById('negPrompt').value || DEFAULT_NEG;
+  if (state.noCharacters) negPrompt += ', people, person, human figure, face, hands, characters, mascot, animal';
+
+  // Get prompt — use the (possibly hand-edited) enhanced box if it has content, else build now
+  const enhText = document.getElementById('enhancedBody').textContent.trim();
+  const prompt  = enhText || buildPrompt(scene);
+
+  // Capture metadata for library items
+  const modelLabel = document.getElementById('modelSelect').selectedOptions[0].textContent.trim();
+  const ratioOpt   = document.getElementById('ratioSelect').selectedOptions[0];
+  const ratioLabel = ratioOpt ? (ratioOpt.dataset.label || ratioOpt.textContent.trim()) : '';
+  lastGenMeta = { prompt: scene || prompt, fullPrompt: prompt, model: modelLabel, modelId, provider: model.provider, ratio: ratioLabel };
+
+  state.cancelRequested = false;
+  isGenerating = true;
+
+  // Update UI
+  const btn = document.getElementById('genBtn');
+  btn.disabled = true;
+  document.getElementById('genBtnLabel').innerHTML = '<span class="btn-spinner"></span>&nbsp; Generating…';
+
+  setStatus('working', 'Generating…');
+  document.getElementById('progressCard').classList.remove('hidden');
+  setProgress(0);
+
+  // Setup results grid
+  const acls = getAspectCls();
+  const grid = document.getElementById('resultsGrid');
+  grid.className = `results-grid n${num}`;
+  grid.innerHTML = Array.from({length: num}, (_, i) =>
+    `<div class="img-ph${acls?' '+acls:''}" id="ph_${i}">
+      <div class="ph-spinner"></div>
+      <div class="ph-msg">Generating…</div>
+      <div class="ph-time" id="pht_${i}">0s</div>
+    </div>`
+  ).join('');
+  document.getElementById('resultsSub').textContent = `Generating ${num} image${num>1?'s':''}…`;
+
+  // Timers for elapsed display
+  const startTime = Date.now();
+  const timerInterval = setInterval(() => {
+    const elapsed = Math.round((Date.now() - startTime) / 1000);
+    document.querySelectorAll('[id^="pht_"]').forEach(el => {
+      if (el.parentElement.classList.contains('img-ph')) {
+        el.textContent = `${elapsed}s`;
+      }
+    });
+    // Fake progress for UX
+    const fakePct = Math.min(90, elapsed * 2.5);
+    setProgress(fakePct);
+  }, 1000);
+
+  const tasks = Array.from({length: num}, (_, i) =>
+    runGeneration(model, prompt, negPrompt, ratio, res, guidance, seed, i)
+  );
+
+  const results = await Promise.allSettled(tasks);
+  clearInterval(timerInterval);
+
+  if (state.cancelRequested) {
+    isGenerating = false;
+    btn.disabled = false;
+    document.getElementById('genBtnLabel').textContent = 'Generate Image';
+    return;
+  }
+
+  setProgress(100);
+  const successes = results.filter(r => r.status === 'fulfilled').length;
+  document.getElementById('progressCard').classList.add('hidden');
+  setStatus('done', `${successes} of ${num} completed`);
+  document.getElementById('resultsSub').textContent = `${successes} image${successes!==1?'s':''} generated.`;
+
+  isGenerating = false;
+  btn.disabled = false;
+  document.getElementById('genBtnLabel').textContent = 'Generate Image';
+}
+
+async function runGeneration(model, prompt, negPrompt, ratio, res, guidance, seed, idx) {
+  try {
+    const imageData = model.provider === 'openai'
+      ? await doOpenAI(model, prompt, ratio)
+      : await doAsync(model, prompt, negPrompt, ratio, res, guidance, seed, idx);
+    if (!state.cancelRequested) showImage(idx, imageData);
+  } catch(e) {
+    if (!state.cancelRequested) showError(idx, e.message);
+    throw e;
+  }
+}
+
+async function doOpenAI(model, prompt, ratio) {
+  const ratioOpt   = document.getElementById('ratioSelect').selectedOptions[0];
+  const ratioLabel = ratioOpt ? ratioOpt.dataset.label : '16:9';
+  const size = OPENAI_SIZE[ratioLabel] || '1024x1024';
+  const body = { model: 'gpt-image-1', prompt, n: 1, size, quality: 'high' };
+
+  const res = await fetch(apiUrl('openai', model.path), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-openai-api-key': getOpenAIKey() },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`API ${res.status}: ${(await res.text()).slice(0,120)}`);
+  const data = await res.json();
+  const img = (data.data || [])[0];
+  if (!img || !img.b64_json) throw new Error('No image returned.');
+  return { b64: img.b64_json, mime: 'image/png' };
+}
+
+async function doAsync(model, prompt, negPrompt, ratio, res, guidance, seed, idx) {
+  const aspectRatio = model.colRatio ? (RATIO_COLON[ratio] || '16:9') : ratio;
+  const body = { prompt, aspect_ratio: aspectRatio, filter_nsfw: true };
+  if (model.supportsRes) body.resolution = res;
+  if (negPrompt && !model.colRatio) body.negative_prompt = negPrompt;
+  if (model.path.indexOf('nano-banana') >= 0) body.use_google_search_tool = false;
+  if (seed !== undefined) body.seed = seed;
+
+  const createRes = await fetch(apiUrl('magnific', model.path), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-magnific-api-key': getKey() },
+    body: JSON.stringify(body),
+  });
+  if (!createRes.ok) throw new Error(`API ${createRes.status}: ${(await createRes.text()).slice(0,120)}`);
+  const created = await createRes.json();
+  const taskId  = (created.data || {}).task_id || (created.data || {}).id;
+  if (!taskId) throw new Error('No task_id in response.');
+
+  const pollUrl = apiUrl('magnific', model.path + '/' + taskId);
+  const hdrs    = { 'Content-Type': 'application/json', 'x-magnific-api-key': getKey() };
+
+  for (let i = 0; i < 90; i++) {
+    if (state.cancelRequested) throw new Error('Cancelled.');
+    await sleep(2000);
+    const pr = await fetch(pollUrl, { headers: hdrs });
+    if (!pr.ok) continue;
+    const result = await pr.json();
+    const status = (result.data || {}).status;
+    if (status === 'COMPLETED') {
+      const generated = (result.data || {}).generated || [];
+      const url = generated[0] || (result.data || {}).image_url;
+      if (!url) throw new Error('No image URL in response.');
+      return { url };
+    }
+    if (status === 'FAILED') throw new Error('Generation failed on server.');
+    const phEl = document.getElementById(`pht_${idx}`);
+    if (phEl) phEl.textContent = `${(i+1)*2}s`;
+  }
+  throw new Error('Timed out (3 min).');
+}
+
+function showImage(idx, imageData) {
+  const ph  = document.getElementById(`ph_${idx}`);
+  if (!ph) return;
+  const acls = getAspectCls();
+
+  const src = imageData.b64
+    ? `data:${imageData.mime||'image/png'};base64,${imageData.b64}`
+    : imageData.url;
+
+  // Persist to history — keep both the short display prompt and the exact full
+  // master-compliant prompt actually sent to the API, so Edit/Regenerate can reuse it.
+  const item = {
+    id: newItemId(), src,
+    prompt: lastGenMeta.prompt, fullPrompt: lastGenMeta.fullPrompt,
+    model: lastGenMeta.model, modelId: lastGenMeta.modelId,
+    provider: lastGenMeta.provider, ratio: lastGenMeta.ratio,
+    ts: Date.now(),
+  };
+  saveToHistory(item);
+
+  const card = document.createElement('div');
+  card.className = `img-card${acls?' '+acls:''}`;
+  card.onclick = () => openLightbox(item.id, 'generate');
+
+  const zoomHint = document.createElement('div');
+  zoomHint.className = 'img-zoom-hint';
+  zoomHint.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>';
+  card.appendChild(zoomHint);
+
+  const img = document.createElement('img');
+  img.alt = 'Generated image';
+  img.src = src;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'img-overlay';
+  overlay.onclick = (e) => e.stopPropagation();
+
+  // Favourite
+  const favBtn = document.createElement('button');
+  favBtn.className = 'gact';
+  favBtn.title = 'Favourite';
+  favBtn.style.cssText = 'width:32px;height:32px';
+  favBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
+  favBtn.onclick = () => { const on = toggleStore('favourites', item); favBtn.classList.toggle('on', on); favBtn.querySelector('svg').setAttribute('fill', on ? 'currentColor' : 'none'); };
+
+  // Collection
+  const collBtn = document.createElement('button');
+  collBtn.className = 'gact';
+  collBtn.title = 'Add to Collection';
+  collBtn.style.cssText = 'width:32px;height:32px';
+  collBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h5l2 2h9a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>`;
+  collBtn.onclick = () => { const on = toggleStore('collections', item); collBtn.classList.toggle('on', on); };
+
+  // Download
+  const dlBtn = document.createElement('button');
+  dlBtn.className = 'btn-dl';
+  dlBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download`;
+  dlBtn.onclick = () => downloadImg(imageData, idx + 1);
+
+  const iconRow = document.createElement('div');
+  iconRow.style.cssText = 'display:flex;gap:8px';
+  iconRow.appendChild(favBtn);
+  iconRow.appendChild(collBtn);
+  overlay.appendChild(iconRow);
+  overlay.appendChild(dlBtn);
+  card.appendChild(img);
+  card.appendChild(overlay);
+  ph.replaceWith(card);
+}
+
+function showError(idx, msg) {
+  const ph = document.getElementById(`ph_${idx}`);
+  if (!ph) return;
+  ph.innerHTML = `<div style="text-align:center;padding:16px;color:#DC2626;font-size:11px">
+    <div style="font-size:20px;margin-bottom:6px">✗</div>${esc(msg.slice(0,80))}</div>`;
+}
+
+async function downloadImg(imageData, num) {
+  const a = document.createElement('a');
+  a.download = `acko-${num}-${Date.now()}.png`;
+  if (imageData.b64) {
+    a.href = `data:${imageData.mime||'image/png'};base64,${imageData.b64}`;
+  } else {
+    try {
+      const r = await fetch(imageData.url);
+      a.href = URL.createObjectURL(await r.blob());
+    } catch { a.href = imageData.url; a.target = '_blank'; }
+  }
+  a.click();
+}
+
+// ─── UTILITIES ────────────────────────────────────────────────────────────────
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // Always ensure the Magnific key is set
+  if (!localStorage.getItem('magnific_key')) {
+    localStorage.setItem('magnific_key', MAGNIFIC_KEY);
+  }
+  document.getElementById('negPrompt').value = DEFAULT_NEG;
+  onModelChange();
+});
+</script>
+</body>
+</html>
