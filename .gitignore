@@ -1,4 +1,4 @@
 .env
 .session_secret
-allowed_emails.json
-pending_requests.json
+service-account*.json
+*-service-account.json

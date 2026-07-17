@@ -43,53 +43,24 @@ def load_env_file(path):
 load_env_file(ENV_FILE)
 MAGNIFIC_KEY = os.environ.get("MAGNIFIC_KEY", "")
 
+# sheets_store reads GOOGLE_* env vars at import time, so it must be imported only
+# after .env has been loaded into os.environ above.
+import sheets_store
+
 ALLOWED_EMAIL_DOMAIN = "acko.tech"
 SESSION_TTL_SECONDS = 12 * 60 * 60  # 12 hours
 SESSION_SECRET_FILE = os.path.join(HTML_DIR, ".session_secret")
-ALLOWLIST_FILE = os.path.join(HTML_DIR, "allowed_emails.json")
-PENDING_FILE = os.path.join(HTML_DIR, "pending_requests.json")
 
-
-def get_permissions():
-    """Reads allowed_emails.json, synced from the permission sheet's Emails/Permissions
-    columns. Returns (approved_set, denied_set). Fails safe: if the file is missing or
-    unreadable, both sets are empty — nobody is allowed in, nobody is hard-denied either
-    (they'll just show as pending until the sync catches up).
-
-    Back-compat: older syncs wrote {"emails": [...]} meaning approved-only.
-    """
-    try:
-        with open(ALLOWLIST_FILE, "r") as f:
-            data = json.load(f)
-        approved = {e.strip().lower() for e in data.get("approved", data.get("emails", []))}
-        denied = {e.strip().lower() for e in data.get("denied", [])}
-        return approved, denied
-    except Exception:
-        return set(), set()
+# Permission checks are delegated to sheets_store, which talks to the Google Sheet
+# directly via a service account and keeps its own refreshed in-process cache.
+get_permissions = sheets_store.get_permissions
+record_pending_request = sheets_store.record_pending_request
 
 
 def get_allowed_emails():
     """Back-compat helper — just the approved set."""
     approved, _denied = get_permissions()
     return approved
-
-
-def record_pending_request(email):
-    """Note a login attempt from an email with no decision yet, so the next sheet sync
-    can mark the 'Request Pending' column for them. Idempotent — safe to call every attempt."""
-    try:
-        with open(PENDING_FILE, "r") as f:
-            data = json.load(f)
-    except Exception:
-        data = {"requests": []}
-    existing = {r.get("email", "").lower() for r in data.get("requests", [])}
-    if email not in existing:
-        data.setdefault("requests", []).append({"email": email, "requestedAt": time.time()})
-        try:
-            with open(PENDING_FILE, "w") as f:
-                json.dump(data, f, indent=2)
-        except Exception:
-            pass
 
 
 def get_session_secret():
@@ -312,6 +283,7 @@ if __name__ == "__main__":
     print(f"  Open in browser → http://localhost:{PORT}/generate.html\n")
     if not MAGNIFIC_KEY:
         print("  WARNING: MAGNIFIC_KEY is not set in .env — image generation will fail with a 401/403 until it is.\n")
+    sheets_store.start()
     try:
         server.serve_forever()
     except KeyboardInterrupt:
