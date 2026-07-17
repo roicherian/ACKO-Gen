@@ -19,8 +19,29 @@ import os
 
 PORT = 3458
 MAGNIFIC_BASE = "https://api.magnific.com"
-MAGNIFIC_KEY  = "MS37c8268acced4d76966a212c97d658de"
 HTML_DIR = os.path.dirname(os.path.abspath(__file__))
+ENV_FILE = os.path.join(HTML_DIR, ".env")
+
+
+def load_env_file(path):
+    """Minimal .env parser (stdlib only) — sets os.environ from KEY=VALUE lines,
+    without overriding anything already set in the real environment."""
+    try:
+        with open(path, "r") as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                key, _, value = line.partition("=")
+                key, value = key.strip(), value.strip()
+                if key and key not in os.environ:
+                    os.environ[key] = value
+    except FileNotFoundError:
+        pass
+
+
+load_env_file(ENV_FILE)
+MAGNIFIC_KEY = os.environ.get("MAGNIFIC_KEY", "")
 
 ALLOWED_EMAIL_DOMAIN = "acko.tech"
 SESSION_TTL_SECONDS = 12 * 60 * 60  # 12 hours
@@ -99,8 +120,9 @@ def upstream_headers(provider, incoming_headers):
     # image edit uploads) instead of forcing JSON, so multipart bodies parse correctly upstream.
     content_type = incoming_headers.get("Content-Type", "application/json")
     if provider == "magnific":
-        key = incoming_headers.get("x-magnific-api-key", "") or MAGNIFIC_KEY
-        return {"Content-Type": content_type, "x-magnific-api-key": key}
+        # The real key lives only here, loaded from .env — the browser never sees it and
+        # any client-supplied x-magnific-api-key header is ignored, not trusted.
+        return {"Content-Type": content_type, "x-magnific-api-key": MAGNIFIC_KEY}
     return {"Content-Type": "application/json"}
 
 
@@ -111,7 +133,7 @@ class ProxyHandler(BaseHTTPRequestHandler):
     def send_cors(self):
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type, x-magnific-api-key, x-session-token")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, x-session-token")
 
     def send_json(self, status, obj):
         body = json.dumps(obj).encode()
@@ -248,6 +270,8 @@ if __name__ == "__main__":
     server = HTTPServer(("localhost", PORT), ProxyHandler)
     print(f"\n  ACKO Image Generator proxy running")
     print(f"  Open in browser → http://localhost:{PORT}/generate.html\n")
+    if not MAGNIFIC_KEY:
+        print("  WARNING: MAGNIFIC_KEY is not set in .env — image generation will fail with a 401/403 until it is.\n")
     try:
         server.serve_forever()
     except KeyboardInterrupt:
