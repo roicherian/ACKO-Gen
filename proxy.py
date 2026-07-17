@@ -43,18 +43,20 @@ def load_env_file(path):
 load_env_file(ENV_FILE)
 MAGNIFIC_KEY = os.environ.get("MAGNIFIC_KEY", "")
 
-# sheets_store reads GOOGLE_* env vars at import time, so it must be imported only
-# after .env has been loaded into os.environ above.
-import sheets_store
-
 ALLOWED_EMAIL_DOMAIN = "acko.tech"
 SESSION_TTL_SECONDS = 12 * 60 * 60  # 12 hours
 SESSION_SECRET_FILE = os.path.join(HTML_DIR, ".session_secret")
 
-# Permission checks are delegated to sheets_store, which talks to the Google Sheet
-# directly via a service account and keeps its own refreshed in-process cache.
-get_permissions = sheets_store.get_permissions
-record_pending_request = sheets_store.record_pending_request
+# TODO: permission storage is being rebuilt as a native in-app DB table with
+# admin-managed permission levels (No access / Full access / Imagen access /
+# Icongen access / Admin), replacing the old Google Sheets sync. Until that
+# lands, this fails safe: nobody is approved, nobody is denied outright.
+def get_permissions():
+    return set(), set()
+
+
+def record_pending_request(email):
+    pass
 
 
 def get_allowed_emails():
@@ -283,7 +285,6 @@ if __name__ == "__main__":
     print(f"  Open in browser → http://localhost:{PORT}/generate.html\n")
     if not MAGNIFIC_KEY:
         print("  WARNING: MAGNIFIC_KEY is not set in .env — image generation will fail with a 401/403 until it is.\n")
-    sheets_store.start()
     try:
         server.serve_forever()
     except KeyboardInterrupt:

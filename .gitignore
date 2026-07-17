@@ -1,4 +1,2 @@
 .env
 .session_secret
-service-account*.json
-*-service-account.json
