@@ -1716,6 +1716,7 @@ async function checkSession() {
     if (data.valid) {
       applyPermission(data.permission);
       hideLoginGate(data.email);
+      if (location.hash === '#admin') navigateTo('admin'); // no-op if not an Admin
     } else {
       clearSession();
       showLoginGate();
