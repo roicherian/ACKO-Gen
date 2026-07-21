@@ -19,10 +19,15 @@ import os
 
 import user_store
 
-PORT = 3458
+PORT = int(os.environ.get("PORT", 3458))
 MAGNIFIC_BASE = "https://api.magnific.com"
 HTML_DIR = os.path.dirname(os.path.abspath(__file__))
 ENV_FILE = os.path.join(HTML_DIR, ".env")
+# On a real host, point this at a persistent volume/disk (e.g. Render's mounted
+# disk path) so the user DB and session secret survive restarts/redeploys.
+# Defaults to living alongside the code, which is fine for local dev.
+DATA_DIR = os.environ.get("DATA_DIR", HTML_DIR)
+os.makedirs(DATA_DIR, exist_ok=True)
 
 
 def load_env_file(path):
@@ -47,7 +52,7 @@ MAGNIFIC_KEY = os.environ.get("MAGNIFIC_KEY", "")
 
 ALLOWED_EMAIL_DOMAIN = "acko.tech"
 SESSION_TTL_SECONDS = 12 * 60 * 60  # 12 hours
-SESSION_SECRET_FILE = os.path.join(HTML_DIR, ".session_secret")
+SESSION_SECRET_FILE = os.path.join(DATA_DIR, ".session_secret")
 
 user_store.init_db()
 _bootstrap_admin_emails = [e for e in os.environ.get("ADMIN_EMAILS", "").split(",") if e.strip()]
@@ -338,8 +343,10 @@ class ProxyHandler(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    server = HTTPServer(("localhost", PORT), ProxyHandler)
-    print(f"\n  ACKO Image Generator proxy running")
+    # 0.0.0.0 so this works both locally and on a real host (Render etc. route
+    # external traffic to whatever port the process binds, not just localhost).
+    server = HTTPServer(("0.0.0.0", PORT), ProxyHandler)
+    print(f"\n  ACKO Image Generator proxy running on port {PORT}")
     print(f"  Open in browser → http://localhost:{PORT}/generate.html\n")
     if not MAGNIFIC_KEY:
         print("  WARNING: MAGNIFIC_KEY is not set in .env — image generation will fail with a 401/403 until it is.\n")

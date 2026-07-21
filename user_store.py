@@ -14,7 +14,10 @@ import threading
 import datetime
 
 HTML_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(HTML_DIR, "acko_gen.db")
+# On a real host, point DATA_DIR at a persistent volume/disk so this DB survives
+# restarts/redeploys — same env var proxy.py uses for the session secret.
+DATA_DIR = os.environ.get("DATA_DIR", HTML_DIR)
+DB_PATH = os.path.join(DATA_DIR, "acko_gen.db")
 
 PERMISSION_LEVELS = ["No access", "Full access", "Imagen access", "Icongen access", "Admin"]
 

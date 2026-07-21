@@ -1607,17 +1607,15 @@ async function doRegenerateEdit(item, instruction) {
 // The Magnific API key lives only in proxy.py (loaded from .env, never sent to
 // the browser) — the client only ever proves it's a signed-in acko.tech user.
 
-// Route calls through local proxy (avoids CORS). Proxy runs on :3458.
-// Falls back to direct if already on the proxy origin.
+// generate.html is always served BY proxy.py itself (locally on :3458, or on
+// whatever host/port it's deployed to) — so calls back to it are always
+// same-origin. Relative paths work everywhere, no hardcoded host needed.
 // Provider-prefixed so the proxy can route to the right upstream.
-const PROXY = 'http://localhost:3458';
-const onProxy = location.hostname === 'localhost' && location.port === '3458';
 function apiUrl(provider, path) {
-  const base = onProxy ? '/api' : PROXY + '/api';
-  return `${base}/${provider}${path}`;
+  return `/api/${provider}${path}`;
 }
 function proxyUrl(path) {
-  return onProxy ? path : PROXY + path;
+  return path;
 }
 
 // ─── AUTH (acko.tech email login) ──────────────────────────────────────────────
