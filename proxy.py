@@ -173,8 +173,11 @@ class ProxyHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
-        # Serve generate.html directly
-        if self.path == "/" or self.path == "/generate.html":
+        # Serve generate.html directly. "/generate.html?x=y" (any query string) should
+        # still match — strip it before comparing, otherwise a cache-busting query
+        # param would silently 404 instead of serving the page.
+        path_no_query = self.path.split("?", 1)[0]
+        if path_no_query == "/" or path_no_query == "/generate.html":
             try:
                 with open(os.path.join(HTML_DIR, "generate.html"), "rb") as f:
                     body = f.read()
@@ -187,6 +190,16 @@ class ProxyHandler(BaseHTTPRequestHandler):
             except FileNotFoundError:
                 self.send_response(404)
                 self.end_headers()
+            except Exception as e:
+                # Don't let a single bad request (e.g. a macOS sandbox permission
+                # error on the file read) take down request handling for everyone
+                # else — log it and fail this one request cleanly instead.
+                print(f"  ERROR serving generate.html: {e}")
+                try:
+                    self.send_response(500)
+                    self.end_headers()
+                except Exception:
+                    pass
             return
 
         # Session check — lets the frontend confirm a stored session is still valid,
