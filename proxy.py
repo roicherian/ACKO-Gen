@@ -173,6 +173,20 @@ class ProxyHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
+        try:
+            self._do_GET_inner()
+        except Exception as e:
+            # Last-resort safety net: whatever broke, make sure this request gets
+            # SOME response instead of hanging (which is what made the proxy look
+            # "unreachable" from the browser even though the process was alive).
+            print(f"  ERROR handling GET {self.path}: {e}")
+            try:
+                self.send_response(500)
+                self.end_headers()
+            except Exception:
+                pass
+
+    def _do_GET_inner(self):
         # Serve generate.html directly. "/generate.html?x=y" (any query string) should
         # still match — strip it before comparing, otherwise a cache-busting query
         # param would silently 404 instead of serving the page.
@@ -190,16 +204,6 @@ class ProxyHandler(BaseHTTPRequestHandler):
             except FileNotFoundError:
                 self.send_response(404)
                 self.end_headers()
-            except Exception as e:
-                # Don't let a single bad request (e.g. a macOS sandbox permission
-                # error on the file read) take down request handling for everyone
-                # else — log it and fail this one request cleanly instead.
-                print(f"  ERROR serving generate.html: {e}")
-                try:
-                    self.send_response(500)
-                    self.end_headers()
-                except Exception:
-                    pass
             return
 
         # Session check — lets the frontend confirm a stored session is still valid,
@@ -260,12 +264,27 @@ class ProxyHandler(BaseHTTPRequestHandler):
                 self.send_cors()
                 self.end_headers()
                 self.wfile.write(body)
+            except Exception as ex:
+                # Network blip, DNS hiccup, timeout, etc. reaching Magnific —
+                # tell the client cleanly instead of leaving the request hanging.
+                self.send_json(502, {"error": f"Upstream request failed: {ex}"})
             return
 
         self.send_response(404)
         self.end_headers()
 
     def do_POST(self):
+        try:
+            self._do_POST_inner()
+        except Exception as e:
+            print(f"  ERROR handling POST {self.path}: {e}")
+            try:
+                self.send_response(500)
+                self.end_headers()
+            except Exception:
+                pass
+
+    def _do_POST_inner(self):
         # Login — validates the email domain and issues a signed session token.
         # Login only proves identity now; it always succeeds for a valid acko.tech
         # address (creating a 'No access' user record on first sight). Whether that
