@@ -1434,6 +1434,7 @@ body:not(.vehicle-mode) .prompt-footer .btn-gen { width: 100%; margin-top: 2px; 
   background: var(--lb-stage-chip); border: 1px solid var(--lb-stage-chip-border);
   backdrop-filter: blur(8px);
 }
+.lb-stage-tools.hidden { display: none; }
 .lb-stage-tools .lb-tool {
   display: inline-flex; align-items: center; gap: 6px;
   height: 34px; padding: 0 10px; border-radius: 10px;
@@ -4515,20 +4516,21 @@ function wireLbPanZoom() {
 }
 function syncLbButtons() {
   if (!lbItem) return;
+  const tools = document.querySelector('.lb-stage-tools');
   const rmBtn = document.getElementById('lbRemoveBg');
   const mirrorBtn = document.getElementById('lbMirror');
+  const isCutoutView = !!(lbItem.badge === 'No BG' || lbItem.isCutout);
+  // Edit / Mirror / Regen / Remove BG apply only to Original + Mirrored
+  if (tools) tools.classList.toggle('hidden', isCutoutView);
+  if (isCutoutView) return;
+
   if (rmBtn) {
     const family = getLbVersionFamily(lbItem);
     const hasCutout = family.some(v => v.label === 'No BG');
-    const isCutoutView = !!(lbItem.badge === 'No BG' || lbItem.isCutout);
     rmBtn.disabled = false;
-    rmBtn.classList.toggle('on', hasCutout || isCutoutView);
+    rmBtn.classList.toggle('on', hasCutout);
     const span = rmBtn.querySelector('span');
-    if (span) {
-      span.textContent = isCutoutView
-        ? 'No-BG'
-        : (hasCutout ? 'Replace BG' : 'Remove BG');
-    }
+    if (span) span.textContent = hasCutout ? 'Replace BG' : 'Remove BG';
   }
   if (mirrorBtn) {
     const family = getLbVersionFamily(lbItem);
