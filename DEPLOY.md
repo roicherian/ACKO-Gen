@@ -25,6 +25,7 @@ In the service's **Environment** tab, add:
 | Key | Value |
 |---|---|
 | `MAGNIFIC_KEY` | your Magnific API key |
+| `REMOVE_BG_API_KEY` | your remove.bg API key (Vehicle Remove BG — same API as the [remove.bg CLI](https://github.com/remove-bg/remove-bg-cli)) |
 | `ADMIN_EMAILS` | comma-separated list, e.g. `roy.cherian@acko.tech,rahul.pramod@acko.tech,sreekanth.karthikeyan@acko.tech` |
 | `DATA_DIR` | `/data` (see step 3 — only needed if you add a persistent disk) |
 

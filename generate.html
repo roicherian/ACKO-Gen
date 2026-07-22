@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ACKO Image Gen</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/node_modules/@coreui/icons/css/free.min.css">
 <style>
 :root {
   --purple: #5B2BE0;
@@ -64,9 +65,758 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
 }
 .nav-item:hover { background: var(--bg); color: var(--text); }
 .nav-item.active { background: var(--grad); color: #fff; font-weight: 600; box-shadow: var(--shadow-sm); }
-.nav-item.active svg { color: #fff; }
+.nav-item.active svg,
+.nav-item.active i[class^="cil-"] { color: #fff; }
 .nav-item svg { width: 17px; height: 17px; flex-shrink: 0; opacity: .7; }
-.nav-item.active svg { opacity: 1; }
+.nav-item i[class^="cil-"] {
+  font-size: 17px; line-height: 1; width: 17px; text-align: center;
+  flex-shrink: 0; opacity: .7;
+}
+.nav-item.active svg,
+.nav-item.active i[class^="cil-"] { opacity: 1; }
+/* CoreUI icon sizing helpers (pair with existing SVG rules) */
+.icon-sm { font-size: 13px; line-height: 1; }
+.icon-md { font-size: 15px; line-height: 1; }
+.icon-lg { font-size: 17px; line-height: 1; }
+.icon-xl { font-size: 20px; line-height: 1; }
+.icon-empty { font-size: 48px; line-height: 1; color: var(--muted); }
+.vehicle-car-panel {
+  display: none; margin-bottom: 14px;
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 14px 16px;
+}
+.vehicle-car-panel.visible { display: block; }
+.vehicle-car-panel-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; margin-bottom: 12px;
+}
+.vehicle-car-panel-label {
+  font-size: 12px; font-weight: 700; color: var(--text); letter-spacing: .02em;
+}
+.vehicle-car-panel-meta { font-size: 11px; color: var(--muted); }
+.vehicle-select-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  margin-bottom: 10px;
+}
+.vehicle-select-row:last-child { margin-bottom: 0; }
+@media (max-width: 640px) {
+  .vehicle-select-row { grid-template-columns: 1fr; }
+}
+.vehicle-select-row .form-group {
+  margin: 0; min-width: 0; width: 100%;
+}
+.vehicle-select-row .sel-wrap {
+  width: 100%;
+}
+.vehicle-select-row select {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  text-overflow: ellipsis;
+}
+.vehicle-select-row select:disabled {
+  opacity: .55; cursor: not-allowed;
+}
+/* Vehicle Image Gen hides these — values are locked in applyVehicleLocks() */
+body.vehicle-mode #numImagesGroup,
+body.vehicle-mode #resRatioRow,
+body.vehicle-mode #modelNumRow,
+body.vehicle-mode .action-row,
+body.vehicle-mode .enhanced-wrap,
+body.vehicle-mode .center-head .btn-adv,
+body.vehicle-mode .neg-accordion { display: none !important; }
+.center-form-stack { display: flex; flex-direction: column; }
+
+/* ═══ Vehicle Image Gen — studio layout (Magnific-inspired) ═══ */
+body.vehicle-mode {
+  font-family: 'Outfit', 'Inter', sans-serif;
+  --vg-bg: #0b0b0f;
+  --vg-surface: #14141a;
+  --vg-elev: #1c1c24;
+  --vg-line: rgba(255,255,255,.08);
+  --vg-text: #f3f3f7;
+  --vg-muted: #8b8b9a;
+  --vg-accent: #c4b5fd;
+  --vg-accent-2: #8b5cf6;
+}
+body.vehicle-mode .app {
+  background:
+    radial-gradient(1000px 480px at 70% -10%, rgba(139,92,246,.18), transparent 55%),
+    radial-gradient(700px 400px at 10% 100%, rgba(56,189,248,.08), transparent 50%),
+    var(--vg-bg);
+  display: grid;
+  grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+}
+body.vehicle-mode .sidebar {
+  grid-row: 1 / -1;
+  background: rgba(12,12,16,.92);
+  border-right: 1px solid var(--vg-line);
+  box-shadow: none;
+}
+body.vehicle-mode .sidebar-logo { border-bottom-color: var(--vg-line); }
+body.vehicle-mode .logo-sub { color: var(--vg-muted); }
+body.vehicle-mode .acko-wordmark { fill: #f3f3f7 !important; }
+body.vehicle-mode .nav-item { color: #b8b8c6; }
+body.vehicle-mode .nav-item:hover { background: rgba(255,255,255,.05); color: #fff; }
+body.vehicle-mode .nav-item.active {
+  background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);
+  color: #fff;
+}
+body.vehicle-mode .sidebar-user { border-top-color: var(--vg-line); }
+body.vehicle-mode .sidebar-user-email { color: var(--vg-muted); }
+body.vehicle-mode .sidebar-signout:hover { background: rgba(255,255,255,.06); }
+
+body.vehicle-mode #view-generate { display: contents; }
+body.vehicle-mode .center {
+  grid-column: 2;
+  grid-row: 1;
+  max-width: none;
+  width: 100%;
+  padding: 22px 28px 10px;
+  gap: 0;
+  overflow: visible;
+  color: var(--vg-text);
+  display: flex;
+  flex-direction: column;
+}
+body.vehicle-mode .right {
+  grid-column: 2;
+  grid-row: 2;
+  min-width: 0;
+  width: auto;
+  padding: 8px 28px 28px;
+  overflow-y: auto;
+  border: none;
+}
+body.vehicle-mode .center-head { margin-bottom: 14px; }
+body.vehicle-mode .center-title {
+  font-size: 26px; font-weight: 800; letter-spacing: -.03em;
+  color: var(--vg-text);
+}
+body.vehicle-mode .center-sub { color: var(--vg-muted); }
+
+/* Composer order: title → prompt (with vehicle selectors) → generate */
+body.vehicle-mode .center-head { order: 0; }
+body.vehicle-mode .center-form-stack { order: 1; }
+body.vehicle-mode .prompt-block { order: 2; margin-bottom: 8px !important; }
+body.vehicle-mode .action-row,
+body.vehicle-mode .enhanced-wrap,
+body.vehicle-mode .neg-accordion { order: 3; }
+
+body.vehicle-mode .prompt-wrap .vehicle-car-panel {
+  display: none;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--vg-line);
+  border-radius: 0;
+  padding: 14px 16px 12px;
+  margin: 0;
+  position: relative;
+  z-index: 5;
+}
+body.vehicle-mode .prompt-wrap .vehicle-car-panel.visible { display: block; }
+body.vehicle-mode .prompt-wrap .vg-combo-panel { z-index: 90; }
+body.vehicle-mode .vehicle-car-panel-head { margin-bottom: 10px; }
+body.vehicle-mode .vehicle-car-panel-label {
+  font-size: 11px; font-weight: 600; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--vg-muted);
+}
+body.vehicle-mode .vehicle-car-panel-meta { color: var(--vg-muted); }
+
+/* Model-identity reference upload (vehicle prompt box) */
+.vg-model-ref {
+  display: none;
+  margin-top: 10px;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+body.vehicle-mode .vg-model-ref { display: flex; }
+.vg-ref-add {
+  display: inline-flex; align-items: center; gap: 7px;
+  height: 36px; padding: 0 14px;
+  border-radius: 999px;
+  border: 1px dashed rgba(196,181,253,.45);
+  background: rgba(139,92,246,.12);
+  color: #ddd6fe;
+  font: 600 12.5px/1 Outfit, sans-serif;
+  cursor: pointer;
+  transition: border-color .15s, background .15s, color .15s;
+}
+.vg-ref-add:hover {
+  border-color: rgba(196,181,253,.8);
+  background: rgba(139,92,246,.22);
+  color: #fff;
+}
+.vg-ref-add i { font-size: 15px; line-height: 1; }
+.vg-ref-add.has-ref { display: none; }
+.vg-ref-preview {
+  display: flex; align-items: center; gap: 10px;
+  min-width: 0; max-width: 100%;
+  padding: 4px 8px 4px 4px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.05);
+  border: 1px solid var(--vg-line);
+}
+.vg-ref-preview.hidden { display: none; }
+.vg-ref-preview img {
+  width: 40px; height: 40px; border-radius: 50%;
+  object-fit: cover; background: #0f0f14; flex-shrink: 0;
+}
+.vg-ref-meta {
+  display: flex; flex-direction: column; gap: 2px; min-width: 0;
+}
+.vg-ref-name {
+  font: 600 12px/1.2 Outfit, sans-serif; color: var(--vg-text);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 180px;
+}
+.vg-ref-note {
+  font: 500 10.5px/1.2 Outfit, sans-serif; color: var(--vg-muted);
+}
+.vg-ref-clear {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: none; background: rgba(255,255,255,.08);
+  color: #fff; font-size: 18px; line-height: 1; cursor: pointer;
+  flex-shrink: 0;
+}
+.vg-ref-clear:hover { background: rgba(248,113,113,.35); }
+
+body.vehicle-mode .vehicle-select-row {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-bottom: 0;
+}
+body.vehicle-mode .vehicle-select-row .form-group {
+  width: auto; flex: 0 1 auto; min-width: 0;
+}
+body.vehicle-mode .vehicle-select-row .form-label {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0,0,0,0); white-space: nowrap;
+}
+body.vehicle-mode .vehicle-select-row .sel-wrap {
+  height: 36px;
+  border-radius: 999px;
+  background: var(--vg-elev);
+  border: 1px solid var(--vg-line);
+  box-shadow: none;
+  padding: 0 12px 0 14px;
+  transition: border-color .15s, background .15s;
+}
+body.vehicle-mode .vehicle-select-row .sel-wrap:focus-within {
+  border-color: rgba(196,181,253,.55);
+  box-shadow: 0 0 0 3px rgba(139,92,246,.18);
+  background: #22222c;
+}
+body.vehicle-mode .vehicle-select-row select {
+  font: 500 12.5px/1 Outfit, sans-serif;
+  color: var(--vg-text);
+  max-width: 168px;
+  /* keep hit-area flush with pill edges (incl. chevron) */
+  margin-right: -22px;
+  padding-right: 26px;
+}
+body.vehicle-mode .vehicle-select-row select option {
+  color: #111; background: #fff;
+}
+body.vehicle-mode .vehicle-select-row .sel-caret { color: var(--vg-muted); }
+body.vehicle-mode .vg-year-ref-locked {
+  opacity: .55;
+  pointer-events: none;
+}
+body.vehicle-mode .vg-year-ref-locked .sel-wrap {
+  border-style: dashed;
+}
+
+/* Custom searchable vehicle combo (Make / Model) */
+.vg-combo {
+  position: relative;
+  width: 100%;
+  min-width: 140px;
+}
+.vg-combo-native {
+  position: absolute !important;
+  width: 1px !important; height: 1px !important;
+  padding: 0 !important; margin: -1px !important;
+  overflow: hidden !important; clip: rect(0,0,0,0) !important;
+  white-space: nowrap !important; border: 0 !important;
+  appearance: none !important;
+}
+.vg-combo-trigger {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; width: 100%; height: 40px;
+  padding: 0 12px 0 14px;
+  border: 1px solid var(--border-s); border-radius: var(--r-sm);
+  background: var(--white); color: var(--text);
+  font: 500 13px/1 Inter, sans-serif;
+  cursor: pointer; text-align: left;
+  box-shadow: var(--shadow-xs);
+  transition: border-color .15s, box-shadow .15s, background .15s;
+}
+.vg-combo-trigger:hover:not(:disabled) { border-color: rgba(0,0,0,.22); }
+.vg-combo-trigger:disabled {
+  opacity: .55; cursor: not-allowed;
+}
+.vg-combo-trigger.is-open {
+  border-color: var(--purple);
+  box-shadow: 0 0 0 3px var(--purple-l);
+}
+.vg-combo-label {
+  flex: 1; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.vg-combo-label.is-placeholder { color: var(--muted); font-weight: 500; }
+.vg-combo-caret {
+  flex-shrink: 0; font-size: 14px; line-height: 1; color: var(--muted);
+  transition: transform .15s;
+}
+.vg-combo-trigger.is-open .vg-combo-caret { transform: rotate(180deg); }
+.vg-combo-panel {
+  position: absolute; top: calc(100% + 6px); left: 0;
+  min-width: max(100%, 260px); max-width: min(360px, 92vw);
+  z-index: 80;
+  background: #121218;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 14px;
+  box-shadow: 0 18px 50px rgba(0,0,0,.45);
+  overflow: hidden;
+  display: none;
+}
+.vg-combo-panel.is-open { display: flex; flex-direction: column; }
+.vg-combo-search {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.vg-combo-search i[class^="cil-"] {
+  font-size: 14px; color: #8b8b9a; flex-shrink: 0;
+}
+.vg-combo-search input {
+  flex: 1; min-width: 0; border: none; outline: none;
+  background: transparent; color: #f4f4f7;
+  font: 500 13px/1.3 Outfit, Inter, sans-serif;
+}
+.vg-combo-search input::placeholder { color: #6d6d7c; }
+.vg-combo-list {
+  max-height: 320px; overflow: auto;
+  padding: 6px 0 8px;
+  overscroll-behavior: contain;
+}
+.vg-combo-group {
+  padding: 8px 12px 4px;
+  font: 600 10px/1 Outfit, sans-serif;
+  letter-spacing: .08em; text-transform: uppercase;
+  color: #8b8b9a;
+}
+.vg-combo-letter {
+  padding: 8px 12px 2px;
+  font: 700 12px/1 Outfit, sans-serif;
+  color: #a78bfa;
+  letter-spacing: .04em;
+  position: sticky; top: 0;
+  background: linear-gradient(180deg, #121218 70%, rgba(18,18,24,0));
+  z-index: 1;
+}
+.vg-combo-option {
+  display: block; width: 100%;
+  border: none; background: transparent;
+  color: #f0f0f5; text-align: left;
+  padding: 8px 14px 8px 18px;
+  font: 500 13px/1.3 Outfit, Inter, sans-serif;
+  cursor: pointer;
+  transition: background .12s, color .12s;
+}
+.vg-combo-option:hover,
+.vg-combo-option.is-active {
+  background: rgba(139,92,246,.18);
+  color: #fff;
+}
+.vg-combo-option.is-selected {
+  background: rgba(139,92,246,.28);
+  color: #fff;
+  font-weight: 600;
+}
+.vg-combo-empty {
+  padding: 18px 14px;
+  text-align: center;
+  font: 500 12.5px/1.4 Outfit, sans-serif;
+  color: #6d6d7c;
+}
+
+body.vehicle-mode .vg-combo-trigger {
+  height: 36px;
+  border-radius: 999px;
+  background: var(--vg-elev);
+  border: 1px solid var(--vg-line);
+  box-shadow: none;
+  color: var(--vg-text);
+  font: 500 12.5px/1 Outfit, sans-serif;
+  max-width: 200px;
+}
+body.vehicle-mode .vg-combo-trigger.is-open,
+body.vehicle-mode .vg-combo-trigger:focus-visible {
+  border-color: rgba(196,181,253,.55);
+  box-shadow: 0 0 0 3px rgba(139,92,246,.18);
+  background: #22222c;
+  outline: none;
+}
+body.vehicle-mode .vg-combo-label.is-placeholder { color: #8b8b9a; }
+body.vehicle-mode .vg-combo-caret { color: var(--vg-muted); }
+body.vehicle-mode .vehicle-select-row .vg-combo {
+  width: auto;
+}
+
+body.vehicle-mode .prompt-block > .form-label { display: none; }
+body.vehicle-mode .prompt-wrap {
+  background: linear-gradient(180deg, #17171f 0%, #121218 100%);
+  border: 1px solid var(--vg-line);
+  border-radius: 22px;
+  box-shadow: 0 18px 50px rgba(0,0,0,.35);
+  /* visible so Make/Model combo panels are not clipped (was blocking selection → gen) */
+  overflow: visible;
+}
+body.vehicle-mode .prompt-wrap:focus-within {
+  border-color: rgba(196,181,253,.45);
+  box-shadow: 0 0 0 3px rgba(139,92,246,.16), 0 18px 50px rgba(0,0,0,.35);
+}
+body.vehicle-mode .prompt-wrap textarea {
+  min-height: 96px;
+  max-height: 180px;
+  padding: 18px 20px 8px;
+  font: 400 14.5px/1.55 Outfit, sans-serif;
+  color: var(--vg-text);
+  background: transparent;
+}
+body.vehicle-mode .prompt-wrap textarea.prompt-locked {
+  cursor: default;
+  opacity: .92;
+  user-select: text;
+}
+body.vehicle-mode .prompt-wrap textarea::placeholder { color: #6d6d7c; }
+body.vehicle-mode .prompt-footer {
+  padding: 8px 12px 12px 18px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+body.vehicle-mode .char-count { color: var(--vg-muted); font-size: 11.5px; }
+body.vehicle-mode .prompt-footer .btn-gen {
+  width: auto; min-width: 148px;
+  margin: 0;
+  padding: 11px 18px;
+  border-radius: 999px;
+  font: 700 13px/1 Outfit, sans-serif;
+  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+  box-shadow: 0 8px 24px rgba(99,102,241,.35);
+}
+body.vehicle-mode .prompt-footer .btn-gen:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(99,102,241,.45);
+}
+
+body.vehicle-mode .right-head { margin-bottom: 4px; }
+body.vehicle-mode .right-title { color: var(--vg-text); font-size: 14px; }
+body.vehicle-mode .status-pill {
+  background: var(--vg-elev);
+  border-color: var(--vg-line);
+  color: var(--vg-muted);
+}
+body.vehicle-mode .btn-clear {
+  background: var(--vg-elev);
+  border-color: var(--vg-line);
+  color: #cfcfd8;
+}
+body.vehicle-mode .btn-clear:hover { border-color: #f87171; color: #f87171; }
+body.vehicle-mode .progress-card {
+  background: var(--vg-surface);
+  border-color: var(--vg-line);
+  box-shadow: none;
+}
+body.vehicle-mode .progress-title { color: var(--vg-text); }
+body.vehicle-mode .progress-sub { color: var(--vg-muted); }
+body.vehicle-mode .ring-bg { stroke: #2a2a35; }
+body.vehicle-mode .ring-fill { stroke: #a78bfa; }
+body.vehicle-mode .ring-pct { color: var(--vg-text); }
+body.vehicle-mode .progress-cancel {
+  border-color: var(--vg-line);
+  color: var(--vg-muted);
+}
+body.vehicle-mode .results-head { color: var(--vg-text); font-size: 14px; }
+body.vehicle-mode .results-sub { color: var(--vg-muted); }
+body.vehicle-mode .results-grid {
+  gap: 14px;
+}
+body.vehicle-mode .results-grid.n1 { grid-template-columns: minmax(0, 1fr); max-width: 960px; }
+body.vehicle-mode .results-grid.n2 { grid-template-columns: 1fr 1fr; }
+body.vehicle-mode .img-card {
+  border-radius: 16px;
+  border-color: var(--vg-line);
+  background: var(--vg-elev);
+  box-shadow: 0 10px 30px rgba(0,0,0,.28);
+}
+body.vehicle-mode .empty-ph {
+  background: var(--vg-surface);
+  border: 1px dashed var(--vg-line);
+  border-radius: 16px;
+  color: #555566;
+}
+body.vehicle-mode .img-badge {
+  background: rgba(20,20,28,.88);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.1);
+}
+body.vehicle-mode .img-badge.cutout {
+  background: #7c3aed;
+  border-color: transparent;
+}
+body.vehicle-mode #resultsSectionClassic,
+body.vehicle-mode #progressCard,
+body.vehicle-mode .right-head { display: none !important; }
+body.vehicle-mode #vehicleGallerySection { display: block !important; }
+
+.vehicle-gallery-section { display: none; }
+.vg-gallery-head { margin-bottom: 12px; }
+.vg-toolbar {
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  margin-bottom: 16px;
+}
+.vg-search-wrap {
+  flex: 1 1 220px; min-width: 180px; height: 38px;
+  display: flex; align-items: center; gap: 8px;
+  padding: 0 12px; border-radius: 999px;
+  background: var(--vg-elev, #1c1c24);
+  border: 1px solid var(--vg-line, rgba(255,255,255,.08));
+}
+.vg-search-wrap svg { width: 15px; height: 15px; color: var(--vg-muted, #8b8b9a); flex-shrink: 0; }
+.vg-search-wrap i[class^="cil-"] { font-size: 15px; color: var(--vg-muted, #8b8b9a); flex-shrink: 0; }
+.vg-search-wrap input {
+  flex: 1; border: none; outline: none; background: transparent;
+  font: 500 13px/1 Outfit, Inter, sans-serif;
+  color: var(--vg-text, #f3f3f7);
+}
+.vg-search-wrap input::placeholder { color: #6d6d7c; }
+.vg-filter {
+  height: 38px; border-radius: 999px !important;
+  background: var(--vg-elev, #1c1c24) !important;
+  border-color: var(--vg-line, rgba(255,255,255,.08)) !important;
+  box-shadow: none !important;
+  min-width: 120px; max-width: 160px;
+}
+.vg-filter select {
+  font: 500 12.5px/1 Outfit, Inter, sans-serif !important;
+  color: var(--vg-text, #f3f3f7) !important;
+}
+.vehicle-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
+  gap: 24px;
+}
+.vg-card {
+  background: var(--vg-surface, #14141a);
+  border: 1px solid var(--vg-line, rgba(255,255,255,.08));
+  border-radius: 22px;
+  overflow: hidden;
+  transition: border-color .15s, transform .15s;
+}
+.vg-card:hover { border-color: rgba(196,181,253,.35); transform: translateY(-2px); }
+.vg-card.is-pending { border-style: dashed; }
+.vg-thumb {
+  position: relative;
+  aspect-ratio: 16/9;
+  background: #101014;
+  cursor: zoom-in;
+  overflow: hidden;
+}
+.vg-thumb.ratio-4-3 { aspect-ratio: 4/3; }
+.vg-thumb img {
+  width: 100%; height: 100%; object-fit: contain; display: block;
+}
+.vg-thumb.has-alpha {
+  background-color: #1a1a20;
+  background-image:
+    linear-gradient(45deg, #2a2a32 25%, transparent 25%),
+    linear-gradient(-45deg, #2a2a32 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #2a2a32 75%),
+    linear-gradient(-45deg, transparent 75%, #2a2a32 75%);
+  background-size: 18px 18px;
+  background-position: 0 0, 0 9px, 9px -9px, -9px 0;
+}
+.vg-pending-inner {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 14px; color: var(--vg-muted, #8b8b9a);
+  background: linear-gradient(180deg, #16161e, #101016);
+}
+.vg-pending-inner .ph-spinner {
+  width: 40px; height: 40px;
+  border: 3px solid rgba(167,139,250,.25);
+  border-top-color: #a78bfa;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+.vg-pending-label { font: 600 16px/1 Outfit, sans-serif; color: #c4b5fd; }
+.vg-pending-time { font: 500 14px/1 Outfit, sans-serif; color: #6d6d7c; }
+.vg-card-body { padding: 20px 22px 22px; }
+.vg-card-title {
+  font: 700 22px/1.25 Outfit, sans-serif;
+  color: var(--vg-text, #f3f3f7);
+  margin-bottom: 8px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.vg-card-line {
+  font: 500 15px/1.45 Outfit, sans-serif;
+  color: #b8b8c6;
+}
+.vg-card-line.muted { color: #7a7a8a; margin-top: 4px; }
+.vg-card-actions {
+  display: flex; gap: 10px; margin-top: 16px;
+}
+.vg-card-actions .btn-dl {
+  flex: 1;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 12px 14px; font: 600 14px/1 Outfit, Inter, sans-serif;
+  border-radius: 12px;
+  background: #22222c; color: #e8e8f0;
+  border: 1px solid rgba(255,255,255,.1);
+}
+.vg-card-actions .btn-dl i[class^="cil-"] { font-size: 16px; line-height: 1; }
+.vg-card-actions .btn-dl:hover {
+  border-color: rgba(167,139,250,.45); color: #fff;
+}
+.vg-card-actions .btn-dl.primary {
+  background: linear-gradient(135deg, #7c3aed, #6366f1);
+  border-color: transparent; color: #fff;
+  box-shadow: 0 8px 20px rgba(99,102,241,.28);
+}
+.vg-card-actions .btn-dl.primary:hover {
+  filter: brightness(1.06);
+  border-color: transparent; color: #fff;
+}
+.vg-card-actions .btn-dl:disabled {
+  opacity: .65; cursor: wait; transform: none; filter: none;
+}
+.vg-empty {
+  grid-column: 1 / -1;
+  padding: 48px 20px; text-align: center;
+  color: var(--vg-muted, #8b8b9a);
+  border: 1px dashed var(--vg-line, rgba(255,255,255,.08));
+  border-radius: 16px;
+  font: 500 13px/1.5 Outfit, sans-serif;
+}
+.vg-gallery-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap;
+}
+.vg-gallery-head-actions {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.vg-view-toggle {
+  display: inline-flex; padding: 3px;
+  border-radius: 999px;
+  background: var(--vg-elev, #1c1c24);
+  border: 1px solid var(--vg-line, rgba(255,255,255,.08));
+}
+.vg-view-toggle button {
+  border: none; background: transparent; cursor: pointer;
+  padding: 7px 14px; border-radius: 999px;
+  font: 600 12px/1 Outfit, Inter, sans-serif;
+  color: var(--vg-muted, #8b8b9a);
+  transition: background .15s, color .15s;
+}
+.vg-view-toggle button.on {
+  background: linear-gradient(135deg, #7c3aed, #6366f1);
+  color: #fff;
+}
+.vg-breadcrumb {
+  display: none; align-items: center; gap: 8px;
+  margin: 0 0 14px; flex-wrap: wrap;
+}
+.vg-breadcrumb.visible { display: flex; }
+.vg-crumb-btn {
+  border: 1px solid var(--vg-line, rgba(255,255,255,.08));
+  background: var(--vg-elev, #1c1c24);
+  color: #cfcfd8; border-radius: 999px;
+  padding: 6px 12px; cursor: pointer;
+  font: 600 12px/1 Outfit, sans-serif;
+}
+.vg-crumb-btn:hover { border-color: rgba(196,181,253,.4); color: #fff; }
+.vg-crumb-sep { color: #555566; font-size: 12px; }
+.vg-crumb-current {
+  font: 600 13px/1 Outfit, sans-serif; color: var(--vg-text, #f3f3f7);
+}
+.vehicle-gallery-grid.is-folders {
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+}
+.vg-folder {
+  background: var(--vg-surface, #14141a);
+  border: 1px solid var(--vg-line, rgba(255,255,255,.08));
+  border-radius: 16px;
+  padding: 14px;
+  cursor: pointer;
+  transition: border-color .15s, transform .15s;
+  display: flex; flex-direction: column; gap: 10px;
+  min-height: 168px;
+}
+.vg-folder:hover {
+  border-color: rgba(196,181,253,.4);
+  transform: translateY(-1px);
+}
+.vg-folder-stack {
+  position: relative; height: 88px;
+  border-radius: 12px; overflow: hidden;
+  background: #101014;
+}
+.vg-folder-stack img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%; object-fit: cover;
+  opacity: .35;
+}
+.vg-folder-stack img:first-child { opacity: 1; }
+.vg-folder-stack img:nth-child(2) {
+  clip-path: inset(0 0 0 42%);
+  opacity: .75;
+}
+.vg-folder-stack img:nth-child(3) {
+  clip-path: inset(0 0 0 68%);
+  opacity: .55;
+}
+.vg-folder-icon {
+  position: absolute; left: 10px; bottom: 10px;
+  width: 28px; height: 28px; border-radius: 8px;
+  background: rgba(20,20,28,.85);
+  border: 1px solid rgba(255,255,255,.1);
+  display: flex; align-items: center; justify-content: center;
+  color: #c4b5fd;
+}
+.vg-folder-icon svg { width: 15px; height: 15px; }
+.vg-folder-icon i[class^="cil-"] { font-size: 15px; line-height: 1; }
+.vg-folder-name {
+  font: 700 14px/1.2 Outfit, sans-serif;
+  color: var(--vg-text, #f3f3f7);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.vg-folder-count {
+  font: 500 11.5px/1 Outfit, sans-serif;
+  color: var(--vg-muted, #8b8b9a);
+}
+.vg-filter-make-wrap.is-hidden { display: none !important; }
+
+@media (max-width: 900px) {
+  body.vehicle-mode .app {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto minmax(0, 1fr);
+  }
+  body.vehicle-mode .sidebar {
+    grid-row: auto;
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    height: auto;
+    padding: 10px 0;
+  }
+  body.vehicle-mode .center,
+  body.vehicle-mode .right {
+    grid-column: 1;
+  }
+}
 
 .sidebar-spacer { flex: 1; }
 .sidebar-user {
@@ -104,6 +854,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
 }
 .btn-adv:hover { border-color: var(--purple); color: var(--purple); }
 .btn-adv svg { width: 14px; height: 14px; }
+.btn-adv i[class^="cil-"] { font-size: 14px; line-height: 1; }
 
 /* FORM ROW */
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
@@ -111,24 +862,39 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
 .form-group { display: flex; flex-direction: column; gap: 5px; }
 .form-label { font-size: 11.5px; font-weight: 600; color: var(--sub); letter-spacing: .01em; }
 
-/* SELECT / INPUT */
+/* SELECT / INPUT — select hit-area covers caret so the whole pill opens the menu */
 .sel-wrap {
   position: relative; background: var(--white);
   border: 1px solid var(--border-s); border-radius: var(--r-sm);
   display: flex; align-items: center; padding: 0 10px 0 12px;
   height: 40px; transition: border-color .15s, box-shadow .15s;
   box-shadow: var(--shadow-xs);
+  cursor: pointer;
 }
 .sel-wrap:focus-within { border-color: var(--purple); box-shadow: 0 0 0 3px var(--purple-l); }
-.sel-icon { display: flex; align-items: center; margin-right: 8px; color: var(--muted); flex-shrink: 0; }
+.sel-icon {
+  display: flex; align-items: center; margin-right: 8px; color: var(--muted);
+  flex-shrink: 0; pointer-events: none; position: relative; z-index: 2;
+}
 .sel-icon svg { width: 15px; height: 15px; }
+.sel-icon i[class^="cil-"] { font-size: 15px; line-height: 1; }
+.sel-caret i[class^="cil-"] { font-size: 14px; line-height: 1; }
 .sel-wrap select {
   flex: 1; border: none; background: none; outline: none;
   font: 500 13px/1 'Inter', sans-serif; color: var(--text);
-  appearance: none; cursor: pointer;
+  appearance: none; -webkit-appearance: none; cursor: pointer;
+  /* Extend under the chevron so the full field (including caret) is the select */
+  position: relative; z-index: 1;
+  margin-right: -22px; padding-right: 26px;
+  min-width: 0; width: 100%;
 }
 .sel-wrap select option { font-weight: 400; }
-.sel-caret { display: flex; align-items: center; color: var(--muted); flex-shrink: 0; margin-left: 4px; }
+.sel-wrap select:disabled { cursor: not-allowed; }
+.sel-caret {
+  display: flex; align-items: center; color: var(--muted);
+  flex-shrink: 0; margin-left: 4px;
+  pointer-events: none; position: relative; z-index: 2;
+}
 .sel-caret svg { width: 14px; height: 14px; }
 
 /* TEXTAREA */
@@ -146,8 +912,16 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
 .prompt-wrap textarea::placeholder { color: var(--muted); }
 .prompt-footer {
   padding: 6px 12px 10px; display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; flex-wrap: wrap;
 }
 .char-count { font-size: 11px; color: var(--muted); }
+/* Regular Generate: keep full-width Generate button under the prompt */
+body:not(.vehicle-mode) .prompt-footer {
+  flex-direction: column;
+  align-items: stretch;
+}
+body:not(.vehicle-mode) .prompt-footer .char-count { align-self: flex-start; }
+body:not(.vehicle-mode) .prompt-footer .btn-gen { width: 100%; margin-top: 2px; }
 
 /* ACTION BUTTONS */
 .action-row { display: flex; gap: 8px; margin-bottom: 14px; }
@@ -159,6 +933,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
 }
 .btn-action:hover { border-color: var(--purple); color: var(--purple); background: var(--purple-pale); box-shadow: var(--shadow-sm); }
 .btn-action svg { width: 14px; height: 14px; }
+.btn-action i[class^="cil-"] { font-size: 14px; line-height: 1; }
 
 /* ENHANCED PROMPT */
 .enhanced-wrap {
@@ -174,6 +949,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
   display: flex; align-items: center; gap: 7px;
 }
 .enhanced-title svg { width: 13px; height: 13px; color: var(--purple); }
+.enhanced-title i[class^="cil-"] { font-size: 13px; line-height: 1; color: var(--purple); }
 .info-icon {
   width: 15px; height: 15px; border-radius: 50%; background: var(--bg);
   display: inline-flex; align-items: center; justify-content: center;
@@ -215,6 +991,9 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
 .neg-toggle:hover { color: var(--text); }
 .neg-toggle-left { display: flex; align-items: center; gap: 7px; }
 .neg-toggle-left svg { width: 14px; height: 14px; color: var(--muted); }
+.neg-toggle-left i[class^="cil-"] { font-size: 14px; line-height: 1; color: var(--muted); }
+.neg-caret.cil-caret-bottom,
+.neg-caret.cil-caret-top { font-size: 14px; transition: transform .15s; }
 .neg-optional { font-size: 11px; font-weight: 400; color: var(--muted); margin-left: 4px; }
 .neg-caret { width: 14px; height: 14px; transition: transform .2s; color: var(--muted); }
 .neg-caret.open { transform: rotate(180deg); }
@@ -251,6 +1030,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
 }
 .btn-close:hover { background: var(--bg); color: var(--text); }
 .btn-close svg { width: 14px; height: 14px; }
+.btn-close i[class^="cil-"] { font-size: 14px; line-height: 1; }
 .adv-section { margin-bottom: 18px; }
 .adv-sec-title { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
 .adv-sec-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
@@ -315,6 +1095,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
 .btn-gen:hover:not(:disabled) { transform: translateY(-1px); box-shadow: var(--shadow-lg); }
 .btn-gen:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
 .btn-gen svg { width: 16px; height: 16px; }
+.btn-gen i[class^="cil-"] { font-size: 16px; line-height: 1; }
 .btn-spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.3); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -346,6 +1127,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
 }
 .btn-clear:hover { border-color: var(--red); color: var(--red); }
 .btn-clear svg { width: 13px; height: 13px; }
+.btn-clear i[class^="cil-"] { font-size: 13px; line-height: 1; }
 
 /* PROGRESS CARD */
 .progress-card {
@@ -394,12 +1176,32 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
 .img-card.port { aspect-ratio: 9/16; }
 .img-card.cls  { aspect-ratio: 4/3; }
 .img-card img  { width: 100%; height: 100%; object-fit: cover; display: block; }
+.img-card.has-alpha {
+  /* CSS-only transparency preview — not baked into the PNG pixels */
+  background-color: #fff;
+  background-image:
+    linear-gradient(45deg, #e8e8e8 25%, transparent 25%),
+    linear-gradient(-45deg, #e8e8e8 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #e8e8e8 75%),
+    linear-gradient(-45deg, transparent 75%, #e8e8e8 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+}
+.img-card.has-alpha img { object-fit: contain; }
+.img-badge {
+  position: absolute; top: 8px; left: 8px; z-index: 2;
+  padding: 3px 8px; border-radius: 6px; font: 600 10px/1.2 'Inter', sans-serif;
+  background: rgba(255,255,255,.92); color: var(--ink); box-shadow: 0 1px 4px rgba(0,0,0,.12);
+  pointer-events: none;
+}
+.img-badge.cutout { background: var(--purple); color: #fff; }
 .img-overlay {
   position: absolute; inset: 0; background: rgba(0,0,0,.5);
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
   opacity: 0; transition: opacity .2s;
 }
 .img-card:hover .img-overlay { opacity: 1; }
+.btn-dl:disabled { opacity: .65; cursor: wait; transform: none; }
 .img-zoom-hint {
   position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 8px;
   background: rgba(255,255,255,.9); display: flex; align-items: center; justify-content: center;
@@ -407,6 +1209,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
 }
 .img-card:hover .img-zoom-hint { opacity: 1; }
 .img-zoom-hint svg { width: 15px; height: 15px; }
+.img-zoom-hint i[class^="cil-"] { font-size: 15px; line-height: 1; }
 .btn-dl {
   padding: 7px 16px; border-radius: 7px; background: var(--white); border: none;
   font: 600 11.5px/1 'Inter', sans-serif; color: var(--ink); cursor: pointer;
@@ -414,6 +1217,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
 }
 .btn-dl:hover { transform: scale(1.04); }
 .btn-dl svg { width: 13px; height: 13px; }
+.btn-dl i[class^="cil-"] { font-size: 13px; line-height: 1; }
 
 /* PLACEHOLDER */
 .img-ph {
@@ -480,6 +1284,8 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
 }
 .gact:hover { color: var(--text); }
 .gact svg { width: 15px; height: 15px; }
+.gact i[class^="cil-"] { font-size: 15px; line-height: 1; }
+.gact.on i.cil-heart { color: #e11d48; }
 .gact.on { background: var(--purple); color: #fff; }
 .gact.on svg { fill: #fff; }
 
@@ -541,18 +1347,129 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
 }
 .lb-close:hover { background: rgba(255,255,255,.28); }
 .lb-close svg { width: 20px; height: 20px; }
+.lb-close i[class^="cil-"] { font-size: 20px; line-height: 1; }
 .lb-inner {
   display: flex; gap: 0; background: #fff; border-radius: 16px; overflow: hidden;
   max-width: 1000px; max-height: 84vh; box-shadow: 0 24px 60px rgba(0,0,0,.4);
 }
-.lb-img-wrap { flex: 1 1 auto; display: flex; align-items: center; justify-content: center; background: #0f0c28; min-width: 0; overflow: hidden; }
-.lb-img-wrap img { max-width: 100%; max-height: 84vh; object-fit: contain; display: block; cursor: zoom-in; transition: transform .2s ease; }
-.lb-img-wrap.zoomed { overflow: auto; cursor: zoom-out; }
-.lb-img-wrap.zoomed img { max-width: none; max-height: none; width: auto; height: 170%; cursor: zoom-out; }
-.lb-meta { flex: 0 0 300px; padding: 26px 24px; display: flex; flex-direction: column; overflow-y: auto; }
+.lb-stage {
+  flex: 1 1 auto; display: flex; flex-direction: column; min-width: 0; min-height: 0;
+  background: #0f0c28; width: min(640px, 58vw);
+}
+.lb-img-wrap {
+  flex: 1 1 auto; display: flex; align-items: center; justify-content: center;
+  background: #0f0c28; min-width: 0; min-height: 360px; height: calc(84vh - 88px);
+  overflow: hidden; position: relative;
+  touch-action: none; user-select: none; overscroll-behavior: contain;
+  cursor: zoom-in;
+}
+.lb-img-wrap.is-zoomed { cursor: grab; }
+.lb-img-wrap.is-panning { cursor: grabbing; }
+.lb-img-wrap img {
+  max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain;
+  display: block; transform-origin: center center;
+  will-change: transform; pointer-events: none; /* pan/zoom handled on wrap */
+}
+.lb-zoom-hint {
+  position: absolute; left: 12px; top: 12px; z-index: 3;
+  padding: 6px 10px; border-radius: 999px;
+  background: rgba(0,0,0,.62); color: rgba(255,255,255,.92);
+  font-size: 11px; font-weight: 500; letter-spacing: .01em;
+  pointer-events: none; opacity: .95;
+}
+.lb-zoom-controls {
+  position: absolute; right: 12px; bottom: 12px; z-index: 3;
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px; border-radius: 12px;
+  background: rgba(12,12,18,.72); border: 1px solid rgba(255,255,255,.14);
+  backdrop-filter: blur(8px);
+}
+.lb-zoom-controls .lb-zoom-pct {
+  min-width: 44px; text-align: center; font-size: 11px; font-weight: 600;
+  color: rgba(255,255,255,.88); pointer-events: none;
+}
+.lb-zoom-controls button {
+  width: 34px; height: 34px; border-radius: 10px; border: 1px solid transparent;
+  background: transparent; color: #fff; font-size: 18px; line-height: 1;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.lb-zoom-controls button:hover { background: rgba(167,139,250,.35); border-color: rgba(167,139,250,.55); }
+.lb-zoom-controls button:disabled { opacity: .35; cursor: default; }
+.lb-versions {
+  display: none; flex-shrink: 0; gap: 10px; padding: 10px 14px 12px;
+  justify-content: center; align-items: stretch;
+  background: rgba(0,0,0,.4); border-top: 1px solid rgba(255,255,255,.08);
+}
+.lb-versions.visible { display: flex; }
+.lb-version-thumb {
+  width: 88px; border: none; padding: 0; cursor: pointer;
+  background: transparent; color: #cfcfd8; text-align: center;
+  border-radius: 10px; overflow: hidden;
+  outline: 2px solid transparent; outline-offset: 2px;
+  transition: outline-color .15s, transform .12s;
+}
+.lb-version-thumb:hover { transform: translateY(-1px); }
+.lb-version-thumb.on { outline-color: #a78bfa; }
+.lb-version-thumb img {
+  display: block; width: 88px; height: 52px; object-fit: cover;
+  background: #1a1a22; border-radius: 8px 8px 0 0;
+}
+.lb-version-thumb span {
+  display: block; padding: 5px 4px 6px;
+  font: 600 10px/1 Outfit, Inter, sans-serif;
+  letter-spacing: .04em; text-transform: uppercase;
+}
+.lb-meta { flex: 0 0 320px; padding: 26px 24px; display: flex; flex-direction: column; overflow-y: auto; }
 .lb-label { font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
-.lb-prompt { font-size: 13px; color: var(--text); line-height: 1.6; margin-bottom: 16px; }
-.lb-info { font-size: 12px; color: var(--muted); margin-bottom: auto; padding-bottom: 20px; }
+.lb-prompt-block { margin-bottom: 14px; }
+.lb-prompt {
+  font-size: 13px; color: var(--text); line-height: 1.55;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+  overflow: hidden; word-break: break-word;
+}
+.lb-prompt.expanded {
+  display: block; -webkit-line-clamp: unset; overflow: visible;
+}
+.lb-prompt-toggle {
+  margin-top: 6px; border: none; background: none; padding: 0;
+  font: 600 12px/1 Outfit, Inter, sans-serif; color: var(--purple);
+  cursor: pointer;
+}
+.lb-prompt-toggle:hover { text-decoration: underline; }
+.lb-prompt-toggle.hidden { display: none; }
+.lb-pills {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  margin-bottom: auto; padding-bottom: 18px;
+}
+.lb-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 10px; border-radius: 999px;
+  background: var(--bg); border: 1px solid var(--border-s);
+  font: 500 11.5px/1.2 Outfit, Inter, sans-serif; color: var(--sub);
+}
+.lb-pill strong {
+  font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .04em; font-size: 10px;
+}
+.lb-info { font-size: 12px; color: var(--muted); margin-bottom: 12px; display: none; }
+body.vehicle-mode .lb-inner { background: #14141a; }
+body.vehicle-mode .lb-meta { background: #14141a; }
+body.vehicle-mode .lb-label { color: #8b8b9a; }
+body.vehicle-mode .lb-prompt { color: #f3f3f7; }
+body.vehicle-mode .lb-prompt-toggle { color: #c4b5fd; }
+body.vehicle-mode .lb-pill {
+  background: #1c1c24; border-color: rgba(255,255,255,.08); color: #d8d8e2;
+}
+body.vehicle-mode .lb-pill strong { color: #8b8b9a; }
+body.vehicle-mode .lb-btn {
+  background: #1c1c24; border-color: rgba(255,255,255,.1); color: #e8e8f0;
+}
+body.vehicle-mode .lb-btn:hover { border-color: #a78bfa; color: #c4b5fd; }
+body.vehicle-mode .lb-btn.primary,
+body.vehicle-mode .lb-btn.on {
+  background: linear-gradient(135deg, #7c3aed, #6366f1);
+  border-color: transparent; color: #fff;
+}
 .lb-actions { display: flex; flex-direction: column; gap: 8px; }
 .lb-btn {
   display: flex; align-items: center; gap: 9px; padding: 11px 14px; border-radius: 10px;
@@ -561,6 +1478,9 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
 }
 .lb-btn:hover { border-color: var(--purple); color: var(--purple); }
 .lb-btn svg { width: 17px; height: 17px; flex-shrink: 0; }
+.lb-btn i[class^="cil-"] { font-size: 17px; line-height: 1; flex-shrink: 0; }
+.lb-btn.on i.cil-heart { color: #e11d48; }
+.empty-icon i[class^="cil-"] { font-size: 48px; line-height: 1; color: var(--muted); }
 .lb-btn.primary { background: var(--purple); border-color: var(--purple); color: #fff; }
 .lb-btn.primary:hover { background: var(--purple-d); color: #fff; }
 .lb-btn.on { background: var(--purple); border-color: var(--purple); color: #fff; }
@@ -606,6 +1526,9 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
 }
 .login-overlay.hidden { display: none; }
 .hidden { display: none !important; }
+.vehicle-locked-control.hidden,
+.vehicle-select-row .form-group.hidden,
+.vg-filter.hidden { display: none !important; }
 .login-card {
   width: 380px; max-width: 100%; background: var(--white); border-radius: var(--r-lg);
   box-shadow: var(--shadow-lg); padding: 36px 32px 32px; display: flex; flex-direction: column;
@@ -703,6 +1626,10 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
         Generate
       </a>
+      <a class="nav-item" href="#" data-view="vehicle" onclick="navigateTo('vehicle');return false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14v-5l-1.5-4.5A2 2 0 0 0 15.6 6H8.4a2 2 0 0 0-1.9 1.5L5 12v5Z"/><path d="M5 17H3v-2M21 17h-2v-2"/><circle cx="7.5" cy="17" r="1.5"/><circle cx="16.5" cy="17" r="1.5"/></svg>
+        Vehicle Image Gen
+      </a>
       <a class="nav-item" href="#" data-view="history" onclick="navigateTo('history');return false">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
         History
@@ -735,8 +1662,8 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
   <main class="center">
     <div class="center-head">
       <div>
-        <div class="center-title">ACKO Image Gen</div>
-        <div class="center-sub">Create brand-compliant images with AI</div>
+        <div class="center-title" id="genTitle">ACKO Image Gen</div>
+        <div class="center-sub" id="genSub">Create brand-compliant images with AI</div>
       </div>
       <button class="btn-adv" onclick="openAdv()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 1 0 4.93 19.07"/></svg>
@@ -744,26 +1671,27 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
       </button>
     </div>
 
-    <!-- Model + Num Images -->
-    <div class="form-row">
-      <div class="form-group">
+    <div class="center-form-stack">
+    <!-- AI Model + Num Images -->
+    <div class="form-row" id="modelNumRow">
+      <div class="form-group" id="aiModelGroup">
         <label class="form-label">Model</label>
         <div class="sel-wrap">
           <div class="sel-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
           </div>
           <select id="modelSelect" onchange="onModelChange()">
-            <optgroup label="ChatGPT">
-              <option value="gpt-2">GPT 2 (via Magnific)</option>
-            </optgroup>
             <optgroup label="Google">
-              <option value="nano-banana">Nano Banana 2</option>
+              <option value="nano-banana" selected>Nano Banana 2</option>
+            </optgroup>
+            <optgroup label="Magnific">
+              <option value="gpt-2">Magnific (classic)</option>
             </optgroup>
           </select>
           <div class="sel-caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
         </div>
       </div>
-      <div class="form-group">
+      <div class="form-group" id="numImagesGroup">
         <label class="form-label">Number of Images</label>
         <div class="sel-wrap">
           <div class="sel-icon">
@@ -780,9 +1708,9 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
       </div>
     </div>
 
-    <!-- Resolution + Aspect Ratio -->
-    <div class="form-row">
-      <div class="form-group">
+    <!-- Resolution + Aspect Ratio (hidden in Vehicle Image Gen — aspect set in vehicle panel) -->
+    <div class="form-row" id="resRatioRow">
+      <div class="form-group" id="resGroup">
         <label class="form-label">Resolution</label>
         <div class="sel-wrap">
           <div class="sel-icon">
@@ -796,7 +1724,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
           <div class="sel-caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
         </div>
       </div>
-      <div class="form-group">
+      <div class="form-group" id="ratioGroup">
         <label class="form-label">Aspect Ratio</label>
         <div class="sel-wrap">
           <div class="sel-icon">
@@ -816,14 +1744,133 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
         </div>
       </div>
     </div>
+    </div><!-- /.center-form-stack -->
 
-    <!-- Prompt -->
-    <div class="form-group" style="margin-bottom:10px">
+    <!-- Prompt (Vehicle Image Gen: selectors + optional model reference live inside this box) -->
+    <div class="form-group prompt-block" style="margin-bottom:10px">
       <label class="form-label">Prompt</label>
       <div class="prompt-wrap">
-        <textarea id="sceneInput" placeholder="Describe the image you want to generate…" oninput="onSceneInput()" maxlength="2000"></textarea>
+        <div id="vehicleCarPanel" class="vehicle-car-panel">
+          <div class="vehicle-car-panel-head">
+            <div class="vehicle-car-panel-label">Vehicle selection</div>
+            <div class="vehicle-car-panel-meta" id="vehicleCarMeta">Loading catalog…</div>
+          </div>
+          <div class="vehicle-select-row">
+            <div class="form-group">
+              <label class="form-label">Make</label>
+              <div class="vg-combo" id="vehicleMakeCombo" data-combo="make">
+                <select id="vehicleMakeSelect" class="vg-combo-native" tabindex="-1" aria-hidden="true" onchange="onVehicleMakeChange()">
+                  <option value="">Select make…</option>
+                </select>
+                <button type="button" class="vg-combo-trigger" id="vehicleMakeTrigger" aria-haspopup="listbox" aria-expanded="false">
+                  <span class="vg-combo-label is-placeholder" id="vehicleMakeLabel">Select make…</span>
+                  <i class="cil-caret-bottom vg-combo-caret" aria-hidden="true"></i>
+                </button>
+                <div class="vg-combo-panel" id="vehicleMakePanel" role="dialog" aria-label="Select make">
+                  <div class="vg-combo-search">
+                    <i class="cil-search" aria-hidden="true"></i>
+                    <input type="search" id="vehicleMakeSearch" placeholder="Search make…" autocomplete="off" spellcheck="false">
+                  </div>
+                  <div class="vg-combo-list" id="vehicleMakeList" role="listbox"></div>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Model</label>
+              <div class="vg-combo" id="vehicleModelCombo" data-combo="model">
+                <select id="vehicleModelSelect" class="vg-combo-native" tabindex="-1" aria-hidden="true" onchange="onVehicleModelChange()" disabled>
+                  <option value="">Select model…</option>
+                </select>
+                <button type="button" class="vg-combo-trigger" id="vehicleModelTrigger" aria-haspopup="listbox" aria-expanded="false" disabled>
+                  <span class="vg-combo-label is-placeholder" id="vehicleModelLabel">Select model…</span>
+                  <i class="cil-caret-bottom vg-combo-caret" aria-hidden="true"></i>
+                </button>
+                <div class="vg-combo-panel" id="vehicleModelPanel" role="dialog" aria-label="Select model">
+                  <div class="vg-combo-search">
+                    <i class="cil-search" aria-hidden="true"></i>
+                    <input type="search" id="vehicleModelSearch" placeholder="Search model…" autocomplete="off" spellcheck="false">
+                  </div>
+                  <div class="vg-combo-list" id="vehicleModelList" role="listbox"></div>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Color</label>
+              <div class="sel-wrap">
+                <select id="vehicleColorSelect" onchange="onVehicleColorChange()" disabled>
+                  <option value="">Select color…</option>
+                </select>
+                <div class="sel-caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Launch year</label>
+              <div class="sel-wrap">
+                <select id="vehicleYearSelect" onchange="onVehicleYearChange()" disabled>
+                  <option value="">Select year…</option>
+                </select>
+                <div class="sel-caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+              </div>
+            </div>
+            <!-- Aspect / view / camera / bg locked for now — keep selects for defaults, hide from UI -->
+            <div class="form-group vehicle-locked-control hidden" aria-hidden="true">
+              <label class="form-label">Aspect ratio</label>
+              <div class="sel-wrap">
+                <select id="vehicleAspectSelect" tabindex="-1" title="Aspect ratio">
+                  <option value="16:9" selected>Aspect 16:9</option>
+                  <option value="4:3">Aspect 4:3</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group vehicle-locked-control hidden" aria-hidden="true">
+              <label class="form-label">Image result</label>
+              <div class="sel-wrap">
+                <select id="vehicleViewSelect" tabindex="-1">
+                  <option value="driver" selected>Driver-side front</option>
+                  <option value="passenger">Passenger-side front</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group vehicle-locked-control hidden" aria-hidden="true">
+              <label class="form-label">Camera angle</label>
+              <div class="sel-wrap">
+                <select id="vehicleCameraSelect" tabindex="-1">
+                  <option value="front_3_4" selected>Front 3/4 (base prompt)</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group vehicle-locked-control hidden" aria-hidden="true">
+              <label class="form-label">Background</label>
+              <div class="sel-wrap">
+                <select id="vehicleBgSelect" tabindex="-1">
+                  <option value="transparent" selected>Transparent (with shadow)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="vg-model-ref" id="vehicleModelRefRow">
+            <input type="file" id="vehicleModelRefInput" accept="image/png,image/jpeg,image/webp,image/*" hidden onchange="onVehicleModelRefSelected(event)">
+            <button type="button" class="vg-ref-add" id="vehicleModelRefAddBtn" onclick="document.getElementById('vehicleModelRefInput').click()">
+              <i class="cil-image-plus" aria-hidden="true"></i>
+              <span>Add reference</span>
+            </button>
+            <div class="vg-ref-preview hidden" id="vehicleModelRefPreview">
+              <img id="vehicleModelRefThumb" alt="Model reference">
+              <div class="vg-ref-meta">
+                <span class="vg-ref-name" id="vehicleModelRefName">Reference</span>
+                <span class="vg-ref-note">Guides grille, lamps, tyres, body</span>
+              </div>
+              <button type="button" class="vg-ref-clear" onclick="clearVehicleModelRef()" title="Remove reference">×</button>
+            </div>
+          </div>
+        </div>
+        <textarea id="sceneInput" placeholder="Describe the image you want to generate…" oninput="onSceneInput()" maxlength="3000"></textarea>
         <div class="prompt-footer">
-          <span class="char-count" id="charCount">0 / 2000</span>
+          <span class="char-count" id="charCount">0 / 3000</span>
+          <button class="btn-gen" id="genBtn" onclick="generate()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <span id="genBtnLabel">Generate Image</span>
+          </button>
         </div>
       </div>
     </div>
@@ -870,12 +1917,6 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
         <div class="neg-note">Prefilled from ACKO guidelines. Edit to override.</div>
       </div>
     </div>
-
-    <!-- Generate -->
-    <button class="btn-gen" id="genBtn" onclick="generate()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-      <span id="genBtnLabel">Generate Image</span>
-    </button>
   </main>
 
   <!-- RIGHT PANEL -->
@@ -894,7 +1935,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
       </button>
     </div>
 
-    <!-- Progress card -->
+    <!-- Progress card (classic Generate only) -->
     <div class="progress-card hidden" id="progressCard">
       <div class="progress-ring">
         <svg width="120" height="120" viewBox="0 0 120 120">
@@ -912,8 +1953,8 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
       </button>
     </div>
 
-    <!-- Results -->
-    <div class="results-section">
+    <!-- Results (classic Generate) -->
+    <div class="results-section" id="resultsSectionClassic">
       <div class="results-head">Results</div>
       <div class="results-sub" id="resultsSub">Your generated images will appear here once completed.</div>
       <div class="results-grid n4" id="resultsGrid">
@@ -922,6 +1963,61 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
         <div class="empty-ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
         <div class="empty-ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
       </div>
+    </div>
+
+    <!-- Vehicle gallery (Vehicle Image Gen) -->
+    <div class="vehicle-gallery-section" id="vehicleGallerySection" hidden>
+      <div class="vg-gallery-head">
+        <div>
+          <div class="results-head">Vehicle gallery</div>
+          <div class="results-sub" id="vgGalleryMeta">Saved vehicle generations appear here.</div>
+        </div>
+        <div class="vg-gallery-head-actions">
+          <div class="vg-view-toggle" role="tablist" aria-label="Gallery view">
+            <button type="button" class="on" id="vgViewPipeline" onclick="setVehicleGalleryMode('pipeline')">Pipeline</button>
+            <button type="button" id="vgViewCollections" onclick="setVehicleGalleryMode('collections')">Collections</button>
+          </div>
+        </div>
+      </div>
+      <div class="vg-breadcrumb" id="vgBreadcrumb">
+        <button type="button" class="vg-crumb-btn" onclick="openVehicleMakeCollection(null)">All makes</button>
+        <span class="vg-crumb-sep">/</span>
+        <span class="vg-crumb-current" id="vgCrumbMake"></span>
+      </div>
+      <div class="vg-toolbar">
+        <div class="vg-search-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input id="vgSearch" type="search" placeholder="Search make, model, year, color…" oninput="onVehicleGalleryFilterChange()">
+        </div>
+        <div class="sel-wrap vg-filter vg-filter-make-wrap" id="vgFilterMakeWrap">
+          <select id="vgFilterMake" onchange="onVehicleGalleryFilterChange()">
+            <option value="">All makes</option>
+          </select>
+          <div class="sel-caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </div>
+        <div class="sel-wrap vg-filter">
+          <select id="vgFilterYear" onchange="onVehicleGalleryFilterChange()">
+            <option value="">All years</option>
+          </select>
+          <div class="sel-caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </div>
+        <!-- Aspect / side filters hidden while those settings are locked -->
+        <div class="sel-wrap vg-filter hidden" aria-hidden="true">
+          <select id="vgFilterAspect" onchange="onVehicleGalleryFilterChange()" tabindex="-1">
+            <option value="">All ratios</option>
+            <option value="16:9">16:9</option>
+            <option value="4:3">4:3</option>
+          </select>
+        </div>
+        <div class="sel-wrap vg-filter hidden" aria-hidden="true">
+          <select id="vgFilterView" onchange="onVehicleGalleryFilterChange()" tabindex="-1">
+            <option value="">All sides</option>
+            <option value="driver">Driver-side</option>
+            <option value="passenger">Passenger-side</option>
+          </select>
+        </div>
+      </div>
+      <div class="vehicle-gallery-grid" id="vehicleGalleryGrid"></div>
     </div>
   </aside>
   </div><!-- /view-generate -->
@@ -1005,10 +2101,27 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
   </button>
   <div class="lb-inner">
-    <div class="lb-img-wrap" id="lbImgWrap"><img id="lbImg" src="" alt="Generated image" onclick="toggleLbZoom()" title="Click to zoom"></div>
+    <div class="lb-stage">
+      <div class="lb-img-wrap" id="lbImgWrap" title="Scroll or use +/− to zoom · drag to pan">
+        <div class="lb-zoom-hint" id="lbZoomHint">Scroll to zoom · drag to pan</div>
+        <img id="lbImg" src="" alt="Generated image" draggable="false">
+        <div class="lb-zoom-controls" aria-label="Zoom controls">
+          <button type="button" id="lbZoomOutBtn" title="Zoom out" onclick="event.stopPropagation(); lbZoomBy(-0.25)">−</button>
+          <button type="button" id="lbZoomResetBtn" title="Reset zoom" onclick="event.stopPropagation(); resetLbZoom()">1×</button>
+          <span class="lb-zoom-pct" id="lbZoomPct">100%</span>
+          <button type="button" id="lbZoomInBtn" title="Zoom in" onclick="event.stopPropagation(); lbZoomBy(0.25)">+</button>
+        </div>
+      </div>
+      <div class="lb-versions" id="lbVersions" aria-label="Original and mirrored versions"></div>
+    </div>
     <div class="lb-meta">
       <div class="lb-label">Prompt</div>
-      <div class="lb-prompt" id="lbPrompt"></div>
+      <div class="lb-prompt-block">
+        <div class="lb-prompt" id="lbPrompt"></div>
+        <button type="button" class="lb-prompt-toggle hidden" id="lbPromptToggle" onclick="toggleLbPromptExpand()">Show more</button>
+      </div>
+      <div class="lb-label" id="lbConfigLabel" style="display:none">Configuration</div>
+      <div class="lb-pills" id="lbPills"></div>
       <div class="lb-info" id="lbInfo"></div>
       <div class="lb-actions">
         <button class="lb-btn" id="lbFav" onclick="lbToggleFav()">
@@ -1023,9 +2136,17 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
           <span>Edit</span>
         </button>
+        <button class="lb-btn" id="lbMirror" onclick="lbMirrorImage()">
+          <i class="cil-flip" aria-hidden="true"></i>
+          <span>Mirror image</span>
+        </button>
         <button class="lb-btn" id="lbRegen" onclick="lbRegenerate()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
           <span>Regenerate</span>
+        </button>
+        <button class="lb-btn" id="lbRemoveBg" onclick="lbRemoveBackground()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16"/><path d="M7 7V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/><path d="M9 11v6"/><path d="M15 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/></svg>
+          <span>Remove BG</span>
         </button>
         <button class="lb-btn primary" onclick="lbDownload()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -1207,18 +2328,1462 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); c
 
 <script>
 // ─── NAVIGATION ───────────────────────────────────────────────────────────────
-const VIEWS = ['generate', 'history', 'collections', 'favourites', 'admin'];
+const VIEWS = ['generate', 'vehicle', 'history', 'collections', 'favourites', 'admin'];
+const GEN_MODES = {
+  generate: {
+    title: 'ACKO Image Gen',
+    sub: 'Create brand-compliant images with AI',
+    placeholder: 'Describe the image you want to generate…',
+  },
+  vehicle: {
+    title: 'Vehicle Image Gen',
+    sub: 'Pick a car, tune the frame, generate a studio cutout',
+    placeholder: 'Select make, model, color, and year to build the prompt…',
+  },
+};
+
+// Vehicle Image Gen — catalog from India-Vehicles-Master-List (Cars + Luxury cars).
+// Base reference image lives ONLY on the server (Vehicles-data/vehicle_base_reference.png)
+// and is attached by proxy.py — never embed/display it in the prompt UI.
+// India RHD: driver sits on the RIGHT. Driver-side front 3/4 = camera at front-RIGHT
+// (RIGHT flank). Do not confuse with "three-quarter left" viewer jargon.
+const VEHICLE_VIEWS = {
+  driver: {
+    label: 'Driver-side front',
+    shotPhrase:
+      'Indian RHD DRIVER-SIDE front 3/4: camera at the front-RIGHT corner, ' +
+      'showing front fascia + RIGHT/driver flank; steering wheel on the RIGHT through the windscreen; ' +
+      'driver side facing the camera; horizontal rotation ~35° from the front bumper',
+    sideLock:
+      'SIDE LOCK: RIGHT/driver flank only — never passenger/left flank; never mirror/flip left-right. Wrong side = fail.',
+  },
+  passenger: {
+    label: 'Passenger-side front',
+    shotPhrase:
+      'Indian RHD PASSENGER-SIDE front 3/4: camera at the front-LEFT corner, ' +
+      'showing front fascia + LEFT/passenger flank; steering wheel still on the RIGHT (far side); ' +
+      'horizontal rotation ~35° from the front bumper (mirrored side of the driver-side setup)',
+    sideLock:
+      'SIDE LOCK: LEFT/passenger flank only — never driver/right flank; never incorrect mirror. Wrong side = fail.',
+  },
+};
+const VEHICLE_CAMERAS = {
+  front_3_4: {
+    label: 'Front 3/4 (base prompt)',
+    anglePhrase:
+      'CAMERA LOCKED to the Baleno/base reference: height at headlight level (~1.2 m), pitch 0–3° down, ' +
+      'roll perfectly level (no Dutch tilt), ~85 mm telephoto equivalent, minimal distortion; ' +
+      'exact same framing, distance, crop, and camera position for every model; ' +
+      'entire vehicle fully visible and perfectly centered. ' +
+      'Match reference height/lens/framing STYLE only — left/right SIDE comes from the side lock, not the reference plate.',
+  },
+};
+const VEHICLE_BACKGROUNDS = {
+  transparent: {
+    label: 'Transparent (with shadow)',
+    bgPhrase:
+      'BACKGROUND: true alpha PNG only — no checkerboard, white, colour fill, gradient, floor, wall, or studio backdrop. ' +
+      'SHADOW: soft natural contact shadow under the tyres only, matching reference lighting direction/softness, on the alpha channel ' +
+      '(required — no floating car, no hard black blob).',
+  },
+};
+const MAGNIFIC_PROMPT_MAX = 3000;
+let vehicleCatalog = null; // { makes: [{ name, models: [{ name, colors: [] }] }] }
+let vehicleCatalogLoading = null;
+let genMode = 'generate';
+const VEHICLE_ASPECTS = {
+  '16:9': { label: '16:9', ratioKey: 'widescreen_16_9', aspectColon: '16:9' },
+  '4:3':  { label: '4:3',  ratioKey: 'classic_4_3',     aspectColon: '4:3' },
+};
+
+let vehicleSelection = {
+  make: '',
+  model: '',
+  color: '',
+  year: '',
+  aspect: '16:9',
+  view: 'driver',
+  camera: 'front_3_4',
+  background: 'transparent',
+};
+
+/** Optional user-uploaded model-identity / facelift reference (data URI). */
+let vehicleModelRef = null; // { dataUri, mime, name }
+/** Year stashed while a model ref locks/clears the year field. */
+let vehicleYearBeforeRef = '';
+
+function getVehicleAspect() {
+  return VEHICLE_ASPECTS[vehicleSelection.aspect] || VEHICLE_ASPECTS['16:9'];
+}
+
+/** In-flight vehicle gens shown as gallery placeholders */
+let vehiclePendingGens = [];
+let vehicleGalleryFilters = { q: '', make: '', year: '', aspect: '', view: '' };
+/** 'pipeline' = chronological generations; 'collections' = folders by make */
+let vehicleGalleryMode = 'pipeline';
+/** When in collections mode, null = folder list; string = open make folder */
+let vehicleCollectionOpenMake = null;
+
+function snapshotVehicleConfig() {
+  readVehicleResultSettings();
+  const aspect = getVehicleAspect();
+  return {
+    make: vehicleSelection.make || '',
+    model: vehicleSelection.model || '',
+    color: vehicleSelection.color || '',
+    // Year is unused when a model reference photo drives identity
+    year: vehicleModelRef ? '' : (vehicleSelection.year || ''),
+    aspect: aspect.aspectColon,
+    view: vehicleSelection.view || 'driver',
+    camera: vehicleSelection.camera || 'front_3_4',
+    background: vehicleSelection.background || 'transparent',
+    hasModelRef: !!vehicleModelRef,
+  };
+}
+
+function inferVehicleMetaFromPrompt(prompt) {
+  const p = prompt || '';
+  const m = p.match(/Photorealistic studio shot of a (.+?)(?:\s+\((\d{4})\))?\s+in\s+(.+?)\./i);
+  if (!m) return null;
+  const label = (m[1] || '').trim();
+  let make = '', model = label;
+  if (vehicleCatalog && vehicleCatalog.makes) {
+    const hit = vehicleCatalog.makes.find(mk => label.toLowerCase().startsWith(mk.name.toLowerCase() + ' '));
+    if (hit) {
+      make = hit.name;
+      model = label.slice(hit.name.length).trim();
+    }
+  }
+  return {
+    make, model, color: (m[3] || '').trim(), year: m[2] || '',
+    aspect: '', view: '', camera: '', background: '',
+  };
+}
+
+function getItemVehicleMeta(item) {
+  if (!item) return null;
+  if (item.vehicle && (item.vehicle.make || item.vehicle.model)) return item.vehicle;
+  if (item.kind === 'vehicle') return item.vehicle || null;
+  return inferVehicleMetaFromPrompt(item.prompt || item.fullPrompt || '');
+}
+
+function isVehicleHistoryItem(item) {
+  if (!item) return false;
+  if (item.kind === 'vehicle' || item.vehicle) return true;
+  const p = item.prompt || item.fullPrompt || '';
+  const looksVehicle = /Photorealistic studio shot of a .+/.test(p)
+    || /Generate a photorealistic isolated OEM-catalogue image of a .+/.test(p)
+    || /Generate a photorealistic isolated image of a .+/.test(p);
+  return looksVehicle && /India-market|DRIVER-SIDE|PASSENGER-SIDE|Baleno\/base|vehicle base reference|RHD/i.test(p);
+}
+
+function vehicleViewLabel(viewKey) {
+  return (VEHICLE_VIEWS[viewKey] || {}).label || viewKey || '—';
+}
+function vehicleCameraLabel(camKey) {
+  return (VEHICLE_CAMERAS[camKey] || {}).label || camKey || '—';
+}
+function vehicleBgLabel(bgKey) {
+  return (VEHICLE_BACKGROUNDS[bgKey] || {}).label || bgKey || '—';
+}
+
+/** In-memory src cache (avoids huge base64 in localStorage; survives the session). */
+const imageSrcCache = new Map();
+
+function proxiedImageUrl(remoteUrl) {
+  if (!remoteUrl) return '';
+  const u = String(remoteUrl);
+  if (u.startsWith('data:') || u.startsWith('/api/fetch-image')) return u;
+  if (!/^https?:\/\//i.test(u)) return u;
+  const token = getSessionToken();
+  return `/api/fetch-image?url=${encodeURIComponent(u)}${token ? `&token=${encodeURIComponent(token)}` : ''}`;
+}
+
+function resolveItemImageSrc(item) {
+  if (!item) return '';
+  if (item.id && imageSrcCache.has(item.id)) return imageSrcCache.get(item.id);
+  if (item.imageData && item.imageData.b64) {
+    return `data:${item.imageData.mime || 'image/png'};base64,${item.imageData.b64}`;
+  }
+  if (item.src && String(item.src).startsWith('data:')) return item.src;
+  // Temp Magnific URLs — serve via same-origin proxy (img + fetch both work)
+  const remote = (item.src && /^https?:\/\//i.test(item.src))
+    ? item.src
+    : (item.sourceUrl && /^https?:\/\//i.test(item.sourceUrl) ? item.sourceUrl : '');
+  if (remote) return proxiedImageUrl(remote);
+  if (item.imageData && item.imageData.url) return proxiedImageUrl(item.imageData.url);
+  return '';
+}
+
+/** Keep gallery cards we can still display (data URL, cached, or proxied remote). */
+function hasLoadableVehicleImage(item) {
+  return !!resolveItemImageSrc(item);
+}
+
+function purgeUnloadableVehicleHistory() {
+  // Only drop vehicle entries whose image bytes are gone (expired temp URLs, etc.).
+  // Keep every loadable image — including older ones without kind:'vehicle'.
+  const hist = storeGet('history');
+  let changed = false;
+  const next = hist.map(item => {
+    if (!isVehicleHistoryItem(item)) return item;
+    if (!hasLoadableVehicleImage(item)) {
+      changed = true;
+      return null;
+    }
+    // Repair: normalize src from b64 + tag as vehicle so they stay in pipeline
+    const src = resolveItemImageSrc(item);
+    const patched = { ...item };
+    if (src && patched.src !== src) {
+      patched.src = src;
+      changed = true;
+    }
+    if (patched.kind !== 'vehicle') {
+      patched.kind = 'vehicle';
+      changed = true;
+    }
+    if (!patched.vehicle) {
+      const inferred = getItemVehicleMeta(patched);
+      if (inferred && (inferred.make || inferred.model)) {
+        patched.vehicle = inferred;
+        changed = true;
+      }
+    }
+    return patched;
+  }).filter(Boolean);
+  if (changed) storeSet('history', next);
+  return next;
+}
+
+function getVehicleGallerySourceItems() {
+  purgeUnloadableVehicleHistory();
+  // Pipeline shows root cars only; mirror/edit/no-BG live as lightbox siblings
+  return storeGet('history').filter(item =>
+    isVehicleHistoryItem(item)
+    && hasLoadableVehicleImage(item)
+    && !item.isMirror
+    && !item.isEdit
+    && item.badge !== 'Mirrored'
+    && item.badge !== 'Edited'
+    && !(item.variantOf && (item.badge === 'No BG' || item.isMirror || item.isEdit))
+  );
+}
+
+function filteredVehicleGalleryItems() {
+  const q = (vehicleGalleryFilters.q || '').trim().toLowerCase();
+  return getVehicleGallerySourceItems().filter(item => {
+    const v = getItemVehicleMeta(item) || {};
+    if (vehicleGalleryFilters.make && v.make !== vehicleGalleryFilters.make) return false;
+    if (vehicleGalleryFilters.year && String(v.year) !== String(vehicleGalleryFilters.year)) return false;
+    if (vehicleGalleryFilters.aspect && (v.aspect || item.ratio) !== vehicleGalleryFilters.aspect) return false;
+    if (vehicleGalleryFilters.view && v.view !== vehicleGalleryFilters.view) return false;
+    if (!q) return true;
+    const hay = [
+      v.make, v.model, v.color, v.year, v.aspect, item.ratio,
+      vehicleViewLabel(v.view), vehicleCameraLabel(v.camera), vehicleBgLabel(v.background),
+      item.badge, item.prompt,
+    ].join(' ').toLowerCase();
+    return hay.includes(q);
+  });
+}
+
+function removeHistoryItemById(id) {
+  if (!id) return;
+  imageSrcCache.delete(id);
+  ['history', 'favourites', 'collections'].forEach(kind => {
+    const arr = storeGet(kind).filter(x => x.id !== id);
+    storeSet(kind, arr);
+  });
+}
+
+function syncVehicleGalleryFilterOptions() {
+  const items = getVehicleGallerySourceItems();
+  const makes = sortAlpha([...new Set(items.map(i => (getItemVehicleMeta(i) || {}).make).filter(Boolean))]);
+  const years = [...new Set(items.map(i => String((getItemVehicleMeta(i) || {}).year || '')).filter(Boolean))]
+    .sort((a, b) => Number(b) - Number(a));
+  const makeSel = document.getElementById('vgFilterMake');
+  const yearSel = document.getElementById('vgFilterYear');
+  if (makeSel) {
+    const cur = vehicleGalleryFilters.make;
+    makeSel.innerHTML = `<option value="">All makes</option>` + makes.map(m =>
+      `<option value="${String(m).replace(/"/g, '&quot;')}"${m === cur ? ' selected' : ''}>${m}</option>`
+    ).join('');
+  }
+  if (yearSel) {
+    const cur = vehicleGalleryFilters.year;
+    yearSel.innerHTML = `<option value="">All years</option>` + years.map(y =>
+      `<option value="${y}"${y === cur ? ' selected' : ''}>${y}</option>`
+    ).join('');
+  }
+}
+
+function onVehicleGalleryFilterChange() {
+  const search = document.getElementById('vgSearch');
+  const makeSel = document.getElementById('vgFilterMake');
+  const yearSel = document.getElementById('vgFilterYear');
+  const aspectSel = document.getElementById('vgFilterAspect');
+  const viewSel = document.getElementById('vgFilterView');
+  vehicleGalleryFilters = {
+    q: search ? search.value : '',
+    make: makeSel ? makeSel.value : '',
+    year: yearSel ? yearSel.value : '',
+    aspect: aspectSel ? aspectSel.value : '',
+    view: viewSel ? viewSel.value : '',
+  };
+  renderVehicleGallery();
+}
+
+function setVehicleGalleryMode(mode) {
+  vehicleGalleryMode = mode === 'collections' ? 'collections' : 'pipeline';
+  if (vehicleGalleryMode === 'pipeline') vehicleCollectionOpenMake = null;
+  const pipelineBtn = document.getElementById('vgViewPipeline');
+  const collectionsBtn = document.getElementById('vgViewCollections');
+  if (pipelineBtn) pipelineBtn.classList.toggle('on', vehicleGalleryMode === 'pipeline');
+  if (collectionsBtn) collectionsBtn.classList.toggle('on', vehicleGalleryMode === 'collections');
+  renderVehicleGallery();
+}
+
+function openVehicleMakeCollection(makeName) {
+  vehicleCollectionOpenMake = makeName || null;
+  // Keep folder open in collections mode
+  if (makeName) vehicleGalleryMode = 'collections';
+  const pipelineBtn = document.getElementById('vgViewPipeline');
+  const collectionsBtn = document.getElementById('vgViewCollections');
+  if (pipelineBtn) pipelineBtn.classList.toggle('on', vehicleGalleryMode === 'pipeline');
+  if (collectionsBtn) collectionsBtn.classList.toggle('on', vehicleGalleryMode === 'collections');
+  renderVehicleGallery();
+}
+
+function groupVehicleItemsByMake(items) {
+  const map = new Map();
+  items.forEach(item => {
+    const v = getItemVehicleMeta(item) || {};
+    const make = (v.make || '').trim() || 'Unknown make';
+    if (!map.has(make)) map.set(make, []);
+    map.get(make).push(item);
+  });
+  return [...map.entries()]
+    .sort((a, b) => a[0].localeCompare(b[0], undefined, { sensitivity: 'base' }))
+    .map(([make, list]) => ({ make, items: list, count: list.length }));
+}
+
+function buildVehicleMakeFolderCard(group) {
+  const card = document.createElement('div');
+  card.className = 'vg-folder';
+  card.onclick = () => openVehicleMakeCollection(group.make);
+
+  const stack = document.createElement('div');
+  stack.className = 'vg-folder-stack';
+  const previews = group.items.slice(0, 3);
+  if (previews.length) {
+    previews.forEach(item => {
+      const src = resolveItemImageSrc(item);
+      if (!src) return;
+      const img = document.createElement('img');
+      img.src = src;
+      img.alt = group.make;
+      stack.appendChild(img);
+    });
+  } else {
+    stack.style.background = '#18181f';
+  }
+  const icon = document.createElement('div');
+  icon.className = 'vg-folder-icon';
+  icon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h5l2 2h11v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7z"/></svg>';
+  stack.appendChild(icon);
+  card.appendChild(stack);
+
+  const name = document.createElement('div');
+  name.className = 'vg-folder-name';
+  name.textContent = group.make;
+  card.appendChild(name);
+
+  const count = document.createElement('div');
+  count.className = 'vg-folder-count';
+  const models = new Set(group.items.map(i => (getItemVehicleMeta(i) || {}).model).filter(Boolean));
+  count.textContent = `${group.count} image${group.count === 1 ? '' : 's'}${models.size ? ` · ${models.size} model${models.size === 1 ? '' : 's'}` : ''}`;
+  card.appendChild(count);
+  return card;
+}
+
+function buildVehicleGalleryCard(item) {
+  const v = getItemVehicleMeta(item) || {};
+  const src = resolveItemImageSrc(item);
+  if (!src) return null;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'vg-card';
+  wrap.dataset.itemId = item.id;
+
+  const thumb = document.createElement('div');
+  const ratio = v.aspect || item.ratio || '';
+  thumb.className = `vg-thumb${ratio === '4:3' ? ' ratio-4-3' : ''}${item.badge === 'No BG' || item.variantOf ? ' has-alpha' : ''}`;
+  thumb.onclick = () => openLightbox(item.id, 'history');
+
+  if (item.badge) {
+    const badge = document.createElement('div');
+    badge.className = `img-badge${item.badge === 'No BG' ? ' cutout' : ''}`;
+    badge.textContent = item.badge;
+    thumb.appendChild(badge);
+  }
+
+  const img = document.createElement('img');
+  img.src = src;
+  img.alt = `${v.make || ''} ${v.model || ''}`.trim() || 'Vehicle';
+  img.onerror = () => {
+    // Expired / corrupt — drop the card and purge history
+    removeHistoryItemById(item.id);
+    if (wrap.parentNode) wrap.remove();
+    renderVehicleGallery();
+  };
+  thumb.appendChild(img);
+  wrap.appendChild(thumb);
+
+  const body = document.createElement('div');
+  body.className = 'vg-card-body';
+  const title = document.createElement('div');
+  title.className = 'vg-card-title';
+  title.textContent = [v.make, v.model].filter(Boolean).join(' ') || 'Vehicle';
+  body.appendChild(title);
+
+  const line1 = document.createElement('div');
+  line1.className = 'vg-card-line';
+  // Aspect / side / camera / bg are locked — keep card copy to year + color only
+  line1.textContent = [v.year, v.color].filter(Boolean).join(' · ') || '—';
+  body.appendChild(line1);
+
+  const actions = document.createElement('div');
+  actions.className = 'vg-card-actions';
+  if (!item.bgRemoved && !item.variantOf) {
+    const rm = document.createElement('button');
+    rm.className = 'btn-dl';
+    rm.innerHTML = '<i class="cil-cut" aria-hidden="true"></i><span>Remove BG</span>';
+    rm.onclick = async (e) => {
+      e.stopPropagation();
+      rm.disabled = true;
+      rm.innerHTML = '<span>Removing…</span>';
+      try {
+        await removeBackgroundForItem(item);
+        renderVehicleGallery();
+      } catch (err) {
+        alert('Remove BG failed: ' + err.message);
+        rm.disabled = false;
+        rm.innerHTML = '<i class="cil-cut" aria-hidden="true"></i><span>Remove BG</span>';
+      }
+    };
+    actions.appendChild(rm);
+  }
+  const dl = document.createElement('button');
+  dl.className = 'btn-dl primary';
+  dl.innerHTML = '<i class="cil-cloud-download" aria-hidden="true"></i><span>Download</span>';
+  dl.onclick = (e) => {
+    e.stopPropagation();
+    downloadImg(item.imageData || { url: item.src }, 1);
+  };
+  actions.appendChild(dl);
+  body.appendChild(actions);
+  wrap.appendChild(body);
+  return wrap;
+}
+
+function buildVehiclePendingCard(pending) {
+  const v = pending.meta || {};
+  const wrap = document.createElement('div');
+  wrap.className = 'vg-card is-pending';
+  wrap.dataset.pendingId = pending.id;
+
+  const thumb = document.createElement('div');
+  thumb.className = `vg-thumb${(v.aspect === '4:3') ? ' ratio-4-3' : ''}`;
+  const inner = document.createElement('div');
+  inner.className = 'vg-pending-inner';
+  inner.innerHTML = `
+    <div class="ph-spinner"></div>
+    <div class="vg-pending-label">Generating…</div>
+    <div class="vg-pending-time" data-pending-timer="${pending.id}">0s</div>`;
+  thumb.appendChild(inner);
+  wrap.appendChild(thumb);
+
+  const body = document.createElement('div');
+  body.className = 'vg-card-body';
+  body.innerHTML = `
+    <div class="vg-card-title">${esc([v.make, v.model].filter(Boolean).join(' ') || 'Vehicle')}</div>
+    <div class="vg-card-line">${esc([v.year, v.color].filter(Boolean).join(' · ') || '—')}</div>`;
+  wrap.appendChild(body);
+  return wrap;
+}
+
+function renderVehicleGallery() {
+  const section = document.getElementById('vehicleGallerySection');
+  const grid = document.getElementById('vehicleGalleryGrid');
+  const meta = document.getElementById('vgGalleryMeta');
+  const crumb = document.getElementById('vgBreadcrumb');
+  const crumbMake = document.getElementById('vgCrumbMake');
+  const makeWrap = document.getElementById('vgFilterMakeWrap');
+  if (!grid || !section) return;
+
+  syncVehicleGalleryFilterOptions();
+  const items = filteredVehicleGalleryItems();
+  grid.innerHTML = '';
+  grid.classList.toggle('is-folders', vehicleGalleryMode === 'collections' && !vehicleCollectionOpenMake);
+
+  // Make filter is redundant in Collections (folders are already by make)
+  if (makeWrap) {
+    makeWrap.classList.toggle('is-hidden', vehicleGalleryMode === 'collections');
+  }
+
+  if (crumb) {
+    const showCrumb = vehicleGalleryMode === 'collections' && !!vehicleCollectionOpenMake;
+    crumb.classList.toggle('visible', showCrumb);
+    if (crumbMake) crumbMake.textContent = vehicleCollectionOpenMake || '';
+  }
+
+  const pipelineBtn = document.getElementById('vgViewPipeline');
+  const collectionsBtn = document.getElementById('vgViewCollections');
+  if (pipelineBtn) pipelineBtn.classList.toggle('on', vehicleGalleryMode === 'pipeline');
+  if (collectionsBtn) collectionsBtn.classList.toggle('on', vehicleGalleryMode === 'collections');
+
+  // Collections: folder grid by make
+  if (vehicleGalleryMode === 'collections' && !vehicleCollectionOpenMake) {
+    // Pending gens still surface at top as cards spanning pipeline feel
+    vehiclePendingGens.forEach(p => grid.appendChild(buildVehiclePendingCard(p)));
+
+    let groups = groupVehicleItemsByMake(items);
+    const q = (vehicleGalleryFilters.q || '').trim().toLowerCase();
+    if (q) {
+      groups = groups.filter(g =>
+        g.make.toLowerCase().includes(q) ||
+        g.items.some(it => {
+          const v = getItemVehicleMeta(it) || {};
+          return [v.model, v.color, v.year].join(' ').toLowerCase().includes(q);
+        })
+      );
+    }
+    groups.forEach(g => grid.appendChild(buildVehicleMakeFolderCard(g)));
+
+    if (!vehiclePendingGens.length && !groups.length) {
+      const empty = document.createElement('div');
+      empty.className = 'vg-empty';
+      empty.textContent = items.length
+        ? 'No make folders match your search.'
+        : 'No vehicle collections yet — generate images to build make folders.';
+      grid.appendChild(empty);
+    }
+
+    if (meta) {
+      const bits = [`${groups.length} make folder${groups.length === 1 ? '' : 's'}`];
+      if (vehiclePendingGens.length) bits.push(`${vehiclePendingGens.length} generating`);
+      meta.textContent = bits.join(' · ') + ' · Collections by make';
+    }
+    return;
+  }
+
+  // Pipeline, or a single make folder inside Collections
+  let list = items;
+  if (vehicleGalleryMode === 'collections' && vehicleCollectionOpenMake) {
+    list = items.filter(item => {
+      const make = ((getItemVehicleMeta(item) || {}).make || '').trim() || 'Unknown make';
+      return make === vehicleCollectionOpenMake;
+    });
+  }
+
+  const pendingForView = vehiclePendingGens.filter(p => {
+    if (vehicleGalleryMode !== 'collections' || !vehicleCollectionOpenMake) return true;
+    const make = (p.meta && p.meta.make) || 'Unknown make';
+    return make === vehicleCollectionOpenMake;
+  });
+  pendingForView.forEach(p => grid.appendChild(buildVehiclePendingCard(p)));
+  list.forEach(item => {
+    const card = buildVehicleGalleryCard(item);
+    if (card) grid.appendChild(card);
+  });
+
+  if (!pendingForView.length && !list.length) {
+    const empty = document.createElement('div');
+    empty.className = 'vg-empty';
+    empty.textContent = vehicleGalleryFilters.q || vehicleGalleryFilters.make || vehicleGalleryFilters.year
+      ? 'No vehicles match your search / filters.'
+      : (vehicleCollectionOpenMake
+        ? `No images in ${vehicleCollectionOpenMake} yet.`
+        : 'No vehicle images yet — generate one to start the gallery.');
+    grid.appendChild(empty);
+  }
+
+  if (meta) {
+    const n = list.length;
+    const p = pendingForView.length;
+    const bits = [`${n} vehicle image${n === 1 ? '' : 's'}`];
+    if (p) bits.push(`${p} generating`);
+    if (vehicleGalleryMode === 'collections' && vehicleCollectionOpenMake) {
+      bits.push(vehicleCollectionOpenMake);
+    } else {
+      bits.push('Generation pipeline');
+    }
+    meta.textContent = bits.join(' · ');
+  }
+}
+
+function startVehicleGalleryPending(meta) {
+  const id = 'pending_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+  vehiclePendingGens.unshift({ id, meta: { ...meta }, startedAt: Date.now() });
+  renderVehicleGallery();
+  return id;
+}
+
+function finishVehicleGalleryPending(pendingId) {
+  vehiclePendingGens = vehiclePendingGens.filter(p => p.id !== pendingId);
+  renderVehicleGallery();
+}
+
+function tickVehiclePendingTimers() {
+  const now = Date.now();
+  vehiclePendingGens.forEach(p => {
+    const el = document.querySelector(`[data-pending-timer="${p.id}"]`);
+    if (el) el.textContent = `${Math.round((now - p.startedAt) / 1000)}s`;
+  });
+}
+setInterval(tickVehiclePendingTimers, 1000);
+
+/** Year options from catalog (Original Launch Year + 2020+ update when present). */
+function yearOptionsForModel(model) {
+  if (!model) return [];
+  const launch = model.launch_year;
+  const update = model.update_year;
+  const years = Array.isArray(model.years) ? model.years : [];
+  return years.map(y => {
+    let label = String(y);
+    if (launch && update && launch !== update) {
+      if (y === launch) label = `${y} — Original launch`;
+      else if (y === update) label = `${y} — Facelift / update`;
+    } else if (y === launch) {
+      label = `${y} — Launch`;
+    }
+    return { value: String(y), label };
+  });
+}
+
+function defaultYearForModel(model) {
+  if (!model) return '';
+  if (model.update_year) return String(model.update_year);
+  if (model.launch_year) return String(model.launch_year);
+  const years = model.years || [];
+  if (years.length) return String(years[years.length - 1]);
+  return '';
+}
+
+function buildVehiclePrompt(make, model, color, year, viewKey, cameraKey, bgKey) {
+  const yearSuffix = year ? ` (${year})` : '';
+  const carLabel = color
+    ? `${make} ${model}${yearSuffix} in ${color}`
+    : `${make} ${model}${yearSuffix}`;
+  const view = VEHICLE_VIEWS[viewKey] || VEHICLE_VIEWS.driver;
+  const camera = VEHICLE_CAMERAS[cameraKey] || VEHICLE_CAMERAS.front_3_4;
+  const bg = VEHICLE_BACKGROUNDS[bgKey] || VEHICLE_BACKGROUNDS.transparent;
+  const yearLock = year
+    ? `India-market ${year} model-year exterior only (grille, lamps, bumper, mirrors, cladding for that launch/facelift — no mixed years). `
+    : 'India-market specification (sold in India). ';
+
+  // Locked base prompt. Optional user model-ref only appends a short postfix — never
+  // rewrites the core (camera/side/plates/quality). Must stay under Magnific's 3000-char limit.
+  const base = (
+    `Generate a photorealistic isolated OEM-catalogue image of a ${carLabel}. ${yearLock}` +
+    `Match the exact camera angle, framing, perspective, lighting, and composition of the attached Baleno/base reference. ` +
+    `${view.shotPhrase}. ${camera.anglePhrase} ${view.sideLock} ` +
+    `ORIENTATION: front wheels perfectly straight — do not steer; match reference tyre orientation and vehicle yaw exactly; ` +
+    `preserve manufacturer body proportions (no exaggerated wheelbase, bonnet, roof, or overhangs). ` +
+    `LIGHTING: soft commercial automotive studio lighting matching the reference — accurate reflections on paint, glass, chrome, and trim; ` +
+    `true paint colour with no colour shift. ` +
+    `PLATES: keep front and rear number-plate mounts with plain solid white blank plates only — no digits, letters, state codes, logos, or any text/graphics on the plates. ` +
+    `LOGOS/TEXT: keep ONLY official manufacturer brand logos/emblems (grille badge, boot badge, wheel centre caps) — correctly oriented and legible; ` +
+    `STRICTLY NO other written text anywhere on the vehicle — no model-name lettering, trim badges (e.g. GLX/VXI/ZX), side-moulding script, door decals, stripe text, or marketing graphics. ` +
+    `${bg.bgPhrase} ` +
+    `QUALITY: ultra-photorealistic, razor-sharp, accurate panel gaps, tyre tread and alloys, realistic paint texture; ` +
+    `clean body — no dents, dirt, stickers, watermarks, people, or props. ` +
+    `OUTPUT: one image, one vehicle only; every colour variant must reuse this exact camera, framing, lighting, wheels, and composition.`
+  );
+  // When a user model photo is attached: postfix only (base lines above stay identical).
+  const modelRefPostfix = vehicleModelRef
+    ? ` MODEL REFERENCE: from the attached additional model photo, extract grille, headlamps/DRLs, bumper, ` +
+      `mirrors, cladding, wheels/tyres, and body proportions, and use those features so this car matches ` +
+      `that uploaded model/facelift — do not copy that photo’s camera, framing, background, or lighting.`
+    : '';
+  return base + modelRefPostfix;
+}
+
+function applyVehicleYearLockForRef() {
+  const yearSel = document.getElementById('vehicleYearSelect');
+  const yearWrap = yearSel ? yearSel.closest('.form-group') : null;
+  if (!yearSel) return;
+  if (vehicleModelRef && vehicleModelRef.dataUri) {
+    if (vehicleSelection.year) vehicleYearBeforeRef = vehicleSelection.year;
+    vehicleSelection.year = '';
+    yearSel.disabled = true;
+    fillSelect(yearSel, 'From reference…', [], '');
+    if (yearWrap) {
+      yearWrap.classList.add('vg-year-ref-locked');
+      yearWrap.title = 'Year is taken from the reference photo — not needed when a model reference is attached';
+    }
+  } else {
+    if (yearWrap) {
+      yearWrap.classList.remove('vg-year-ref-locked');
+      yearWrap.title = '';
+    }
+    const modelEntry = getSelectedModelEntry();
+    if (modelEntry) {
+      if (vehicleYearBeforeRef) vehicleSelection.year = vehicleYearBeforeRef;
+      vehicleYearBeforeRef = '';
+      populateVehicleYearSelect(modelEntry, true);
+    } else {
+      vehicleYearBeforeRef = '';
+      resetVehicleYearSelect(true);
+    }
+  }
+}
+
+function renderVehicleModelRefUI() {
+  const addBtn = document.getElementById('vehicleModelRefAddBtn');
+  const preview = document.getElementById('vehicleModelRefPreview');
+  const thumb = document.getElementById('vehicleModelRefThumb');
+  const nameEl = document.getElementById('vehicleModelRefName');
+  if (!addBtn || !preview) return;
+  if (vehicleModelRef && vehicleModelRef.dataUri) {
+    addBtn.classList.add('has-ref');
+    preview.classList.remove('hidden');
+    if (thumb) thumb.src = vehicleModelRef.dataUri;
+    if (nameEl) nameEl.textContent = vehicleModelRef.name || 'Reference image';
+  } else {
+    addBtn.classList.remove('has-ref');
+    preview.classList.add('hidden');
+    if (thumb) thumb.removeAttribute('src');
+    if (nameEl) nameEl.textContent = 'Reference';
+  }
+  applyVehicleYearLockForRef();
+}
+
+async function onVehicleModelRefSelected(ev) {
+  const file = ev && ev.target && ev.target.files && ev.target.files[0];
+  if (!file) return;
+  if (!/^image\//i.test(file.type || '')) {
+    alert('Please choose an image file (PNG, JPEG, or WebP).');
+    ev.target.value = '';
+    return;
+  }
+  if (file.size > 12 * 1024 * 1024) {
+    alert('Reference image is too large (max 12 MB). Try a smaller photo.');
+    ev.target.value = '';
+    return;
+  }
+  try {
+    const rawUri = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ''));
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+    // Keep small — Freepik rejects oversized multi-ref payloads (base + model).
+    const compressed = await compressDataUriForReference(rawUri, 350 * 1024);
+    const mimeMatch = /^data:([^;]+);/i.exec(compressed);
+    vehicleModelRef = {
+      dataUri: compressed,
+      mime: (mimeMatch && mimeMatch[1]) || file.type || 'image/jpeg',
+      name: file.name || 'Reference image',
+    };
+    renderVehicleModelRefUI();
+    syncVehiclePrompt(); // refresh locked prompt so MODEL REFERENCE postfix appears
+  } catch (e) {
+    alert('Could not load reference image: ' + (e && e.message ? e.message : e));
+  }
+  ev.target.value = '';
+}
+
+function clearVehicleModelRef() {
+  vehicleModelRef = null;
+  const input = document.getElementById('vehicleModelRefInput');
+  if (input) input.value = '';
+  renderVehicleModelRefUI();
+  syncVehiclePrompt(); // drop MODEL REFERENCE postfix from locked prompt
+}
+
+async function getVehicleModelReferenceImages() {
+  if (!vehicleModelRef || !vehicleModelRef.dataUri) return [];
+  let uri = vehicleModelRef.dataUri;
+  if (uri.startsWith('data:')) {
+    uri = await compressDataUriForReference(uri, 350 * 1024);
+  }
+  const mimeMatch = /^data:([^;]+);/i.exec(uri);
+  const mime = (mimeMatch && mimeMatch[1]) || vehicleModelRef.mime || 'image/jpeg';
+  const make = vehicleSelection.make || 'the';
+  const model = vehicleSelection.model || 'selected';
+  return [{
+    image: uri,
+    mime_type: mime,
+    text: (
+      `ADDITIONAL MODEL REFERENCE (car identity — not camera): study THIS photo of the ${make} ${model}` +
+      ` and reproduce its real exterior accurately — grille/mesh pattern, headlamp and DRL shape, fog lamps, bumper sculpting, ` +
+      `bonnet/hood lines, mirrors, cladding, wheel arches, alloy/wheel design, tyre sidewall/tread look, glass graphics, and overall body proportions. ` +
+      `The photo defines the model year/facelift — do not invent a different face. ` +
+      `Do NOT copy this photo’s camera angle, framing, background, or lighting — those stay locked to the Baleno/base reference and the text prompt. ` +
+      `Paint colour follows the prompt. Keep plain white blank plates and brand emblems only.`
+    ),
+  }];
+}
+
+function clampPromptForApi(text) {
+  const s = (text || '').trim();
+  if (s.length <= MAGNIFIC_PROMPT_MAX) return s;
+  return s.slice(0, MAGNIFIC_PROMPT_MAX).trim();
+}
+
+function fillSelect(selectEl, placeholder, options, selected) {
+  if (!selectEl) return;
+  const opts = [`<option value="">${placeholder}</option>`]
+    .concat(options.map(o => {
+      const value = typeof o === 'string' ? o : o.value;
+      const label = typeof o === 'string' ? o : o.label;
+      const sel = value === selected ? ' selected' : '';
+      return `<option value="${String(value).replace(/"/g, '&quot;')}"${sel}>${label}</option>`;
+    }));
+  selectEl.innerHTML = opts.join('');
+}
+
+/** Fill a <select> with alphabetical optgroups (e.g. Luxury / Normal makes). */
+function fillSelectGrouped(selectEl, placeholder, groups, selected) {
+  if (!selectEl) return;
+  const parts = [`<option value="">${placeholder}</option>`];
+  (groups || []).forEach(g => {
+    if (!g || !g.options || !g.options.length) return;
+    const label = String(g.label || '').replace(/"/g, '&quot;');
+    parts.push(`<optgroup label="${label}">`);
+    g.options.forEach(o => {
+      const value = typeof o === 'string' ? o : o.value;
+      const text = typeof o === 'string' ? o : o.label;
+      const sel = value === selected ? ' selected' : '';
+      parts.push(`<option value="${String(value).replace(/"/g, '&quot;')}"${sel}>${text}</option>`);
+    });
+    parts.push('</optgroup>');
+  });
+  selectEl.innerHTML = parts.join('');
+}
+
+function sortAlpha(items, getLabel) {
+  const labelOf = getLabel || (x => (typeof x === 'string' ? x : x.label || x.name || ''));
+  return [...items].sort((a, b) =>
+    String(labelOf(a)).localeCompare(String(labelOf(b)), undefined, { sensitivity: 'base' })
+  );
+}
+
+function vehicleMakeSelectGroups(data) {
+  const makes = sortAlpha(data.makes || [], m => m.name);
+  const luxury = makes.filter(m => m.category === 'luxury').map(m => m.name);
+  const normal = makes.filter(m => m.category !== 'luxury').map(m => m.name);
+  return [
+    { label: 'Luxury', options: luxury },
+    { label: 'Normal', options: normal },
+  ];
+}
+
+// ─── Custom searchable combo (Make / Model) ───────────────────────────────────
+const vehicleCombos = {
+  make: {
+    rootId: 'vehicleMakeCombo',
+    selectId: 'vehicleMakeSelect',
+    triggerId: 'vehicleMakeTrigger',
+    labelId: 'vehicleMakeLabel',
+    panelId: 'vehicleMakePanel',
+    searchId: 'vehicleMakeSearch',
+    listId: 'vehicleMakeList',
+    placeholder: 'Select make…',
+    groups: [],
+    query: '',
+    open: false,
+    onPick: () => onVehicleMakeChange(),
+  },
+  model: {
+    rootId: 'vehicleModelCombo',
+    selectId: 'vehicleModelSelect',
+    triggerId: 'vehicleModelTrigger',
+    labelId: 'vehicleModelLabel',
+    panelId: 'vehicleModelPanel',
+    searchId: 'vehicleModelSearch',
+    listId: 'vehicleModelList',
+    placeholder: 'Select model…',
+    groups: [],
+    query: '',
+    open: false,
+    onPick: () => onVehicleModelChange(),
+  },
+};
+
+function comboLetter(label) {
+  const ch = String(label || '').trim().charAt(0).toUpperCase();
+  return /[A-Z]/.test(ch) ? ch : '#';
+}
+
+function syncComboNativeSelect(combo, selected) {
+  const selectEl = document.getElementById(combo.selectId);
+  if (!selectEl) return;
+  fillSelectGrouped(selectEl, combo.placeholder, combo.groups, selected || '');
+  selectEl.value = selected || '';
+}
+
+function updateComboTrigger(combo) {
+  const selectEl = document.getElementById(combo.selectId);
+  const labelEl = document.getElementById(combo.labelId);
+  const trigger = document.getElementById(combo.triggerId);
+  if (!labelEl || !selectEl) return;
+  const value = selectEl.value || '';
+  const disabled = !!selectEl.disabled;
+  if (trigger) trigger.disabled = disabled;
+  if (value) {
+    labelEl.textContent = value;
+    labelEl.classList.remove('is-placeholder');
+  } else {
+    labelEl.textContent = combo.placeholder;
+    labelEl.classList.add('is-placeholder');
+  }
+}
+
+function setVehicleCombo(key, groups, selected, opts = {}) {
+  const combo = vehicleCombos[key];
+  if (!combo) return;
+  combo.groups = (groups || [])
+    .map(g => ({
+      label: g.label || '',
+      options: sortAlpha((g.options || []).map(o => (typeof o === 'string' ? o : o.value || o.label))),
+    }))
+    .filter(g => g.options.length);
+  if (opts.placeholder) combo.placeholder = opts.placeholder;
+  const selectEl = document.getElementById(combo.selectId);
+  if (selectEl && opts.disabled != null) selectEl.disabled = !!opts.disabled;
+  syncComboNativeSelect(combo, selected || '');
+  updateComboTrigger(combo);
+  if (combo.open) renderVehicleComboList(key);
+}
+
+function setVehicleComboFlat(key, options, selected, opts = {}) {
+  setVehicleCombo(key, [{ label: '', options: options || [] }], selected, opts);
+}
+
+function closeVehicleCombo(key) {
+  const combo = vehicleCombos[key];
+  if (!combo || !combo.open) return;
+  combo.open = false;
+  combo.query = '';
+  const panel = document.getElementById(combo.panelId);
+  const trigger = document.getElementById(combo.triggerId);
+  const search = document.getElementById(combo.searchId);
+  if (panel) panel.classList.remove('is-open');
+  if (trigger) {
+    trigger.classList.remove('is-open');
+    trigger.setAttribute('aria-expanded', 'false');
+  }
+  if (search) search.value = '';
+}
+
+function closeAllVehicleCombos(exceptKey) {
+  Object.keys(vehicleCombos).forEach(k => {
+    if (k !== exceptKey) closeVehicleCombo(k);
+  });
+}
+
+function openVehicleCombo(key) {
+  const combo = vehicleCombos[key];
+  if (!combo) return;
+  const selectEl = document.getElementById(combo.selectId);
+  if (!selectEl || selectEl.disabled) return;
+  closeAllVehicleCombos(key);
+  combo.open = true;
+  combo.query = '';
+  const panel = document.getElementById(combo.panelId);
+  const trigger = document.getElementById(combo.triggerId);
+  const search = document.getElementById(combo.searchId);
+  if (panel) panel.classList.add('is-open');
+  if (trigger) {
+    trigger.classList.add('is-open');
+    trigger.setAttribute('aria-expanded', 'true');
+  }
+  renderVehicleComboList(key);
+  if (search) {
+    search.value = '';
+    setTimeout(() => search.focus(), 0);
+  }
+}
+
+function toggleVehicleCombo(key) {
+  const combo = vehicleCombos[key];
+  if (!combo) return;
+  if (combo.open) closeVehicleCombo(key);
+  else openVehicleCombo(key);
+}
+
+function renderVehicleComboList(key) {
+  const combo = vehicleCombos[key];
+  const list = document.getElementById(combo.listId);
+  const selectEl = document.getElementById(combo.selectId);
+  if (!combo || !list || !selectEl) return;
+  const q = (combo.query || '').trim().toLowerCase();
+  const selected = selectEl.value || '';
+  const parts = [];
+  let any = false;
+
+  combo.groups.forEach(group => {
+    const filtered = group.options.filter(name => !q || String(name).toLowerCase().includes(q));
+    if (!filtered.length) return;
+    any = true;
+    if (group.label) {
+      parts.push(`<div class="vg-combo-group">${esc(group.label)}</div>`);
+    }
+    let lastLetter = '';
+    filtered.forEach(name => {
+      const letter = comboLetter(name);
+      if (letter !== lastLetter) {
+        lastLetter = letter;
+        parts.push(`<div class="vg-combo-letter">${esc(letter)}</div>`);
+      }
+      const isSel = name === selected;
+      parts.push(
+        `<button type="button" class="vg-combo-option${isSel ? ' is-selected' : ''}" role="option" aria-selected="${isSel}" data-value="${esc(name)}">${esc(name)}</button>`
+      );
+    });
+  });
+
+  list.innerHTML = any
+    ? parts.join('')
+    : `<div class="vg-combo-empty">No matches</div>`;
+}
+
+function pickVehicleComboValue(key, value) {
+  const combo = vehicleCombos[key];
+  if (!combo) return;
+  const selectEl = document.getElementById(combo.selectId);
+  if (!selectEl) return;
+  selectEl.value = value || '';
+  updateComboTrigger(combo);
+  closeVehicleCombo(key);
+  if (typeof combo.onPick === 'function') combo.onPick();
+}
+
+function wireVehicleCombos() {
+  Object.keys(vehicleCombos).forEach(key => {
+    const combo = vehicleCombos[key];
+    const trigger = document.getElementById(combo.triggerId);
+    const search = document.getElementById(combo.searchId);
+    const list = document.getElementById(combo.listId);
+    if (trigger && !trigger.dataset.wired) {
+      trigger.dataset.wired = '1';
+      trigger.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleVehicleCombo(key);
+      });
+    }
+    if (search && !search.dataset.wired) {
+      search.dataset.wired = '1';
+      search.addEventListener('input', () => {
+        combo.query = search.value || '';
+        renderVehicleComboList(key);
+      });
+      search.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          closeVehicleCombo(key);
+          trigger && trigger.focus();
+        }
+      });
+      search.addEventListener('click', (e) => e.stopPropagation());
+    }
+    if (list && !list.dataset.wired) {
+      list.dataset.wired = '1';
+      list.addEventListener('click', (e) => {
+        const btn = e.target.closest('.vg-combo-option');
+        if (!btn) return;
+        e.preventDefault();
+        e.stopPropagation();
+        pickVehicleComboValue(key, btn.getAttribute('data-value') || '');
+      });
+    }
+  });
+
+  if (!document.documentElement.dataset.vgComboDocWired) {
+    document.documentElement.dataset.vgComboDocWired = '1';
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('.vg-combo')) return;
+      closeAllVehicleCombos();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeAllVehicleCombos();
+    });
+  }
+}
+
+function catalogMetaSummary(data) {
+  if (!data) return '';
+  const lux = data.luxury_make_count != null
+    ? data.luxury_make_count
+    : (data.makes || []).filter(m => m.category === 'luxury').length;
+  const normal = data.normal_make_count != null
+    ? data.normal_make_count
+    : (data.makes || []).filter(m => m.category !== 'luxury').length;
+  return `${data.make_count} makes (${lux} luxury · ${normal} normal) · ${data.model_count} models`;
+}
+
+async function ensureVehicleCatalog() {
+  if (vehicleCatalog) return vehicleCatalog;
+  if (vehicleCatalogLoading) return vehicleCatalogLoading;
+  const meta = document.getElementById('vehicleCarMeta');
+  if (meta) meta.textContent = 'Loading catalog…';
+  vehicleCatalogLoading = fetch(`/vehicle_catalog.json?v=${Date.now()}`)
+    .then(r => {
+      if (!r.ok) throw new Error('Could not load vehicle catalog');
+      return r.json();
+    })
+    .then(data => {
+      vehicleCatalog = data;
+      vehicleCatalogLoading = null;
+      return data;
+    })
+    .catch(err => {
+      vehicleCatalogLoading = null;
+      if (meta) meta.textContent = 'Failed to load catalog';
+      throw err;
+    });
+  return vehicleCatalogLoading;
+}
+
+async function initVehicleSelectors() {
+  const data = await ensureVehicleCatalog();
+  const makeSel = document.getElementById('vehicleMakeSelect');
+  const colorSel = document.getElementById('vehicleColorSelect');
+  const yearSel = document.getElementById('vehicleYearSelect');
+  const meta = document.getElementById('vehicleCarMeta');
+  if (!makeSel) return;
+  wireVehicleCombos();
+  setVehicleCombo(
+    'make',
+    vehicleMakeSelectGroups(data),
+    vehicleSelection.make,
+    { placeholder: 'Select make…', disabled: false }
+  );
+  colorSel.disabled = !vehicleSelection.model;
+  if (yearSel) yearSel.disabled = !vehicleSelection.model;
+  if (vehicleSelection.make) {
+    onVehicleMakeChange(true);
+  } else {
+    setVehicleComboFlat('model', [], '', { placeholder: 'Select model…', disabled: true });
+    fillSelect(colorSel, 'Select color…', [], '');
+    resetVehicleYearSelect(true);
+  }
+  if (meta) {
+    meta.textContent = catalogMetaSummary(data);
+  }
+}
+
+function getSelectedMakeEntry() {
+  if (!vehicleCatalog) return null;
+  return vehicleCatalog.makes.find(m => m.name === vehicleSelection.make) || null;
+}
+
+function getSelectedModelEntry() {
+  const make = getSelectedMakeEntry();
+  if (!make) return null;
+  return make.models.find(m => m.name === vehicleSelection.model) || null;
+}
+
+function resetVehicleYearSelect(disabled) {
+  const yearSel = document.getElementById('vehicleYearSelect');
+  if (!yearSel) return;
+  yearSel.disabled = !!disabled;
+  fillSelect(yearSel, 'Select year…', [], '');
+  vehicleSelection.year = '';
+}
+
+function populateVehicleYearSelect(model, preserve) {
+  const yearSel = document.getElementById('vehicleYearSelect');
+  if (!yearSel) return;
+  // Model reference photo owns year/facelift identity — keep year locked off
+  if (vehicleModelRef && vehicleModelRef.dataUri) {
+    applyVehicleYearLockForRef();
+    return;
+  }
+  const opts = yearOptionsForModel(model);
+  if (!opts.length) {
+    yearSel.disabled = true;
+    fillSelect(yearSel, 'Year not in catalog', [], '');
+    vehicleSelection.year = '';
+    return;
+  }
+  yearSel.disabled = false;
+  let selected = preserve ? vehicleSelection.year : '';
+  if (!selected || !opts.some(o => o.value === selected)) {
+    selected = defaultYearForModel(model);
+  }
+  vehicleSelection.year = selected;
+  fillSelect(yearSel, 'Select year…', opts, selected);
+}
+
+function onVehicleMakeChange(preserveDownstream) {
+  const makeSel = document.getElementById('vehicleMakeSelect');
+  const colorSel = document.getElementById('vehicleColorSelect');
+  vehicleSelection.make = makeSel.value;
+  updateComboTrigger(vehicleCombos.make);
+  if (!preserveDownstream) {
+    vehicleSelection.model = '';
+    vehicleSelection.color = '';
+    vehicleSelection.year = '';
+  }
+  const make = getSelectedMakeEntry();
+  if (!make) {
+    colorSel.disabled = true;
+    setVehicleComboFlat('model', [], '', { placeholder: 'Select model…', disabled: true });
+    fillSelect(colorSel, 'Select color…', [], '');
+    resetVehicleYearSelect(true);
+    syncVehiclePrompt();
+    return;
+  }
+  setVehicleComboFlat(
+    'model',
+    sortAlpha(make.models.map(m => m.name)),
+    vehicleSelection.model,
+    { placeholder: 'Select model…', disabled: false }
+  );
+  if (vehicleSelection.model && make.models.some(m => m.name === vehicleSelection.model)) {
+    onVehicleModelChange(true);
+  } else {
+    vehicleSelection.model = '';
+    vehicleSelection.color = '';
+    vehicleSelection.year = '';
+    colorSel.disabled = true;
+    setVehicleComboFlat('model', sortAlpha(make.models.map(m => m.name)), '', {
+      placeholder: 'Select model…',
+      disabled: false,
+    });
+    fillSelect(colorSel, 'Select color…', [], '');
+    resetVehicleYearSelect(true);
+    syncVehiclePrompt();
+  }
+}
+
+function onVehicleModelChange(preserveDownstream) {
+  const modelSel = document.getElementById('vehicleModelSelect');
+  const colorSel = document.getElementById('vehicleColorSelect');
+  vehicleSelection.model = modelSel.value;
+  updateComboTrigger(vehicleCombos.model);
+  if (!preserveDownstream) {
+    vehicleSelection.color = '';
+    vehicleSelection.year = '';
+  }
+  const model = getSelectedModelEntry();
+  if (!model) {
+    colorSel.disabled = true;
+    fillSelect(colorSel, 'Select color…', [], '');
+    resetVehicleYearSelect(true);
+    syncVehiclePrompt();
+    return;
+  }
+  colorSel.disabled = false;
+  fillSelect(colorSel, 'Select color…', sortAlpha(model.colors || []), vehicleSelection.color);
+  if (!vehicleSelection.color || !model.colors.includes(vehicleSelection.color)) {
+    vehicleSelection.color = '';
+  }
+  populateVehicleYearSelect(model, !!preserveDownstream);
+  syncVehiclePrompt();
+}
+
+function onVehicleColorChange() {
+  const colorSel = document.getElementById('vehicleColorSelect');
+  vehicleSelection.color = colorSel.value;
+  syncVehiclePrompt();
+}
+
+function onVehicleYearChange() {
+  const yearSel = document.getElementById('vehicleYearSelect');
+  vehicleSelection.year = yearSel ? yearSel.value : '';
+  syncVehiclePrompt();
+}
+
+function readVehicleResultSettings() {
+  const aspectSel = document.getElementById('vehicleAspectSelect');
+  const viewSel = document.getElementById('vehicleViewSelect');
+  const camSel = document.getElementById('vehicleCameraSelect');
+  const bgSel = document.getElementById('vehicleBgSelect');
+  // Aspect / view / camera locked (UI hidden)
+  vehicleSelection.aspect = '16:9';
+  vehicleSelection.view = 'driver';
+  vehicleSelection.camera = 'front_3_4';
+  if (aspectSel) aspectSel.value = '16:9';
+  if (viewSel) viewSel.value = 'driver';
+  if (camSel) camSel.value = 'front_3_4';
+  // Background is locked to transparent for now
+  vehicleSelection.background = 'transparent';
+  if (bgSel) bgSel.value = 'transparent';
+}
+
+function onVehicleResultSettingsChange() {
+  readVehicleResultSettings();
+  // Keep hidden global ratio select in sync for any shared helpers
+  const ratioSel = document.getElementById('ratioSelect');
+  if (ratioSel && genMode === 'vehicle') {
+    ratioSel.value = getVehicleAspect().ratioKey;
+  }
+  syncVehiclePrompt();
+}
+
+function syncVehiclePrompt() {
+  const sceneEl = document.getElementById('sceneInput');
+  const meta = document.getElementById('vehicleCarMeta');
+  if (!sceneEl) return;
+  readVehicleResultSettings();
+  const { make, model, color, aspect, view, camera, background } = vehicleSelection;
+  const year = vehicleModelRef ? '' : (vehicleSelection.year || '');
+  const modelEntry = getSelectedModelEntry();
+  const needsYear = !vehicleModelRef && !!(modelEntry && (modelEntry.years || []).length);
+  if (make && model && color && (!needsYear || year || vehicleModelRef)) {
+    sceneEl.value = buildVehiclePrompt(make, model, color, year, view, camera, background);
+    onSceneInput();
+    if (meta) {
+      const viewLabel = (VEHICLE_VIEWS[view] || VEHICLE_VIEWS.driver).label;
+      const bgLabel = (VEHICLE_BACKGROUNDS[background] || VEHICLE_BACKGROUNDS.transparent).label;
+      const aspectLabel = (VEHICLE_ASPECTS[aspect] || VEHICLE_ASPECTS['16:9']).label;
+      const yearBit = vehicleModelRef ? ' · ref photo' : (year ? ` · ${year}` : '');
+      meta.textContent = `${make} ${model}${yearBit} · ${color} · ${aspectLabel} · ${viewLabel} · ${bgLabel}`;
+    }
+  } else if (make && model && color && needsYear && !year) {
+    sceneEl.value = '';
+    onSceneInput();
+    if (meta) meta.textContent = `${make} ${model} · pick a launch year`;
+  } else if (make && model) {
+    // Wait for color — clear stale prompt so user finishes selection
+    sceneEl.value = '';
+    onSceneInput();
+    if (meta) meta.textContent = `${make} ${model} · pick a color`;
+  } else if (vehicleCatalog) {
+    sceneEl.value = '';
+    onSceneInput();
+    if (meta) meta.textContent = catalogMetaSummary(vehicleCatalog);
+  }
+}
+
+// Vehicle Image Gen: num/res locked; aspect ratio chosen in vehicle panel (16:9 | 4:3).
+const VEHICLE_LOCKED = { num: '1', res: '2K' };
+let genSettingsBackup = null;
+
+function applyVehicleLocks(enabled) {
+  document.body.classList.toggle('vehicle-mode', enabled);
+  const numSel = document.getElementById('numSelect');
+  const resSel = document.getElementById('resSelect');
+  const ratioSel = document.getElementById('ratioSelect');
+  const modelSel = document.getElementById('modelSelect');
+  const modelNumRow = document.getElementById('modelNumRow');
+  if (enabled) {
+    if (!genSettingsBackup) {
+      genSettingsBackup = {
+        num: numSel.value,
+        res: resSel.value,
+        ratio: ratioSel.value,
+        model: modelSel.value,
+      };
+    }
+    readVehicleResultSettings();
+    numSel.value = VEHICLE_LOCKED.num;
+    resSel.value = VEHICLE_LOCKED.res;
+    ratioSel.value = getVehicleAspect().ratioKey;
+    // Vehicle gen needs Nano Banana (supports reference_images for the server-side base ref)
+    modelSel.value = 'nano-banana';
+    if (typeof onModelChange === 'function') onModelChange();
+    // AI Model spans full row when num/res/ratio are hidden
+    if (modelNumRow) modelNumRow.style.gridTemplateColumns = '1fr';
+    if (typeof updatePrompt === 'function') updatePrompt();
+  } else {
+    if (genSettingsBackup) {
+      numSel.value = genSettingsBackup.num;
+      resSel.value = genSettingsBackup.res;
+      ratioSel.value = genSettingsBackup.ratio;
+      if (genSettingsBackup.model) modelSel.value = genSettingsBackup.model;
+      genSettingsBackup = null;
+      if (typeof onModelChange === 'function') onModelChange();
+    }
+    if (modelNumRow) modelNumRow.style.gridTemplateColumns = '';
+    if (typeof updatePrompt === 'function') updatePrompt();
+  }
+}
+
+function applyGenMode(mode) {
+  genMode = mode;
+  const cfg = GEN_MODES[mode] || GEN_MODES.generate;
+  const titleEl = document.getElementById('genTitle');
+  const subEl = document.getElementById('genSub');
+  const sceneEl = document.getElementById('sceneInput');
+  const panel = document.getElementById('vehicleCarPanel');
+  if (titleEl) titleEl.textContent = cfg.title;
+  if (subEl) subEl.textContent = cfg.sub;
+  if (sceneEl) {
+    sceneEl.placeholder = cfg.placeholder;
+    // Vehicle base prompt is locked — rebuilt from make/model/color/year only
+    sceneEl.readOnly = mode === 'vehicle';
+    sceneEl.title = mode === 'vehicle'
+      ? 'Locked Baleno/base vehicle prompt — changes come from Make / Model / Color / Year (+ optional reference)'
+      : '';
+    sceneEl.classList.toggle('prompt-locked', mode === 'vehicle');
+  }
+  if (panel) panel.classList.toggle('visible', mode === 'vehicle');
+  renderVehicleModelRefUI();
+  applyVehicleLocks(mode === 'vehicle');
+  const genLabel = document.getElementById('genBtnLabel');
+  if (genLabel && !isGenerating) {
+    genLabel.textContent = mode === 'vehicle' ? 'Generate' : 'Generate Image';
+  }
+  const classicResults = document.getElementById('resultsSectionClassic');
+  const vehicleGallery = document.getElementById('vehicleGallerySection');
+  if (classicResults) classicResults.hidden = mode === 'vehicle';
+  if (vehicleGallery) vehicleGallery.hidden = mode !== 'vehicle';
+  const clearBtn = document.querySelector('.right-head .btn-clear');
+  if (clearBtn) {
+    clearBtn.onclick = mode === 'vehicle' ? clearVehicleGalleryFilters : clearResults;
+    clearBtn.title = mode === 'vehicle' ? 'Clear search & filters' : 'Clear results';
+  }
+  if (mode === 'vehicle') {
+    initVehicleSelectors()
+      .then(() => renderVehicleGallery())
+      .catch(err => console.warn(err));
+  }
+}
+
+function clearVehicleGalleryFilters() {
+  vehicleGalleryFilters = { q: '', make: '', year: '', aspect: '', view: '' };
+  vehicleCollectionOpenMake = null;
+  const search = document.getElementById('vgSearch');
+  const makeSel = document.getElementById('vgFilterMake');
+  const yearSel = document.getElementById('vgFilterYear');
+  const aspectSel = document.getElementById('vgFilterAspect');
+  const viewSel = document.getElementById('vgFilterView');
+  if (search) search.value = '';
+  if (makeSel) makeSel.value = '';
+  if (yearSel) yearSel.value = '';
+  if (aspectSel) aspectSel.value = '';
+  if (viewSel) viewSel.value = '';
+  renderVehicleGallery();
+}
+
 function navigateTo(view) {
   if (view === 'admin' && currentPermission !== 'Admin') return; // client-side convenience only — server enforces this regardless
+  const showGenerate = view === 'generate' || view === 'vehicle';
   VIEWS.forEach(v => {
     const el = document.getElementById('view-' + v);
-    if (el) el.style.display = v === view ? (v === 'generate' ? 'contents' : 'flex') : 'none';
+    if (!el) return;
+    if (v === 'generate') {
+      el.style.display = showGenerate ? 'contents' : 'none';
+    } else if (v === 'vehicle') {
+      // Vehicle reuses the generate view; no separate panel.
+      el.style.display = 'none';
+    } else {
+      el.style.display = v === view ? 'flex' : 'none';
+    }
   });
   document.querySelectorAll('.nav-item').forEach(el => {
     el.classList.toggle('active', el.dataset.view === view);
   });
+  if (showGenerate) applyGenMode(view);
   if (view === 'admin') loadAdminData();
-  else if (view !== 'generate') renderGallery(view);
+  else if (!showGenerate) renderGallery(view);
 }
 
 // ─── LIBRARY STORE (history / favourites / collections) ───────────────────────
@@ -1239,7 +3804,35 @@ const EMPTY_STATES = {
 };
 
 function storeGet(kind) { try { return JSON.parse(localStorage.getItem(STORE_KEYS[kind])) || []; } catch { return []; } }
-function storeSet(kind, arr) { try { localStorage.setItem(STORE_KEYS[kind], JSON.stringify(arr)); } catch (e) { console.warn('Storage full', e); } }
+function slimHistoryItemForStorage(item) {
+  // Keep metadata + remote URL; drop huge base64 from localStorage (quota ~5MB).
+  const slim = { ...item };
+  if (slim.imageData && slim.imageData.b64) {
+    const mime = slim.imageData.mime || 'image/png';
+    const remote = slim.sourceUrl || slim.imageData.url || '';
+    slim.imageData = remote ? { url: remote, mime } : { mime, hasBytes: true };
+  }
+  if (slim.src && String(slim.src).startsWith('data:') && slim.src.length > 8000) {
+    slim.src = slim.sourceUrl || '';
+  }
+  return slim;
+}
+function storeSet(kind, arr) {
+  try {
+    localStorage.setItem(STORE_KEYS[kind], JSON.stringify(arr));
+    return true;
+  } catch (e) {
+    console.warn('Storage full, trimming…', e);
+    try {
+      const trimmed = arr.slice(0, 20).map(slimHistoryItemForStorage);
+      localStorage.setItem(STORE_KEYS[kind], JSON.stringify(trimmed));
+      return true;
+    } catch (e2) {
+      console.warn('Storage still full', e2);
+      return false;
+    }
+  }
+}
 function inStore(kind, id) { return storeGet(kind).some(x => x.id === id); }
 function toggleStore(kind, item) {
   let arr = storeGet(kind);
@@ -1253,10 +3846,21 @@ let itemSeq = 0;
 function newItemId() { return 'img_' + (Date.now().toString(36)) + '_' + (itemSeq++); }
 
 function saveToHistory(item) {
+  if (item && item.id && item.src) imageSrcCache.set(item.id, item.src);
   const arr = storeGet('history');
-  arr.unshift(item);
+  arr.unshift(slimHistoryItemForStorage(item));
   if (arr.length > 60) arr.length = 60;
-  storeSet('history', arr);
+  const ok = storeSet('history', arr);
+  if (!ok && item) {
+    // Keep visible this session even if localStorage rejected the write
+    const existing = storeGet('history');
+    if (!existing.some(x => x.id === item.id)) {
+      try {
+        sessionStorage.setItem('acko_live_' + item.id, JSON.stringify(slimHistoryItemForStorage(item)));
+      } catch (_) { /* ignore */ }
+    }
+  }
+  return ok;
 }
 
 // ─── GALLERY RENDER ───────────────────────────────────────────────────────────
@@ -1452,37 +4056,310 @@ function clearGallery(kind) {
   renderGallery(kind);
 }
 
+/** Wipe history + favourites + collections and refresh galleries. */
+function wipeAllLibraryStores() {
+  Object.keys(STORE_KEYS).forEach(kind => storeSet(kind, []));
+  vehiclePendingGens = [];
+  vehicleCollectionOpenMake = null;
+  vehicleGalleryFilters = { q: '', make: '', year: '', aspect: '', view: '' };
+  const search = document.getElementById('vgSearch');
+  if (search) search.value = '';
+  ['vgFilterMake', 'vgFilterYear', 'vgFilterAspect', 'vgFilterView'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  try { clearResults(); } catch (_) { /* DOM may not be ready */ }
+  if (typeof renderVehicleGallery === 'function') renderVehicleGallery();
+  ['history', 'favourites', 'collections'].forEach(kind => {
+    const view = document.getElementById(`view-${kind}`);
+    if (view && view.style.display !== 'none') renderGallery(kind);
+  });
+}
+
+function clearAllLibrary() {
+  if (!confirm('Clear all history, favourites, and collections? This cannot be undone.')) return;
+  wipeAllLibraryStores();
+  setStatus('', 'Library cleared — start fresh');
+}
+
 // ─── LIGHTBOX ─────────────────────────────────────────────────────────────────
 let lbItem = null;
 let lbFromView = 'generate';
+let lbPromptExpanded = false;
+
+function buildLbPill(label, value) {
+  if (value == null || value === '') return null;
+  const pill = document.createElement('span');
+  pill.className = 'lb-pill';
+  pill.innerHTML = `<strong>${esc(label)}</strong> ${esc(String(value))}`;
+  return pill;
+}
+
+function populateLbPills(item) {
+  const host = document.getElementById('lbPills');
+  const labelEl = document.getElementById('lbConfigLabel');
+  if (!host) return;
+  host.innerHTML = '';
+  const v = getItemVehicleMeta(item) || item.vehicle || {};
+  const pills = [
+    buildLbPill('Make', v.make),
+    buildLbPill('Model', v.model),
+    buildLbPill('Year', v.year),
+    buildLbPill('Color', v.color),
+    buildLbPill('Aspect', v.aspect || item.ratio),
+    buildLbPill('Side', v.view ? vehicleViewLabel(v.view) : ''),
+    buildLbPill('Camera', v.camera ? vehicleCameraLabel(v.camera) : ''),
+    buildLbPill('Background', v.background ? vehicleBgLabel(v.background) : ''),
+    buildLbPill('AI', item.model),
+    buildLbPill('Badge', item.badge && item.badge !== 'Original' ? item.badge : ''),
+  ].filter(Boolean);
+
+  // Non-vehicle fallback: still show model + ratio as pills
+  if (!pills.length) {
+    const fallback = [
+      buildLbPill('AI', item.model),
+      buildLbPill('Aspect', item.ratio),
+    ].filter(Boolean);
+    fallback.forEach(p => host.appendChild(p));
+  } else {
+    pills.forEach(p => host.appendChild(p));
+  }
+  if (labelEl) labelEl.style.display = host.children.length ? '' : 'none';
+}
+
+function setupLbPromptClamp(text) {
+  const el = document.getElementById('lbPrompt');
+  const toggle = document.getElementById('lbPromptToggle');
+  if (!el || !toggle) return;
+  lbPromptExpanded = false;
+  el.classList.remove('expanded');
+  el.textContent = text || '—';
+  toggle.textContent = 'Show more';
+  // Measure after paint whether content exceeds 2 lines
+  requestAnimationFrame(() => {
+    const overflow = el.scrollHeight > el.clientHeight + 1;
+    toggle.classList.toggle('hidden', !overflow);
+  });
+}
+
+function toggleLbPromptExpand() {
+  const el = document.getElementById('lbPrompt');
+  const toggle = document.getElementById('lbPromptToggle');
+  if (!el || !toggle) return;
+  lbPromptExpanded = !lbPromptExpanded;
+  el.classList.toggle('expanded', lbPromptExpanded);
+  toggle.textContent = lbPromptExpanded ? 'Show less' : 'Show more';
+}
+
 function openLightbox(id, fromView) {
   const item = findItem(id);
   if (!item) return;
   lbItem = item;
   lbFromView = fromView || 'generate';
-  document.getElementById('lbImg').src = item.src;
-  document.getElementById('lbPrompt').textContent = item.prompt || '—';
+  document.getElementById('lbImg').src = resolveItemImageSrc(item) || item.src || '';
+  setupLbPromptClamp(item.fullPrompt || item.prompt || '—');
+  populateLbPills(item);
   const bits = [];
   if (item.model) bits.push(item.model);
   if (item.ratio) bits.push(item.ratio);
-  document.getElementById('lbInfo').textContent = bits.join('  ·  ');
+  const info = document.getElementById('lbInfo');
+  if (info) {
+    info.textContent = bits.join('  ·  ');
+    // Prefer pills; keep info as quiet fallback when no pills rendered
+    info.style.display = document.getElementById('lbPills')?.children.length ? 'none' : '';
+  }
+  renderLbVersions(item);
   syncLbButtons();
+  wireLbPanZoom();
   resetLbZoom();
   document.getElementById('lightbox').classList.add('open');
 }
-function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); lbItem = null; resetLbZoom(); }
-function toggleLbZoom() {
-  document.getElementById('lbImg').classList.toggle('zoomed');
-  document.getElementById('lbImgWrap').classList.toggle('zoomed');
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  lbItem = null;
+  lbPromptExpanded = false;
+  resetLbZoom();
+  const versions = document.getElementById('lbVersions');
+  if (versions) {
+    versions.classList.remove('visible');
+    versions.innerHTML = '';
+  }
 }
+const LB_ZOOM_MIN = 1;
+const LB_ZOOM_MAX = 6;
+let lbView = { scale: 1, x: 0, y: 0 };
+let lbPan = {
+  active: false, moved: false, pointerId: null,
+  startX: 0, startY: 0, origX: 0, origY: 0,
+};
+let lbZoomWired = false;
+
+function applyLbTransform() {
+  const img = document.getElementById('lbImg');
+  const wrap = document.getElementById('lbImgWrap');
+  if (!img || !wrap) return;
+  img.style.transform = `translate(${lbView.x}px, ${lbView.y}px) scale(${lbView.scale})`;
+  wrap.classList.toggle('is-zoomed', lbView.scale > 1.01);
+  const pct = Math.round(lbView.scale * 100) + '%';
+  const hint = document.getElementById('lbZoomHint');
+  if (hint) {
+    hint.textContent = lbView.scale > 1.01
+      ? pct + ' · drag to pan · double-click reset'
+      : 'Scroll / + to zoom · drag to pan';
+  }
+  const pctEl = document.getElementById('lbZoomPct');
+  if (pctEl) pctEl.textContent = pct;
+  const outBtn = document.getElementById('lbZoomOutBtn');
+  const inBtn = document.getElementById('lbZoomInBtn');
+  if (outBtn) outBtn.disabled = lbView.scale <= LB_ZOOM_MIN + 0.001;
+  if (inBtn) inBtn.disabled = lbView.scale >= LB_ZOOM_MAX - 0.001;
+}
+
+function clampLbPan() {
+  if (lbView.scale <= 1) {
+    lbView.x = 0;
+    lbView.y = 0;
+    return;
+  }
+  const wrap = document.getElementById('lbImgWrap');
+  const img = document.getElementById('lbImg');
+  if (!wrap || !img) return;
+  const wr = wrap.getBoundingClientRect();
+  const iw = img.offsetWidth || img.naturalWidth || 0;
+  const ih = img.offsetHeight || img.naturalHeight || 0;
+  if (!iw || !ih) return;
+  const scaledW = iw * lbView.scale;
+  const scaledH = ih * lbView.scale;
+  const maxX = Math.max(40, (scaledW - wr.width) / 2 + 24);
+  const maxY = Math.max(40, (scaledH - wr.height) / 2 + 24);
+  lbView.x = Math.min(maxX, Math.max(-maxX, lbView.x));
+  lbView.y = Math.min(maxY, Math.max(-maxY, lbView.y));
+}
+
+function setLbZoomAt(nextScale, clientX, clientY) {
+  const wrap = document.getElementById('lbImgWrap');
+  if (!wrap) return;
+  const prev = lbView.scale || 1;
+  const scale = Math.min(LB_ZOOM_MAX, Math.max(LB_ZOOM_MIN, nextScale));
+  if (Math.abs(scale - prev) < 0.001) {
+    applyLbTransform();
+    return;
+  }
+  const rect = wrap.getBoundingClientRect();
+  const cx = (clientX != null ? clientX : rect.left + rect.width / 2) - rect.left - rect.width / 2;
+  const cy = (clientY != null ? clientY : rect.top + rect.height / 2) - rect.top - rect.height / 2;
+  lbView.x = cx - ((cx - lbView.x) * (scale / prev));
+  lbView.y = cy - ((cy - lbView.y) * (scale / prev));
+  lbView.scale = scale;
+  if (scale <= 1) { lbView.x = 0; lbView.y = 0; }
+  else clampLbPan();
+  applyLbTransform();
+}
+
+function lbZoomBy(delta) {
+  const wrap = document.getElementById('lbImgWrap');
+  if (!wrap) return;
+  const rect = wrap.getBoundingClientRect();
+  setLbZoomAt(lbView.scale + delta, rect.left + rect.width / 2, rect.top + rect.height / 2);
+}
+
 function resetLbZoom() {
-  document.getElementById('lbImg').classList.remove('zoomed');
-  document.getElementById('lbImgWrap').classList.remove('zoomed');
+  lbView = { scale: 1, x: 0, y: 0 };
+  lbPan.active = false;
+  lbPan.moved = false;
+  const wrap = document.getElementById('lbImgWrap');
+  if (wrap) wrap.classList.remove('is-panning', 'is-zoomed', 'zoomed');
+  const img = document.getElementById('lbImg');
+  if (img) {
+    img.classList.remove('zoomed');
+    img.style.transform = 'translate(0px, 0px) scale(1)';
+  }
+  applyLbTransform();
+}
+
+function toggleLbZoom() {
+  if (lbView.scale > 1.01) resetLbZoom();
+  else lbZoomBy(1);
+}
+
+function wireLbPanZoom() {
+  if (lbZoomWired) return;
+  const wrap = document.getElementById('lbImgWrap');
+  if (!wrap) return;
+  lbZoomWired = true;
+
+  wrap.addEventListener('wheel', (e) => {
+    if (!document.getElementById('lightbox').classList.contains('open')) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const factor = e.deltaY > 0 ? 0.9 : 1.12;
+    setLbZoomAt(lbView.scale * factor, e.clientX, e.clientY);
+  }, { passive: false });
+
+  wrap.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0) return;
+    if (e.target.closest('.lb-zoom-controls')) return;
+    lbPan.active = true;
+    lbPan.moved = false;
+    lbPan.pointerId = e.pointerId;
+    lbPan.startX = e.clientX;
+    lbPan.startY = e.clientY;
+    lbPan.origX = lbView.x;
+    lbPan.origY = lbView.y;
+    wrap.classList.add('is-panning');
+    try { wrap.setPointerCapture(e.pointerId); } catch (_) { /* ignore */ }
+  });
+
+  wrap.addEventListener('pointermove', (e) => {
+    if (!lbPan.active || e.pointerId !== lbPan.pointerId) return;
+    const dx = e.clientX - lbPan.startX;
+    const dy = e.clientY - lbPan.startY;
+    if (!lbPan.moved && (Math.abs(dx) > 3 || Math.abs(dy) > 3)) lbPan.moved = true;
+    if (lbView.scale <= 1.01) {
+      // Drag-up at 1x starts a zoom so pan always has room to work
+      if (lbPan.moved && dy < -24) {
+        setLbZoomAt(2, e.clientX, e.clientY);
+        lbPan.startX = e.clientX;
+        lbPan.startY = e.clientY;
+        lbPan.origX = lbView.x;
+        lbPan.origY = lbView.y;
+      }
+      return;
+    }
+    lbView.x = lbPan.origX + dx;
+    lbView.y = lbPan.origY + dy;
+    clampLbPan();
+    applyLbTransform();
+  });
+
+  const endPan = (e) => {
+    if (!lbPan.active || (e && e.pointerId != null && e.pointerId !== lbPan.pointerId)) return;
+    const wasClick = lbPan.active && !lbPan.moved;
+    const cx = e && e.clientX;
+    const cy = e && e.clientY;
+    lbPan.active = false;
+    wrap.classList.remove('is-panning');
+    // Click (no drag): zoom in toward click, or reset if already zoomed via double-click only
+    if (wasClick && cx != null && !e.target.closest('.lb-zoom-controls')) {
+      if (lbView.scale <= 1.01) setLbZoomAt(2.25, cx, cy);
+    }
+  };
+  wrap.addEventListener('pointerup', endPan);
+  wrap.addEventListener('pointercancel', endPan);
+
+  wrap.addEventListener('dblclick', (e) => {
+    if (e.target.closest('.lb-zoom-controls')) return;
+    e.preventDefault();
+    if (lbView.scale > 1.01) resetLbZoom();
+    else setLbZoomAt(2.5, e.clientX, e.clientY);
+  });
 }
 function syncLbButtons() {
   if (!lbItem) return;
   const favBtn = document.getElementById('lbFav');
   const collBtn = document.getElementById('lbColl');
+  const rmBtn = document.getElementById('lbRemoveBg');
+  const mirrorBtn = document.getElementById('lbMirror');
   const isFav = inStore('favourites', lbItem.id);
   const isColl = inStore('collections', lbItem.id);
   favBtn.classList.toggle('on', isFav);
@@ -1490,10 +4367,359 @@ function syncLbButtons() {
   favBtn.querySelector('span').textContent = isFav ? 'Favourited' : 'Favourite';
   collBtn.classList.toggle('on', isColl);
   collBtn.querySelector('span').textContent = isColl ? 'In Collection' : 'Add to Collection';
+  if (rmBtn) {
+    const done = !!(lbItem.bgRemoved || (lbItem.variantOf && lbItem.badge === 'No BG'));
+    rmBtn.disabled = done;
+    rmBtn.querySelector('span').textContent = (lbItem.variantOf && lbItem.badge === 'No BG')
+      ? 'No-BG version'
+      : (lbItem.bgRemoved ? 'BG removed' : 'Remove BG');
+  }
+  if (mirrorBtn) {
+    const family = getLbVersionFamily(lbItem);
+    const hasMirror = family.some(v => v.label === 'Mirrored');
+    const isMirrorView = !!(lbItem.isMirror || lbItem.badge === 'Mirrored');
+    mirrorBtn.disabled = false;
+    mirrorBtn.classList.toggle('on', hasMirror || isMirrorView);
+    mirrorBtn.querySelector('span').textContent = isMirrorView
+      ? 'Mirrored version'
+      : (hasMirror ? 'Replace mirror' : 'Mirror image');
+  }
+}
+
+/** Root car for a lightbox item (walks past mirror/edit/cutout variants). */
+function getLbRootItem(item) {
+  if (!item) return null;
+  const hist = storeGet('history');
+  let cur = item;
+  for (let i = 0; i < 6; i++) {
+    const parentId = cur.rootId || cur.mirrorOf || cur.editedFrom
+      || ((cur.isMirror || cur.isEdit || cur.badge === 'Mirrored' || cur.badge === 'Edited' || cur.badge === 'No BG')
+        ? cur.variantOf : null);
+    if (!parentId || parentId === cur.id) break;
+    const parent = hist.find(x => x.id === parentId) || findItem(parentId);
+    if (!parent) break;
+    cur = parent;
+  }
+  return cur;
+}
+
+/** Original + mirrored + edits (+ no-BG) for the thumbnail strip. */
+function getLbVersionFamily(item) {
+  const root = getLbRootItem(item);
+  if (!root) return [];
+  const hist = storeGet('history');
+  const versions = [{ item: root, label: 'Original' }];
+  const mirror = (root.mirrorId && hist.find(x => x.id === root.mirrorId))
+    || hist.find(x => x.mirrorOf === root.id && (x.isMirror || x.badge === 'Mirrored'));
+  if (mirror) versions.push({ item: mirror, label: 'Mirrored' });
+  const edits = hist
+    .filter(x => (x.editedFrom === root.id || (x.rootId === root.id && x.isEdit)) && (x.isEdit || x.badge === 'Edited'))
+    .sort((a, b) => (a.ts || 0) - (b.ts || 0));
+  edits.forEach((e, i) => {
+    versions.push({ item: e, label: edits.length === 1 ? 'Edited' : `Edit ${i + 1}` });
+  });
+  const cutout = root.cutoutId
+    ? (hist.find(x => x.id === root.cutoutId) || findItem(root.cutoutId))
+    : hist.find(x => x.variantOf === root.id && x.badge === 'No BG');
+  if (cutout) versions.push({ item: cutout, label: 'No BG' });
+  return versions;
+}
+
+/** @deprecated use getLbVersionFamily — kept for mirror button helpers */
+function getLbMirrorPair(item) {
+  const family = getLbVersionFamily(item);
+  const original = (family.find(v => v.label === 'Original') || {}).item || null;
+  const mirror = (family.find(v => v.label === 'Mirrored') || {}).item || null;
+  return { original, mirror };
+}
+
+function renderLbVersions(item) {
+  const host = document.getElementById('lbVersions');
+  if (!host) return;
+  const family = getLbVersionFamily(item);
+  if (family.length < 2) {
+    host.classList.remove('visible');
+    host.innerHTML = '';
+    return;
+  }
+  host.innerHTML = '';
+  const activeId = item.id;
+  family.forEach(({ item: it, label }) => {
+    if (!it) return;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = `lb-version-thumb${it.id === activeId ? ' on' : ''}`;
+    btn.title = label;
+    btn.onclick = () => selectLbVersion(it.id);
+    const img = document.createElement('img');
+    img.alt = label;
+    img.src = resolveItemImageSrc(it) || it.src || '';
+    const span = document.createElement('span');
+    span.textContent = label;
+    btn.appendChild(img);
+    btn.appendChild(span);
+    host.appendChild(btn);
+  });
+  host.classList.add('visible');
+}
+
+function selectLbVersion(id) {
+  const item = findItem(id);
+  if (!item) return;
+  lbItem = item;
+  document.getElementById('lbImg').src = resolveItemImageSrc(item) || item.src || '';
+  setupLbPromptClamp(item.fullPrompt || item.prompt || '—');
+  populateLbPills(item);
+  renderLbVersions(item);
+  syncLbButtons();
+  resetLbZoom();
+}
+
+async function loadImageElement(dataUri) {
+  return new Promise((resolve, reject) => {
+    const el = new Image();
+    el.onload = () => resolve(el);
+    el.onerror = () => reject(new Error('Could not decode image.'));
+    el.src = dataUri;
+  });
+}
+
+/** Shrink large data URIs so Magnific/WAF does not 403 oversized reference_images. */
+async function compressDataUriForReference(dataUri, maxBytes = 900 * 1024) {
+  if (!dataUri || !String(dataUri).startsWith('data:')) return dataUri;
+  const approxBytes = (uri) => {
+    const i = uri.indexOf(',');
+    if (i < 0) return uri.length;
+    return Math.floor((uri.length - i - 1) * 0.75);
+  };
+  if (approxBytes(dataUri) <= maxBytes) return dataUri;
+
+  const img = await loadImageElement(dataUri);
+  let baseW = img.naturalWidth || img.width;
+  let baseH = img.naturalHeight || img.height;
+  if (!baseW || !baseH) return dataUri;
+  const maxEdge = 1400;
+  if (Math.max(baseW, baseH) > maxEdge) {
+    const s = maxEdge / Math.max(baseW, baseH);
+    baseW = Math.round(baseW * s);
+    baseH = Math.round(baseH * s);
+  }
+  const canvas = document.createElement('canvas');
+  const attempts = [
+    { mime: 'image/webp', q: 0.84, scale: 1 },
+    { mime: 'image/webp', q: 0.72, scale: 1 },
+    { mime: 'image/webp', q: 0.64, scale: 0.8 },
+    { mime: 'image/webp', q: 0.55, scale: 0.65 },
+    { mime: 'image/png', q: null, scale: 0.6 },
+    { mime: 'image/webp', q: 0.5, scale: 0.5 },
+  ];
+  let best = dataUri;
+  let bestBytes = approxBytes(dataUri);
+  for (const a of attempts) {
+    const w = Math.max(1, Math.round(baseW * a.scale));
+    const h = Math.max(1, Math.round(baseH * a.scale));
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, w, h);
+    ctx.drawImage(img, 0, 0, w, h);
+    let out = '';
+    try {
+      out = a.q == null ? canvas.toDataURL(a.mime) : canvas.toDataURL(a.mime, a.q);
+    } catch (_) {
+      continue;
+    }
+    if (!out.startsWith('data:')) continue;
+    const bytes = approxBytes(out);
+    if (bytes < bestBytes) {
+      best = out;
+      bestBytes = bytes;
+    }
+    if (bytes <= maxBytes) return out;
+  }
+  return best;
+}
+
+/** Pixel-perfect horizontal flip (orientation lock before AI logo fix). */
+async function flipImageHorizontal(item) {
+  const dataUri = await getItemAsDataUri(item);
+  let bitmap;
+  try {
+    const blob = await (await fetch(dataUri)).blob();
+    bitmap = await createImageBitmap(blob);
+  } catch (_) {
+    bitmap = await loadImageElement(dataUri);
+  }
+  const w = bitmap.width || bitmap.naturalWidth;
+  const h = bitmap.height || bitmap.naturalHeight;
+  if (!w || !h) throw new Error('Invalid image size for mirror.');
+  const canvas = document.createElement('canvas');
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext('2d');
+  ctx.translate(w, 0);
+  ctx.scale(-1, 1);
+  ctx.drawImage(bitmap, 0, 0);
+  if (bitmap.close) bitmap.close();
+  const mime = 'image/png';
+  const src = canvas.toDataURL(mime);
+  const b64 = src.split(',')[1] || '';
+  if (!b64) throw new Error('Mirror flip produced empty image.');
+  return { b64, mime, src, url: '' };
+}
+
+function linkVariantOnRoot(rootId, patch) {
+  const hist = storeGet('history');
+  const hi = hist.findIndex(x => x.id === rootId);
+  if (hi < 0) return;
+  hist[hi] = { ...hist[hi], ...patch, badge: hist[hi].badge || 'Original' };
+  storeSet('history', hist);
+}
+
+async function lbMirrorImage() {
+  if (!lbItem) return;
+  const root = getLbRootItem(lbItem);
+  if (!root) {
+    alert('Open the original image to create a mirror.');
+    return;
+  }
+  let pair = getLbMirrorPair(root);
+  if (pair.mirror) {
+    const replace = confirm('A mirrored version already exists. Replace it with a new AI mirror (logos corrected)?');
+    if (!replace) {
+      selectLbVersion(pair.mirror.id);
+      return;
+    }
+    removeHistoryItemById(pair.mirror.id);
+    linkVariantOnRoot(root.id, { mirrorId: undefined });
+    const hist = storeGet('history');
+    const hi = hist.findIndex(x => x.id === root.id);
+    if (hi >= 0) {
+      const patched = { ...hist[hi] };
+      delete patched.mirrorId;
+      hist[hi] = patched;
+      storeSet('history', hist);
+    }
+    delete root.mirrorId;
+  }
+  const btn = document.getElementById('lbMirror');
+  const label = btn.querySelector('span');
+  const origLabel = label.textContent;
+  btn.disabled = true;
+  // Canvas locks left/right; AI only re-orients logos (avoids undo-flip + huge-payload 403).
+  const logoFixInstruction =
+    'The SOURCE image is ALREADY horizontally flipped. Do NOT flip the vehicle body left/right again. ' +
+    'BRAND LOGOS MUST NOT STAY MIRRORED (critical — brand must stay recognizable): ' +
+    'un-mirror / re-draw every manufacturer logo, grille badge, boot badge, emblem, and wheel centre-cap ' +
+    'so each matches the real OEM mark — correct geometry, correct lettering direction, NOT a mirror image. ' +
+    'A backwards or flipped logo is a hard fail. ' +
+    'INDIA RHD STEERING (critical): steering wheel and driver controls MUST stay on the RIGHT through the windscreen; ' +
+    'if the flip put them on the LEFT, move them back to the RIGHT; never leave LHD. ' +
+    'Keep plain solid white blank number plates with no text. ' +
+    'Remove any model-name / trim lettering on the body (keep brand emblems only). ' +
+    'Preserve exact paint, body shape, wheels, lighting, transparency, contact shadow, ' +
+    'and the current exterior left/right body orientation exactly.';
+
+  const saveMirrorItem = async (imageData, fullPromptNote) => {
+    const persisted = await persistImageDataForHistory(imageData);
+    const src = persisted
+      ? persisted.src
+      : (imageData.b64
+        ? `data:${imageData.mime || 'image/png'};base64,${imageData.b64}`
+        : proxiedImageUrl(imageData.url));
+    if (!src) throw new Error('No mirrored image returned.');
+    const mirrorItem = {
+      id: newItemId(),
+      src,
+      sourceUrl: (persisted && persisted.sourceUrl) || imageData.url || '',
+      imageData: (persisted && persisted.imageData) || imageData,
+      prompt: `${root.prompt || ''} — mirrored`,
+      fullPrompt: `${root.fullPrompt || root.prompt || ''}\n\n[Mirror] ${fullPromptNote}`,
+      model: root.model,
+      modelId: root.modelId,
+      provider: root.provider,
+      ratio: root.ratio,
+      kind: root.kind || (root.vehicle ? 'vehicle' : 'generate'),
+      vehicle: root.vehicle ? { ...root.vehicle } : null,
+      ts: Date.now(),
+      badge: 'Mirrored',
+      isMirror: true,
+      mirrorOf: root.id,
+      variantOf: root.id,
+      rootId: root.id,
+    };
+    imageSrcCache.set(mirrorItem.id, src);
+    saveToHistory(mirrorItem);
+    linkVariantOnRoot(root.id, { mirrorId: mirrorItem.id });
+    root.mirrorId = mirrorItem.id;
+    root.badge = root.badge || 'Original';
+    refreshOpenView();
+    if (genMode === 'vehicle') renderVehicleGallery();
+    openLightbox(root.id, lbFromView || 'history');
+    selectLbVersion(mirrorItem.id);
+    return mirrorItem;
+  };
+
+  try {
+    label.textContent = 'Flipping…';
+    const flipped = await flipImageHorizontal(root);
+    label.textContent = 'Fixing logos…';
+    const compressed = await compressDataUriForReference(flipped.src, 900 * 1024);
+    try {
+      const imageData = await doRegenerateEdit(root, logoFixInstruction, {
+        mirror: true,
+        sourceDataUri: compressed,
+      });
+      await saveMirrorItem(imageData, logoFixInstruction);
+      label.textContent = 'Mirror ready';
+    } catch (aiErr) {
+      // Still deliver a mirror if Magnific 403s oversized refs / expired URLs
+      console.warn('AI logo fix failed; saving canvas flip.', aiErr);
+      await saveMirrorItem(
+        { b64: flipped.b64, mime: flipped.mime, url: '' },
+        'Pixel flip only (AI logo fix failed: ' + (aiErr && aiErr.message ? aiErr.message : aiErr) + ').'
+      );
+      label.textContent = 'Mirror ready';
+      alert(
+        'Mirrored with a pixel flip, but AI logo correction failed:\n' +
+        (aiErr && aiErr.message ? aiErr.message : String(aiErr)) +
+        '\n\nLogos may appear reversed — try Mirror again, or Edit to fix badges.'
+      );
+    }
+    btn.disabled = false;
+  } catch (e) {
+    alert('Mirror failed: ' + e.message);
+    label.textContent = origLabel;
+    btn.disabled = false;
+  }
 }
 function lbToggleFav() { if (!lbItem) return; toggleStore('favourites', lbItem); syncLbButtons(); refreshOpenView(); }
 function lbToggleColl() { if (!lbItem) return; toggleStore('collections', lbItem); syncLbButtons(); refreshOpenView(); }
 function lbDownload() { if (lbItem) downloadImg(lbItem.imageData || { url: lbItem.src }, 1); }
+
+async function lbRemoveBackground() {
+  if (!lbItem) return;
+  if (lbItem.bgRemoved || lbItem.variantOf) {
+    alert(lbItem.bgRemoved ? 'A no-BG version was already created — check the thumbnails.' : 'This is already the no-BG version.');
+    return;
+  }
+  const btn = document.getElementById('lbRemoveBg');
+  const label = btn.querySelector('span');
+  const orig = label.textContent;
+  btn.disabled = true;
+  label.textContent = 'Removing…';
+  try {
+    const cutout = await removeBackgroundForItem(lbItem);
+    label.textContent = 'Added thumbnail';
+    // Keep lightbox on the original; cutout appears as a sibling thumbnail
+    setTimeout(() => { label.textContent = 'BG removed'; btn.disabled = true; }, 1200);
+    if (cutout) syncLbButtons();
+  } catch (e) {
+    alert('Remove BG failed: ' + e.message);
+    label.textContent = orig;
+    btn.disabled = false;
+  }
+}
 
 // Regenerate — produce a fresh, separate image from the same prompt/model/ratio (no edit instruction).
 async function lbRegenerate() {
@@ -1535,7 +4761,7 @@ async function doRegenerate(item) {
 function refreshOpenView() {
   const active = document.querySelector('.nav-item.active');
   const v = active ? active.dataset.view : 'generate';
-  if (v !== 'generate') renderGallery(v);
+  if (v !== 'generate' && v !== 'vehicle') renderGallery(v);
 }
 
 // ─── EDIT IMAGE ───────────────────────────────────────────────────────────────
@@ -1543,9 +4769,9 @@ let editItem = null;
 function openEditModal() {
   if (!lbItem) return;
   editItem = lbItem;
-  document.getElementById('editPreviewImg').src = editItem.src;
+  document.getElementById('editPreviewImg').src = resolveItemImageSrc(editItem) || editItem.src || '';
   document.getElementById('editInstruction').value = '';
-  document.getElementById('editNote').textContent = "This model doesn't support true inpainting yet — we'll regenerate a new image combining the original prompt with your edit instruction.";
+  document.getElementById('editNote').textContent = "Edits are saved next to the original (and mirror) in this car's version strip.";
   document.getElementById('editApplyBtn').textContent = 'Apply Edit';
   document.getElementById('editApplyBtn').disabled = false;
   document.getElementById('editOverlay').classList.add('open');
@@ -1567,23 +4793,53 @@ async function applyEdit() {
   btn.textContent = 'Applying…';
 
   try {
+    const root = getLbRootItem(editItem) || editItem;
     const imageData = await doRegenerateEdit(editItem, instruction);
-
-    const src = imageData.b64
-      ? `data:${imageData.mime || 'image/png'};base64,${imageData.b64}`
-      : imageData.url;
+    const persisted = await persistImageDataForHistory(imageData);
+    const src = persisted
+      ? persisted.src
+      : (imageData.b64
+        ? `data:${imageData.mime || 'image/png'};base64,${imageData.b64}`
+        : proxiedImageUrl(imageData.url));
+    if (!src) throw new Error('No edited image returned.');
 
     const newItem = {
-      id: newItemId(), src,
-      prompt: `${editItem.prompt} — edited: ${instruction}`,
-      fullPrompt: `${editItem.fullPrompt || editItem.prompt} Additional edit instruction: ${instruction}.`,
-      model: editItem.model, modelId: editItem.modelId, provider: editItem.provider,
-      ratio: editItem.ratio, ts: Date.now(), editedFrom: editItem.id,
+      id: newItemId(),
+      src,
+      sourceUrl: (persisted && persisted.sourceUrl) || imageData.url || '',
+      imageData: (persisted && persisted.imageData) || imageData,
+      prompt: `${root.prompt || editItem.prompt} — edited: ${instruction}`,
+      fullPrompt: `${editItem.fullPrompt || editItem.prompt || ''} Additional edit instruction: ${instruction}.`,
+      model: editItem.model || root.model,
+      modelId: editItem.modelId || root.modelId,
+      provider: editItem.provider || root.provider,
+      ratio: editItem.ratio || root.ratio,
+      kind: root.kind || editItem.kind || (root.vehicle ? 'vehicle' : 'generate'),
+      vehicle: root.vehicle ? { ...root.vehicle } : (editItem.vehicle || null),
+      ts: Date.now(),
+      badge: 'Edited',
+      isEdit: true,
+      editedFrom: root.id,
+      variantOf: root.id,
+      rootId: root.id,
     };
+    imageSrcCache.set(newItem.id, src);
     saveToHistory(newItem);
+
+    const hist = storeGet('history');
+    const hi = hist.findIndex(x => x.id === root.id);
+    if (hi >= 0) {
+      const editIds = Array.isArray(hist[hi].editIds) ? hist[hi].editIds.slice() : [];
+      if (!editIds.includes(newItem.id)) editIds.push(newItem.id);
+      hist[hi] = { ...hist[hi], editIds, badge: hist[hi].badge || 'Original' };
+      storeSet('history', hist);
+    }
+
     closeEditModal();
     refreshOpenView();
-    openLightbox(newItem.id, 'history');
+    if (genMode === 'vehicle') renderVehicleGallery();
+    openLightbox(root.id, lbFromView || 'history');
+    selectLbVersion(newItem.id);
   } catch (e) {
     alert('Edit failed: ' + e.message);
   } finally {
@@ -1592,14 +4848,98 @@ async function applyEdit() {
   }
 }
 
-async function doRegenerateEdit(item, instruction) {
+let forceVehicleApiHeaders = false;
+
+/** Load the original generation as a data URI for reference_images (edit / mirror). */
+async function getItemAsDataUri(item) {
+  if (!item) throw new Error('No image to edit.');
+  // Prefer in-memory / embedded bytes — Magnific temp URLs often expire with 403.
+  if (item.imageData && item.imageData.b64) {
+    return `data:${item.imageData.mime || 'image/png'};base64,${item.imageData.b64}`;
+  }
+  if (item.id && imageSrcCache.has(item.id)) {
+    const cached = imageSrcCache.get(item.id);
+    if (cached && String(cached).startsWith('data:')) return cached;
+  }
+  const src = resolveItemImageSrc(item) || item.src || '';
+  if (src.startsWith('data:')) return src;
+  const remote = item.sourceUrl || (src.startsWith('http') ? src : '');
+  const fetchUrl = src.startsWith('/api/')
+    ? src
+    : (remote ? proxiedImageUrl(remote) : '');
+  if (!fetchUrl) {
+    throw new Error('Original image bytes unavailable. Re-generate, then try Mirror / Edit again.');
+  }
+  const r = await fetch(fetchUrl, { headers: { 'x-session-token': getSessionToken() } });
+  if (!r.ok) {
+    throw new Error(
+      r.status === 403
+        ? 'Source image URL expired (403). Re-generate the car, then Mirror again while it is still open.'
+        : 'Could not load original image for edit (' + r.status + ').'
+    );
+  }
+  const blob = await r.blob();
+  return await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ''));
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function doRegenerateEdit(item, instruction, opts = {}) {
   const model = MODELS[item.modelId] || MODELS['nano-banana'];
-  // Reuse the exact full master prompt from the original generation (not just the
-  // short scene text), so brand/background/technical-correctness rules carry over.
-  const fullPrompt = item.fullPrompt || item.prompt;
-  const combinedPrompt = `${fullPrompt} Additional edit instruction: ${instruction}.`;
-  const ratioValue = ratioValueFromLabel(item.ratio);
-  return doAsync(model, combinedPrompt, DEFAULT_NEG, ratioValue, '2K', 1.2, undefined, 'edit');
+  const isMirror = !!opts.mirror;
+  let sourceUri = opts.sourceDataUri || await getItemAsDataUri(item);
+  // Oversized data-URI references commonly get HTTP 403 from the upstream edge.
+  if (String(sourceUri).startsWith('data:')) {
+    sourceUri = await compressDataUriForReference(sourceUri, 900 * 1024);
+  }
+  const mimeMatch = /^data:([^;]+);/i.exec(sourceUri);
+  const mime = (mimeMatch && mimeMatch[1])
+    || (String(sourceUri).startsWith('http') ? 'image/png' : 'image/png');
+
+  // Mirror / edit must use the *generated car* as reference — not a full text regen
+  // with the universal base ref (that redesigns the car and blocks mirroring).
+  let combinedPrompt;
+  if (isMirror) {
+    combinedPrompt = clampPromptForApi(
+      'Edit the attached SOURCE vehicle image. ' +
+      'Keep the exact same car identity, make/model year, body shape, paint color and finish, ' +
+      'wheel designs, lighting, soft tyre contact shadow, and true transparent background. ' +
+      'Do not invent a different car, restyle it, or re-generate from scratch. ' +
+      'Apply only this transformation: ' + instruction
+    );
+  } else {
+    const fullPrompt = item.fullPrompt || item.prompt || '';
+    combinedPrompt = clampPromptForApi(
+      `${fullPrompt} Additional edit instruction: ${instruction}. ` +
+      'Use the attached SOURCE image as the exact vehicle to edit — preserve identity and composition unless the edit requires a change.'
+    );
+  }
+
+  let ratioValue = ratioValueFromLabel(item.ratio);
+  let aspectColon = null;
+  if ((item.kind === 'vehicle' || item.vehicle) && item.ratio) {
+    if (item.ratio === '16:9' || item.ratio === '4:3') {
+      ratioValue = item.ratio;
+      aspectColon = item.ratio;
+    }
+  }
+
+  return doAsync(model, combinedPrompt, DEFAULT_NEG, ratioValue, '2K', 1.2, undefined, 'edit', {
+    skipVehicleRef: true,
+    aspectColon,
+    referenceImages: [
+      {
+        image: sourceUri,
+        mime_type: mime,
+        text: isMirror
+          ? 'SOURCE IMAGE (primary): already left/right flipped vehicle exterior. Do NOT flip body again. CRITICAL: brand logos/badges/emblems/centre-caps MUST NOT remain mirrored — restore real OEM orientation so the brand is recognizable (backwards logo = fail). INDIA RHD: steering wheel + driver controls on the RIGHT through the windscreen. Plain white blank plates. No model-name lettering. Preserve paint, identity, lighting, transparency, ground shadow, exterior orientation.'
+          : 'SOURCE IMAGE (primary): the exact previously generated image to edit. Preserve vehicle identity and details; apply only the edit instruction.',
+      },
+    ],
+  });
 }
 
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
@@ -1728,9 +5068,9 @@ async function checkSession() {
 
 // ─── MODEL CATALOGUE ─────────────────────────────────────────────────────────
 const MODELS = {
-  // ChatGPT (GPT 2, hosted via Magnific — endpoint unconfirmed, following Magnific's standard async pattern)
-  'gpt-2':       { provider: 'magnific', path: '/v1/ai/text-to-image/gpt-2',          async: true,  supportsRes: false, supportsSubModel: false, colRatio: true },
-  // Google (hosted via Magnific)
+  // Classic Magnific text-to-image (sync, underscore size keys)
+  'gpt-2':       { provider: 'magnific', path: '/v1/ai/text-to-image', async: false, supportsRes: false, supportsSubModel: false, colRatio: false },
+  // Google Nano Banana 2 via Magnific (async, colon aspect ratios; supports reference_images)
   'nano-banana': { provider: 'magnific', path: '/v1/ai/text-to-image/nano-banana-pro-flash', async: true, supportsRes: true, supportsSubModel: false, colRatio: true },
 };
 
@@ -1884,6 +5224,7 @@ function buildPrompt(scene) {
 let enhancedUserEdited = false;
 
 function enhancePrompt() {
+  if (genMode === 'vehicle') return; // Vehicle Image Gen uses the scene prompt as-is
   const scene = document.getElementById('sceneInput').value.trim();
   if (!scene) {
     alert('Please describe a scene first.');
@@ -1895,6 +5236,7 @@ function enhancePrompt() {
 }
 
 function updatePrompt() {
+  if (genMode === 'vehicle') return;
   const scene = document.getElementById('sceneInput').value.trim();
   const body  = document.getElementById('enhancedBody');
   if (body.textContent.trim() && !enhancedUserEdited) {
@@ -1920,8 +5262,11 @@ function copyEnhanced() {
 
 // ─── INPUT EVENTS ─────────────────────────────────────────────────────────────
 function onSceneInput() {
-  const v = document.getElementById('sceneInput').value;
-  document.getElementById('charCount').textContent = `${v.length} / 2000`;
+  const el = document.getElementById('sceneInput');
+  const max = MAGNIFIC_PROMPT_MAX;
+  if (el.value.length > max) el.value = el.value.slice(0, max);
+  el.maxLength = max;
+  document.getElementById('charCount').textContent = `${el.value.length} / ${max}`;
 }
 
 // ─── MODEL CHANGE ─────────────────────────────────────────────────────────────
@@ -2016,132 +5361,311 @@ async function generate() {
   if (isGenerating) return;
 
   const scene = document.getElementById('sceneInput').value.trim();
-  if (!scene) { alert('Please describe a scene first.'); return; }
+  if (!scene) {
+    alert(genMode === 'vehicle'
+      ? 'Please select make, model, and color first.'
+      : 'Please describe a scene first.');
+    return;
+  }
+  if (genMode === 'vehicle') {
+    if (!vehicleSelection.make || !vehicleSelection.model || !vehicleSelection.color) {
+      alert('Please select make, model, and color first.');
+      return;
+    }
+    const modelEntry = getSelectedModelEntry();
+    const needsYear = !vehicleModelRef && !!(modelEntry && (modelEntry.years || []).length);
+    if (needsYear && !vehicleSelection.year) {
+      alert('Please select a launch year for this model.');
+      return;
+    }
+  }
 
-  const modelId   = document.getElementById('modelSelect').value;
-  const model     = MODELS[modelId];
-
-  const num       = parseInt(document.getElementById('numSelect').value);
-  const ratio     = document.getElementById('ratioSelect').value;
-  const res       = document.getElementById('resSelect').value;
-  const guidance  = parseFloat(document.getElementById('guidance').value) || 1.2;
-  const seedRaw   = document.getElementById('seed').value.trim();
-  const seed      = seedRaw ? parseInt(seedRaw) : undefined;
-  let negPrompt   = document.getElementById('negPrompt').value || DEFAULT_NEG;
-  if (state.noCharacters) negPrompt += ', people, person, human figure, face, hands, characters, mascot, animal';
-
-  // Get prompt — use the (possibly hand-edited) enhanced box if it has content, else build now
-  const enhText = document.getElementById('enhancedBody').textContent.trim();
-  const prompt  = enhText || buildPrompt(scene);
-
-  // Capture metadata for library items
-  const modelLabel = document.getElementById('modelSelect').selectedOptions[0].textContent.trim();
-  const ratioOpt   = document.getElementById('ratioSelect').selectedOptions[0];
-  const ratioLabel = ratioOpt ? (ratioOpt.dataset.label || ratioOpt.textContent.trim()) : '';
-  lastGenMeta = { prompt: scene || prompt, fullPrompt: prompt, model: modelLabel, modelId, provider: model.provider, ratio: ratioLabel };
-
-  state.cancelRequested = false;
-  isGenerating = true;
-
-  // Update UI
-  const btn = document.getElementById('genBtn');
-  btn.disabled = true;
-  document.getElementById('genBtnLabel').innerHTML = '<span class="btn-spinner"></span>&nbsp; Generating…';
-
-  setStatus('working', 'Generating…');
-  document.getElementById('progressCard').classList.remove('hidden');
-  setProgress(0);
-
-  // Setup results grid
-  const acls = getAspectCls();
-  const grid = document.getElementById('resultsGrid');
-  grid.className = `results-grid n${num}`;
-  grid.innerHTML = Array.from({length: num}, (_, i) =>
-    `<div class="img-ph${acls?' '+acls:''}" id="ph_${i}">
-      <div class="ph-spinner"></div>
-      <div class="ph-msg">Generating…</div>
-      <div class="ph-time" id="pht_${i}">0s</div>
-    </div>`
-  ).join('');
-  document.getElementById('resultsSub').textContent = `Generating ${num} image${num>1?'s':''}…`;
-
-  // Timers for elapsed display
-  const startTime = Date.now();
-  const timerInterval = setInterval(() => {
-    const elapsed = Math.round((Date.now() - startTime) / 1000);
-    document.querySelectorAll('[id^="pht_"]').forEach(el => {
-      if (el.parentElement.classList.contains('img-ph')) {
-        el.textContent = `${elapsed}s`;
-      }
-    });
-    // Fake progress for UX
-    const fakePct = Math.min(90, elapsed * 2.5);
-    setProgress(fakePct);
-  }, 1000);
-
-  const tasks = Array.from({length: num}, (_, i) =>
-    runGeneration(model, prompt, negPrompt, ratio, res, guidance, seed, i)
-  );
-
-  const results = await Promise.allSettled(tasks);
-  clearInterval(timerInterval);
-
-  if (state.cancelRequested) {
-    isGenerating = false;
-    btn.disabled = false;
-    document.getElementById('genBtnLabel').textContent = 'Generate Image';
+  const modelId   = document.getElementById('modelSelect').value || 'nano-banana';
+  const model     = MODELS[modelId] || MODELS['nano-banana'];
+  if (!model) {
+    alert('No AI model available. Refresh the page and try again.');
     return;
   }
 
-  setProgress(100);
-  const successes = results.filter(r => r.status === 'fulfilled').length;
-  document.getElementById('progressCard').classList.add('hidden');
-  setStatus('done', `${successes} of ${num} completed`);
-  document.getElementById('resultsSub').textContent = `${successes} image${successes!==1?'s':''} generated.`;
+  const btn = document.getElementById('genBtn');
+  let pendingIds = [];
+  let timerInterval = null;
 
-  isGenerating = false;
-  btn.disabled = false;
-  document.getElementById('genBtnLabel').textContent = 'Generate Image';
+  try {
+    // Vehicle Image Gen: 1 image, 2K; aspect from vehicle panel (16:9 | 4:3)
+    if (genMode === 'vehicle') readVehicleResultSettings();
+    const vehicleAspect = getVehicleAspect();
+    const num       = genMode === 'vehicle' ? 1 : parseInt(document.getElementById('numSelect').value);
+    const ratio     = genMode === 'vehicle' ? vehicleAspect.ratioKey : document.getElementById('ratioSelect').value;
+    const res       = genMode === 'vehicle' ? VEHICLE_LOCKED.res : document.getElementById('resSelect').value;
+    const guidanceEl = document.getElementById('guidance');
+    const seedEl = document.getElementById('seed');
+    const guidance  = parseFloat(guidanceEl && guidanceEl.value) || 1.2;
+    const seedRaw   = (seedEl && seedEl.value ? seedEl.value.trim() : '');
+    const seed      = seedRaw ? parseInt(seedRaw) : undefined;
+    let negPrompt   = (document.getElementById('negPrompt') || {}).value || DEFAULT_NEG;
+    if (state.noCharacters) negPrompt += ', people, person, human figure, face, hands, characters, mascot, animal';
+
+    // Vehicle prompts are locked to buildVehiclePrompt() — never send a hand-edited scene.
+    let prompt;
+    let displayPrompt = scene;
+    if (genMode === 'vehicle') {
+      readVehicleResultSettings();
+      syncVehiclePrompt();
+      const locked = buildVehiclePrompt(
+        vehicleSelection.make,
+        vehicleSelection.model,
+        vehicleSelection.color,
+        vehicleModelRef ? '' : vehicleSelection.year,
+        vehicleSelection.view,
+        vehicleSelection.camera,
+        vehicleSelection.background
+      );
+      prompt = clampPromptForApi(locked);
+      displayPrompt = prompt;
+      const sceneEl = document.getElementById('sceneInput');
+      if (sceneEl) sceneEl.value = prompt;
+      onSceneInput();
+    } else {
+      const enhText = document.getElementById('enhancedBody').textContent.trim();
+      prompt = clampPromptForApi(enhText || buildPrompt(scene));
+    }
+
+    // Capture metadata for library items
+    const modelOpt = document.getElementById('modelSelect').selectedOptions[0];
+    const modelLabel = (modelOpt && modelOpt.textContent.trim()) || modelId;
+    const ratioOpt   = document.getElementById('ratioSelect').selectedOptions[0];
+    const ratioLabel = genMode === 'vehicle'
+      ? vehicleAspect.aspectColon
+      : (ratioOpt ? (ratioOpt.dataset.label || ratioOpt.textContent.trim()) : '');
+    const vehicleMeta = genMode === 'vehicle' ? snapshotVehicleConfig() : null;
+    lastGenMeta = {
+      prompt: displayPrompt || prompt,
+      fullPrompt: prompt,
+      model: modelLabel,
+      modelId,
+      provider: model.provider,
+      ratio: ratioLabel,
+      kind: genMode === 'vehicle' ? 'vehicle' : 'generate',
+      vehicle: vehicleMeta,
+    };
+
+    state.cancelRequested = false;
+    isGenerating = true;
+    if (btn) btn.disabled = true;
+    document.getElementById('genBtnLabel').innerHTML = '<span class="btn-spinner"></span>&nbsp; Generating…';
+    setStatus('working', 'Generating…');
+
+    if (genMode === 'vehicle') {
+      for (let i = 0; i < num; i++) {
+        pendingIds.push(startVehicleGalleryPending(vehicleMeta));
+      }
+    } else {
+      document.getElementById('progressCard').classList.remove('hidden');
+      setProgress(0);
+      const acls = getAspectCls();
+      const grid = document.getElementById('resultsGrid');
+      grid.className = `results-grid n${num}`;
+      grid.innerHTML = Array.from({length: num}, (_, i) =>
+        `<div class="img-ph${acls?' '+acls:''}" id="ph_${i}">
+          <div class="ph-spinner"></div>
+          <div class="ph-msg">Generating…</div>
+          <div class="ph-time" id="pht_${i}">0s</div>
+        </div>`
+      ).join('');
+      document.getElementById('resultsSub').textContent = `Generating ${num} image${num>1?'s':''}…`;
+
+      const startTime = Date.now();
+      timerInterval = setInterval(() => {
+        const elapsed = Math.round((Date.now() - startTime) / 1000);
+        document.querySelectorAll('[id^="pht_"]').forEach(el => {
+          if (el.parentElement.classList.contains('img-ph')) {
+            el.textContent = `${elapsed}s`;
+          }
+        });
+        const fakePct = Math.min(90, elapsed * 2.5);
+        setProgress(fakePct);
+      }, 1000);
+    }
+
+    const tasks = Array.from({length: num}, (_, i) =>
+      runGeneration(model, prompt, negPrompt, ratio, res, guidance, seed, i, pendingIds[i])
+    );
+
+    const results = await Promise.allSettled(tasks);
+    if (timerInterval) clearInterval(timerInterval);
+
+    if (state.cancelRequested) {
+      if (genMode === 'vehicle') pendingIds.forEach(finishVehicleGalleryPending);
+      setStatus('err', 'Cancelled');
+      return;
+    }
+
+    const successes = results.filter(r => r.status === 'fulfilled').length;
+    const firstErr = results.find(r => r.status === 'rejected');
+    if (genMode !== 'vehicle') {
+      setProgress(100);
+      document.getElementById('progressCard').classList.add('hidden');
+      document.getElementById('resultsSub').textContent = `${successes} image${successes!==1?'s':''} generated.`;
+    } else {
+      pendingIds.forEach(id => {
+        if (vehiclePendingGens.some(p => p.id === id)) finishVehicleGalleryPending(id);
+      });
+      renderVehicleGallery();
+    }
+    if (successes) {
+      setStatus('done', `${successes} of ${num} completed`);
+    } else {
+      const detail = firstErr && firstErr.reason
+        ? (firstErr.reason.message || String(firstErr.reason))
+        : 'Generation failed — check status and try again';
+      setStatus('err', detail.slice(0, 120));
+      console.error('Generation failed:', firstErr && firstErr.reason);
+      if (genMode === 'vehicle') {
+        alert('Generation failed:\n' + detail);
+      }
+    }
+  } catch (e) {
+    console.error('generate() error:', e);
+    pendingIds.forEach(finishVehicleGalleryPending);
+    setStatus('err', (e && e.message ? e.message : String(e)).slice(0, 120));
+    alert('Generation failed: ' + (e && e.message ? e.message : e));
+  } finally {
+    if (timerInterval) clearInterval(timerInterval);
+    isGenerating = false;
+    if (btn) btn.disabled = false;
+    const label = document.getElementById('genBtnLabel');
+    if (label) label.textContent = genMode === 'vehicle' ? 'Generate' : 'Generate Image';
+  }
 }
 
-async function runGeneration(model, prompt, negPrompt, ratio, res, guidance, seed, idx) {
+async function runGeneration(model, prompt, negPrompt, ratio, res, guidance, seed, idx, pendingId) {
   try {
-    const imageData = await doAsync(model, prompt, negPrompt, ratio, res, guidance, seed, idx);
-    if (!state.cancelRequested) showImage(idx, imageData);
+    const options = {};
+    if (genMode === 'vehicle') {
+      const modelRefs = await getVehicleModelReferenceImages();
+      if (modelRefs.length) options.referenceImages = modelRefs;
+    }
+    const imageData = model.async
+      ? await doAsync(model, prompt, negPrompt, ratio, res, guidance, seed, idx, options)
+      : await doSync(model, prompt, negPrompt, ratio, guidance, seed);
+    if (!state.cancelRequested) await showImage(idx, imageData, pendingId);
   } catch(e) {
-    if (!state.cancelRequested) showError(idx, e.message);
+    if (!state.cancelRequested) {
+      if (pendingId) finishVehicleGalleryPending(pendingId);
+      if (genMode !== 'vehicle') showError(idx, e.message);
+      else setStatus('err', e.message.slice(0, 80));
+    }
     throw e;
   }
 }
 
-async function doAsync(model, prompt, negPrompt, ratio, res, guidance, seed, idx) {
-  const aspectRatio = model.colRatio ? (RATIO_COLON[ratio] || '16:9') : ratio;
-  const body = { prompt, aspect_ratio: aspectRatio, filter_nsfw: true };
+function apiAuthHeaders(extra) {
+  const headers = {
+    'Content-Type': 'application/json',
+    'x-session-token': getSessionToken(),
+  };
+  // Vehicle Image Gen: ask the proxy to attach the universal base reference
+  // server-side (image never appears in the prompt UI).
+  if (genMode === 'vehicle' || forceVehicleApiHeaders) {
+    headers['x-acko-vehicle-ref'] = '1';
+    headers['x-acko-vehicle-view'] = vehicleSelection.view || 'driver';
+  }
+  if (extra) Object.assign(headers, extra);
+  return headers;
+}
+
+function parseApiError(status, errText) {
+  const raw = String(errText || '');
+  if (/^\s*</.test(raw) || /Something is going on in the Universe/i.test(raw)) {
+    return (
+      `API ${status}: upstream rejected the request` +
+      (status === 502 || status === 413
+        ? ' (payload too large — remove or shrink the reference photo and try again)'
+        : '')
+    );
+  }
+  let message = `API ${status}: ${raw.slice(0, 160)}`;
+  try {
+    const errData = JSON.parse(raw);
+    if (errData.error) message = errData.error;
+    else if (errData.message) {
+      message = `API ${status}: ${errData.message}`;
+      const invalid = errData.invalid_params;
+      if (Array.isArray(invalid) && invalid.length) {
+        const detail = invalid
+          .map(p => `${(p.field || '').replace(/^body\./, '')}: ${p.reason || ''}`.trim())
+          .join('; ');
+        if (detail) message += ` — ${detail}`;
+      }
+    }
+  } catch { /* keep raw-text fallback */ }
+  return message;
+}
+
+async function doSync(model, prompt, negPrompt, ratio, guidance, seed) {
+  const body = {
+    prompt,
+    negative_prompt: negPrompt || DEFAULT_NEG,
+    guidance_scale: guidance,
+    num_images: 1,
+    filter_nsfw: true,
+    image: { size: ratio || 'classic_4_3' },
+  };
+  if (seed !== undefined) body.seed = seed;
+
+  const res = await fetch(apiUrl('magnific', model.path), {
+    method: 'POST',
+    headers: apiAuthHeaders(),
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(parseApiError(res.status, await res.text()));
+  const data = await res.json();
+  const images = data.data || [];
+  if (!images.length || !images[0].base64) throw new Error('No image returned from Magnific.');
+  return { b64: images[0].base64, mime: 'image/png' };
+}
+
+async function doAsync(model, prompt, negPrompt, ratio, res, guidance, seed, idx, options = {}) {
+  // Nano Banana (and other colRatio models) require '4:3' not 'classic_4_3'
+  let aspectRatio = model.colRatio ? (RATIO_COLON[ratio] || ratio) : ratio;
+  if (options.aspectColon) aspectRatio = options.aspectColon;
+  else if (genMode === 'vehicle') aspectRatio = getVehicleAspect().aspectColon;
+  if (model.path.indexOf('nano-banana') >= 0 && RATIO_COLON[aspectRatio]) {
+    aspectRatio = RATIO_COLON[aspectRatio];
+  }
+  const body = { prompt, aspect_ratio: aspectRatio };
   if (model.supportsRes) body.resolution = res;
   if (negPrompt && !model.colRatio) body.negative_prompt = negPrompt;
   if (model.path.indexOf('nano-banana') >= 0) body.use_google_search_tool = false;
   if (seed !== undefined) body.seed = seed;
+  if (options.referenceImages && options.referenceImages.length) {
+    body.reference_images = options.referenceImages;
+  }
+
+  const headers = apiAuthHeaders();
+  // Source-image edit/mirror: do not attach universal base ref (overwrites identity + blocks flip)
+  if (options.skipVehicleRef) {
+    delete headers['x-acko-vehicle-ref'];
+    delete headers['x-acko-vehicle-view'];
+  }
 
   const createRes = await fetch(apiUrl('magnific', model.path), {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-session-token': getSessionToken() },
+    headers,
     body: JSON.stringify(body),
   });
   if (!createRes.ok) {
-    const errText = await createRes.text();
-    let message = `API ${createRes.status}: ${errText.slice(0,120)}`;
-    try {
-      const errData = JSON.parse(errText);
-      if (errData.error) message = errData.error;
-    } catch { /* not JSON — keep the raw-text fallback message */ }
-    throw new Error(message);
+    throw new Error(parseApiError(createRes.status, await createRes.text()));
   }
   const created = await createRes.json();
   const taskId  = (created.data || {}).task_id || (created.data || {}).id;
   if (!taskId) throw new Error('No task_id in response.');
 
   const pollUrl = apiUrl('magnific', model.path + '/' + taskId);
-  const hdrs    = { 'Content-Type': 'application/json', 'x-session-token': getSessionToken() };
+  const hdrs = { ...headers };
+  // Polling does not need the heavy create-only headers
+  delete hdrs['Content-Type'];
 
   for (let i = 0; i < 90; i++) {
     if (state.cancelRequested) throw new Error('Cancelled.');
@@ -2163,29 +5687,132 @@ async function doAsync(model, prompt, negPrompt, ratio, res, guidance, seed, idx
   throw new Error('Timed out (3 min).');
 }
 
-function showImage(idx, imageData) {
-  const ph  = document.getElementById(`ph_${idx}`);
-  if (!ph) return;
-  const acls = getAspectCls();
+async function blobToPersisted(blob, sourceUrl) {
+  const mime = (blob && blob.type) || 'image/png';
+  const b64 = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = String(reader.result || '');
+      const comma = dataUrl.indexOf(',');
+      resolve(comma >= 0 ? dataUrl.slice(comma + 1) : '');
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+  if (!b64) throw new Error('empty image');
+  return {
+    src: `data:${mime};base64,${b64}`,
+    sourceUrl: sourceUrl || '',
+    imageData: { b64, mime, url: sourceUrl || '' },
+  };
+}
 
-  const src = imageData.b64
-    ? `data:${imageData.mime||'image/png'};base64,${imageData.b64}`
-    : imageData.url;
+async function persistImageDataForHistory(imageData) {
+  if (imageData && imageData.b64) {
+    return {
+      src: `data:${imageData.mime || 'image/png'};base64,${imageData.b64}`,
+      sourceUrl: imageData.url || '',
+      imageData: { b64: imageData.b64, mime: imageData.mime || 'image/png', url: imageData.url || '' },
+    };
+  }
+  const url = imageData && imageData.url;
+  if (!url) return null;
+
+  // 1) Direct fetch (works when CDN sends CORS)
+  try {
+    const r = await fetch(url);
+    if (r.ok) return await blobToPersisted(await r.blob(), url);
+  } catch (e) {
+    console.warn('Direct image fetch failed, trying proxy…', e);
+  }
+
+  // 2) Same-origin proxy (fixes CORS) — this is why gens were vanishing
+  try {
+    const r = await fetch(proxiedImageUrl(url), {
+      headers: { 'x-session-token': getSessionToken() },
+    });
+    if (!r.ok) throw new Error('proxy fetch ' + r.status);
+    return await blobToPersisted(await r.blob(), url);
+  } catch (e) {
+    console.warn('Could not persist image bytes; keeping proxied URL.', e);
+    // Still return a displayable src so the card does not disappear
+    return {
+      src: proxiedImageUrl(url),
+      sourceUrl: url,
+      imageData: { url, mime: 'image/png' },
+    };
+  }
+}
+
+async function showImage(idx, imageData, pendingId) {
+  const persisted = await persistImageDataForHistory(imageData);
+  const isVehicle = genMode === 'vehicle' || lastGenMeta.kind === 'vehicle' || !!pendingId;
+
+  if (!persisted && !imageData) {
+    if (pendingId) finishVehicleGalleryPending(pendingId);
+    setStatus('err', 'No image returned — try generate again.');
+    return;
+  }
+
+  const src = persisted
+    ? persisted.src
+    : (imageData.b64
+      ? `data:${imageData.mime || 'image/png'};base64,${imageData.b64}`
+      : proxiedImageUrl(imageData.url));
+
+  if (!src) {
+    if (pendingId) finishVehicleGalleryPending(pendingId);
+    setStatus('err', 'Image could not be saved — try generate again.');
+    return;
+  }
 
   // Persist to history — keep both the short display prompt and the exact full
   // master-compliant prompt actually sent to the API, so Edit/Regenerate can reuse it.
   const item = {
-    id: newItemId(), src,
+    id: newItemId(),
+    src,
+    sourceUrl: (persisted && persisted.sourceUrl) || imageData.url || '',
+    imageData: (persisted && persisted.imageData) || imageData,
     prompt: lastGenMeta.prompt, fullPrompt: lastGenMeta.fullPrompt,
     model: lastGenMeta.model, modelId: lastGenMeta.modelId,
     provider: lastGenMeta.provider, ratio: lastGenMeta.ratio,
+    kind: lastGenMeta.kind || 'generate',
+    vehicle: lastGenMeta.vehicle || null,
     ts: Date.now(),
+    bgRemoved: false,
+    badge: 'Original',
   };
+  imageSrcCache.set(item.id, src);
   saveToHistory(item);
 
+  if (isVehicle) {
+    if (pendingId) finishVehicleGalleryPending(pendingId);
+    else renderVehicleGallery();
+    return;
+  }
+
+  const ph = document.getElementById(`ph_${idx}`);
+  if (!ph) return;
+  const card = buildResultCard(item, { showRemoveBg: true });
+  ph.replaceWith(card);
+  updateResultsGridLayout();
+}
+
+function buildResultCard(item, { showRemoveBg = true } = {}) {
+  const acls = getAspectClsForRatio(item.ratio);
+  const isCutout = !!(item.variantOf || item.badge === 'No BG');
+
   const card = document.createElement('div');
-  card.className = `img-card${acls?' '+acls:''}`;
+  card.className = `img-card${acls ? ' ' + acls : ''}${isCutout ? ' has-alpha' : ''}`;
+  card.dataset.itemId = item.id;
   card.onclick = () => openLightbox(item.id, 'generate');
+
+  if (item.badge) {
+    const badge = document.createElement('div');
+    badge.className = `img-badge${isCutout ? ' cutout' : ''}`;
+    badge.textContent = item.badge;
+    card.appendChild(badge);
+  }
 
   const zoomHint = document.createElement('div');
   zoomHint.className = 'img-zoom-hint';
@@ -2193,14 +5820,13 @@ function showImage(idx, imageData) {
   card.appendChild(zoomHint);
 
   const img = document.createElement('img');
-  img.alt = 'Generated image';
-  img.src = src;
+  img.alt = item.badge || 'Generated image';
+  img.src = item.src;
 
   const overlay = document.createElement('div');
   overlay.className = 'img-overlay';
   overlay.onclick = (e) => e.stopPropagation();
 
-  // Favourite
   const favBtn = document.createElement('button');
   favBtn.className = 'gact';
   favBtn.title = 'Favourite';
@@ -2208,7 +5834,6 @@ function showImage(idx, imageData) {
   favBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
   favBtn.onclick = () => { const on = toggleStore('favourites', item); favBtn.classList.toggle('on', on); favBtn.querySelector('svg').setAttribute('fill', on ? 'currentColor' : 'none'); };
 
-  // Collection
   const collBtn = document.createElement('button');
   collBtn.className = 'gact';
   collBtn.title = 'Add to Collection';
@@ -2216,21 +5841,171 @@ function showImage(idx, imageData) {
   collBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h5l2 2h9a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>`;
   collBtn.onclick = () => { const on = toggleStore('collections', item); collBtn.classList.toggle('on', on); };
 
-  // Download
-  const dlBtn = document.createElement('button');
-  dlBtn.className = 'btn-dl';
-  dlBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download`;
-  dlBtn.onclick = () => downloadImg(imageData, idx + 1);
-
   const iconRow = document.createElement('div');
   iconRow.style.cssText = 'display:flex;gap:8px';
   iconRow.appendChild(favBtn);
   iconRow.appendChild(collBtn);
   overlay.appendChild(iconRow);
+
+  if (showRemoveBg && !item.bgRemoved && !item.variantOf) {
+    const rmBgBtn = document.createElement('button');
+    rmBgBtn.className = 'btn-dl';
+    rmBgBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="9" r="1"/></svg> Remove BG`;
+    rmBgBtn.onclick = async () => {
+      if (item.bgRemoved) { alert('A no-BG thumbnail was already created.'); return; }
+      const origHtml = rmBgBtn.innerHTML;
+      rmBgBtn.disabled = true;
+      rmBgBtn.textContent = 'Removing…';
+      try {
+        await removeBackgroundForItem(item);
+        rmBgBtn.textContent = 'No-BG added';
+      } catch (e) {
+        alert('Remove BG failed: ' + e.message);
+        rmBgBtn.innerHTML = origHtml;
+        rmBgBtn.disabled = false;
+      }
+    };
+    overlay.appendChild(rmBgBtn);
+  }
+
+  const dlBtn = document.createElement('button');
+  dlBtn.className = 'btn-dl';
+  dlBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download`;
+  dlBtn.onclick = () => downloadImg(item.imageData || { url: item.src }, 1);
   overlay.appendChild(dlBtn);
+
   card.appendChild(img);
   card.appendChild(overlay);
-  ph.replaceWith(card);
+  return card;
+}
+
+function getAspectClsForRatio(ratioLabel) {
+  const label = ratioLabel || '';
+  if (label === '1:1' || label === 'Square') return 'sq';
+  if (label === '9:16' || label === '4:5' || label === '3:4') return 'port';
+  if (label === '4:3') return 'cls';
+  if (label === '16:9') return '';
+  // Fall back to current UI selection
+  return getAspectCls();
+}
+
+function updateResultsGridLayout() {
+  const grid = document.getElementById('resultsGrid');
+  if (!grid) return;
+  const n = grid.querySelectorAll('.img-card').length;
+  const cols = Math.min(4, Math.max(1, n));
+  grid.className = `results-grid n${cols}`;
+  const sub = document.getElementById('resultsSub');
+  if (sub && n) sub.textContent = `${n} image${n !== 1 ? 's' : ''} in results.`;
+}
+
+function appendResultThumbnail(item) {
+  if (genMode === 'vehicle' || item.kind === 'vehicle' || item.vehicle) {
+    // Keep vehicle meta on cutout variants
+    if (!item.vehicle && item.variantOf) {
+      const parent = storeGet('history').find(x => x.id === item.variantOf);
+      if (parent && parent.vehicle) item.vehicle = { ...parent.vehicle };
+      if (parent && parent.kind) item.kind = parent.kind;
+      const hist = storeGet('history');
+      const hi = hist.findIndex(x => x.id === item.id);
+      if (hi >= 0) {
+        hist[hi] = { ...hist[hi], vehicle: item.vehicle, kind: item.kind || 'vehicle' };
+        storeSet('history', hist);
+      }
+    }
+    renderVehicleGallery();
+    return;
+  }
+  const grid = document.getElementById('resultsGrid');
+  if (!grid) return;
+  const card = buildResultCard(item, { showRemoveBg: !item.variantOf });
+  grid.appendChild(card);
+  updateResultsGridLayout();
+}
+
+async function removeBackgroundForItem(item) {
+  if (item.bgRemoved || item.cutoutId) {
+    throw new Error('A no-BG thumbnail already exists for this image.');
+  }
+  const imageUrl = item.sourceUrl || (item.src && item.src.startsWith('http') ? item.src : '');
+  const imageB64 = (item.src && item.src.startsWith('data:'))
+    ? item.src
+    : (item.imageData && item.imageData.b64
+      ? `data:${item.imageData.mime || 'image/png'};base64,${item.imageData.b64}`
+      : '');
+  if (!imageUrl && !imageB64) {
+    throw new Error('No image data available for remove.bg. Re-generate, then try again.');
+  }
+  const res = await fetch('/api/vehicle/remove-bg', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-session-token': getSessionToken(),
+    },
+    // Prefer uploading bytes — works even when Magnific temp URLs expire
+    body: JSON.stringify(imageB64
+      ? { image_b64: imageB64 }
+      : { image_url: imageUrl }),
+  });
+  if (!res.ok) {
+    throw new Error(parseApiError(res.status, await res.text()));
+  }
+  const data = await res.json();
+  if (!data.b64) throw new Error('No cutout returned from remove.bg.');
+
+  // remove.bg (type=car + shadow_type=car) — no Magnific, no client shadow rewrite
+  const finalSrc = `data:${data.mime || 'image/png'};base64,${data.b64}`;
+
+  const cutoutItem = {
+    id: newItemId(),
+    src: finalSrc,
+    sourceUrl: '',
+    imageData: { b64: finalSrc.split(',')[1], mime: 'image/png' },
+    prompt: item.prompt,
+    fullPrompt: item.fullPrompt,
+    model: item.model,
+    modelId: item.modelId,
+    provider: item.provider,
+    ratio: item.ratio,
+    ts: Date.now(),
+    badge: 'No BG',
+    variantOf: item.id,
+    bgRemoved: true,
+  };
+
+  // Keep original; link the pair in history
+  item.bgRemoved = true;
+  item.cutoutId = cutoutItem.id;
+  item.badge = item.badge || 'Original';
+  saveToHistory(cutoutItem);
+  const hist = storeGet('history');
+  const hi = hist.findIndex(x => x.id === item.id);
+  if (hi >= 0) {
+    hist[hi] = { ...hist[hi], bgRemoved: true, cutoutId: cutoutItem.id, badge: item.badge };
+    storeSet('history', hist);
+  }
+
+  // Update original card badge / disable its Remove BG if still in the results grid
+  const origCard = document.querySelector(`.img-card[data-item-id="${item.id}"]`);
+  if (origCard) {
+    let badge = origCard.querySelector('.img-badge');
+    if (!badge) {
+      badge = document.createElement('div');
+      badge.className = 'img-badge';
+      origCard.appendChild(badge);
+    }
+    badge.textContent = 'Original';
+    origCard.querySelectorAll('.btn-dl').forEach(btn => {
+      if ((btn.textContent || '').includes('Remove') || (btn.textContent || '').includes('No-BG') || (btn.textContent || '').includes('Removing')) {
+        btn.textContent = 'No-BG added';
+        btn.disabled = true;
+      }
+    });
+  }
+
+  appendResultThumbnail(cutoutItem);
+  refreshOpenView();
+  return cutoutItem;
 }
 
 function showError(idx, msg) {
@@ -2260,10 +6035,37 @@ function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
+/** Make the whole pill (incl. chevron / padding) open the native select menu. */
+function wireSelectWraps(root = document) {
+  root.querySelectorAll('.sel-wrap').forEach(wrap => {
+    if (wrap.dataset.selectWired === '1') return;
+    wrap.dataset.selectWired = '1';
+    wrap.addEventListener('click', (e) => {
+      const sel = wrap.querySelector('select');
+      if (!sel || sel.disabled) return;
+      // Native option clicks / already on select — leave alone
+      if (e.target === sel) return;
+      sel.focus();
+      if (typeof sel.showPicker === 'function') {
+        try { sel.showPicker(); } catch (_) { /* ignore if blocked */ }
+      }
+    });
+  });
+}
+
 // ─── INIT ────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  // One-time fresh start (Hector/Skoda morning gens used expired temp URLs and are gone).
+  const FRESH_START_KEY = 'acko_fresh_start_20260722';
+  if (localStorage.getItem(FRESH_START_KEY) !== '1') {
+    wipeAllLibraryStores();
+    localStorage.setItem(FRESH_START_KEY, '1');
+  }
   document.getElementById('negPrompt').value = DEFAULT_NEG;
   onModelChange();
+  wireSelectWraps();
+  wireVehicleCombos();
+  wireLbPanZoom();
   checkSession();
 });
 </script>
