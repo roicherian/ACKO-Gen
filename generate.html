@@ -3454,10 +3454,12 @@ function buildVehiclePrompt(make, model, color, year, viewKey, cameraKey, bgKey)
     `OUTPUT: one image, one vehicle only; every colour variant must reuse this exact camera, framing, lighting, wheels, and composition.`
   );
   // When a user model photo is attached: postfix only (base lines above stay identical).
+  // Identity MUST come from the uploaded photo — Baleno/base is camera/lighting only.
   const modelRefPostfix = vehicleModelRef
-    ? ` MODEL REFERENCE: from the attached additional model photo, extract grille, headlamps/DRLs, bumper, ` +
-      `mirrors, cladding, wheels/tyres, and body proportions, and use those features so this car matches ` +
-      `that uploaded model/facelift — do not copy that photo’s camera, framing, background, or lighting.`
+    ? ` CRITICAL MODEL IDENTITY: the ADDITIONAL MODEL REFERENCE photo defines this car’s face and body — ` +
+      `copy its grille/mesh pattern, headlamp + DRL shape, fog lamps, front bumper sculpting, ` +
+      `bonnet lines, mirrors, cladding, wheels/tyres, and proportions exactly (same facelift). ` +
+      `Do not invent a Baleno-like or generic face. Do not copy that photo’s camera, framing, background, or lighting.`
     : '';
   return base + modelRefPostfix;
 }
@@ -3533,11 +3535,15 @@ async function onVehicleModelRefSelected(ev) {
       reader.readAsDataURL(file);
     });
     // Keep small — Freepik rejects oversized multi-ref payloads (base + model).
+    // Also forces jpeg/png/webp — Magnific rejects image/jpg, avif, heic, gif, etc.
     const compressed = await compressDataUriForReference(rawUri, 350 * 1024);
-    const mimeMatch = /^data:([^;]+);/i.exec(compressed);
+    const mime = normalizeMagnificRefMime(mimeFromDataUri(compressed) || file.type);
+    if (!mime) {
+      throw new Error('Unsupported image format after processing. Please upload a PNG, JPEG, or WebP.');
+    }
     vehicleModelRef = {
       dataUri: compressed,
-      mime: (mimeMatch && mimeMatch[1]) || file.type || 'image/jpeg',
+      mime,
       name: file.name || 'Reference image',
     };
     renderVehicleModelRefUI();
@@ -3562,18 +3568,27 @@ async function getVehicleModelReferenceImages() {
   if (uri.startsWith('data:')) {
     uri = await compressDataUriForReference(uri, 350 * 1024);
   }
-  const mimeMatch = /^data:([^;]+);/i.exec(uri);
-  const mime = (mimeMatch && mimeMatch[1]) || vehicleModelRef.mime || 'image/jpeg';
+  const mime = normalizeMagnificRefMime(
+    mimeFromDataUri(uri) || vehicleModelRef.mime
+  );
+  if (!mime) {
+    throw new Error(
+      'Model reference mime_type is invalid for the API. Re-add the photo as PNG/JPEG/WebP.'
+    );
+  }
+  // Persist normalized mime so retries stay valid
+  vehicleModelRef.mime = mime;
+  vehicleModelRef.dataUri = uri;
   const make = vehicleSelection.make || 'the';
   const model = vehicleSelection.model || 'selected';
   return [{
     image: uri,
     mime_type: mime,
     text: (
-      `ADDITIONAL MODEL REFERENCE (car identity — not camera): study THIS photo of the ${make} ${model}` +
+      `ADDITIONAL MODEL REFERENCE (PRIMARY car identity — not camera): study THIS photo of the ${make} ${model}` +
       ` and reproduce its real exterior accurately — grille/mesh pattern, headlamp and DRL shape, fog lamps, bumper sculpting, ` +
       `bonnet/hood lines, mirrors, cladding, wheel arches, alloy/wheel design, tyre sidewall/tread look, glass graphics, and overall body proportions. ` +
-      `The photo defines the model year/facelift — do not invent a different face. ` +
+      `The photo defines the model year/facelift face — do not invent a different or Baleno-like face. ` +
       `Do NOT copy this photo’s camera angle, framing, background, or lighting — those stay locked to the Baleno/base reference and the text prompt. ` +
       `Paint colour follows the prompt. Keep plain white blank plates and brand emblems only.`
     ),
@@ -4999,7 +5014,27 @@ async function loadImageElement(dataUri) {
   });
 }
 
-/** Shrink large data URIs so Magnific/WAF does not 403 oversized reference_images. */
+/** Magnific reference_images.mime_type allow-list (strict). */
+const MAGNIFIC_REF_MIMES = new Set(['image/png', 'image/jpeg', 'image/webp']);
+
+function mimeFromDataUri(dataUri) {
+  const m = /^data:([^;,]+)/i.exec(String(dataUri || ''));
+  return m ? String(m[1] || '').trim().toLowerCase() : '';
+}
+
+/** Map aliases / strip params → Magnific-safe mime, or '' if unsupported. */
+function normalizeMagnificRefMime(mime) {
+  let m = String(mime || '').toLowerCase().split(';')[0].trim();
+  if (m === 'image/jpg' || m === 'image/pjpeg' || m === 'image/x-jpeg') m = 'image/jpeg';
+  if (m === 'image/x-png') m = 'image/png';
+  return MAGNIFIC_REF_MIMES.has(m) ? m : '';
+}
+
+/**
+ * Shrink / re-encode data URIs for Magnific reference_images.
+ * Always re-encodes when mime is not png/jpeg/webp (e.g. image/jpg, avif, heic, gif)
+ * — otherwise Freepik returns HTTP 400 on body.reference_images.*.mime_type.
+ */
 async function compressDataUriForReference(dataUri, maxBytes = 900 * 1024) {
   if (!dataUri || !String(dataUri).startsWith('data:')) return dataUri;
   const approxBytes = (uri) => {
@@ -5007,7 +5042,9 @@ async function compressDataUriForReference(dataUri, maxBytes = 900 * 1024) {
     if (i < 0) return uri.length;
     return Math.floor((uri.length - i - 1) * 0.75);
   };
-  if (approxBytes(dataUri) <= maxBytes) return dataUri;
+  const currentMime = normalizeMagnificRefMime(mimeFromDataUri(dataUri));
+  const needsReencode = !currentMime;
+  if (!needsReencode && approxBytes(dataUri) <= maxBytes) return dataUri;
 
   const img = await loadImageElement(dataUri);
   let baseW = img.naturalWidth || img.width;
@@ -5020,23 +5057,33 @@ async function compressDataUriForReference(dataUri, maxBytes = 900 * 1024) {
     baseH = Math.round(baseH * s);
   }
   const canvas = document.createElement('canvas');
+  // Prefer JPEG first — safest Magnific mime; webp/png as fallbacks for size.
   const attempts = [
-    { mime: 'image/webp', q: 0.84, scale: 1 },
-    { mime: 'image/webp', q: 0.72, scale: 1 },
+    { mime: 'image/jpeg', q: 0.88, scale: 1 },
+    { mime: 'image/jpeg', q: 0.78, scale: 1 },
+    { mime: 'image/webp', q: 0.8, scale: 1 },
+    { mime: 'image/jpeg', q: 0.7, scale: 0.85 },
     { mime: 'image/webp', q: 0.64, scale: 0.8 },
+    { mime: 'image/jpeg', q: 0.62, scale: 0.7 },
     { mime: 'image/webp', q: 0.55, scale: 0.65 },
-    { mime: 'image/png', q: null, scale: 0.6 },
-    { mime: 'image/webp', q: 0.5, scale: 0.5 },
+    { mime: 'image/png', q: null, scale: 0.55 },
+    { mime: 'image/jpeg', q: 0.55, scale: 0.5 },
   ];
-  let best = dataUri;
-  let bestBytes = approxBytes(dataUri);
+  let best = needsReencode ? '' : dataUri;
+  let bestBytes = needsReencode ? Infinity : approxBytes(dataUri);
   for (const a of attempts) {
     const w = Math.max(1, Math.round(baseW * a.scale));
     const h = Math.max(1, Math.round(baseH * a.scale));
     canvas.width = w;
     canvas.height = h;
     const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, w, h);
+    // JPEG has no alpha — fill white so transparent sources don't go black.
+    if (a.mime === 'image/jpeg') {
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, w, h);
+    } else {
+      ctx.clearRect(0, 0, w, h);
+    }
     ctx.drawImage(img, 0, 0, w, h);
     let out = '';
     try {
@@ -5045,6 +5092,7 @@ async function compressDataUriForReference(dataUri, maxBytes = 900 * 1024) {
       continue;
     }
     if (!out.startsWith('data:')) continue;
+    if (!normalizeMagnificRefMime(mimeFromDataUri(out))) continue;
     const bytes = approxBytes(out);
     if (bytes < bestBytes) {
       best = out;
@@ -5052,7 +5100,7 @@ async function compressDataUriForReference(dataUri, maxBytes = 900 * 1024) {
     }
     if (bytes <= maxBytes) return out;
   }
-  return best;
+  return best || dataUri;
 }
 
 /** Pixel-perfect horizontal flip (orientation lock before AI logo fix). */
@@ -5474,9 +5522,7 @@ async function doRegenerateEdit(item, instruction, opts = {}) {
   if (String(sourceUri).startsWith('data:')) {
     sourceUri = await compressDataUriForReference(sourceUri, 900 * 1024);
   }
-  const mimeMatch = /^data:([^;]+);/i.exec(sourceUri);
-  const mime = (mimeMatch && mimeMatch[1])
-    || (String(sourceUri).startsWith('http') ? 'image/png' : 'image/png');
+  const mime = normalizeMagnificRefMime(mimeFromDataUri(sourceUri)) || 'image/png';
 
   // Mirror / edit must use the *generated car* as reference — not a full text regen
   // with the universal base ref (that redesigns the car and blocks mirroring).

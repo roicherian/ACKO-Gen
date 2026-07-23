@@ -2447,7 +2447,9 @@
             "Cumulus Gray",
             "Pearl White",
             "Perla Nera Black",
-            "Tijuca Blue"
+            "Tijuca Blue",
+            "Eclipse Blue",
+            "Cumulus Grey"
           ],
           "colour_families": [
             "White",
@@ -3687,7 +3689,8 @@
             "Lunar Silver Metalli",
             "Meteoroid Grey Metal",
             "Platinum White Pearl",
-            "Radiant Red Metallic"
+            "Radiant Red Metallic",
+            "Obsidian Blue Pearl"
           ],
           "colour_families": [
             "White",
@@ -3803,7 +3806,8 @@
             "Meteoroid Grey Metal",
             "Obsidian Blue Pearl",
             "Platinum White Pearl",
-            "Rediant Red Metallic"
+            "Rediant Red Metallic",
+            "Radiant Red"
           ],
           "colour_families": [
             "White",
@@ -3895,7 +3899,8 @@
             "Lunar Silver Metalli",
             "Obsidian Blue Pearl",
             "Radiant Red Metallic",
-            "Radiant Red-Metallic"
+            "Radiant Red-Metallic",
+            "Meteoroid Gray"
           ],
           "colour_families": [
             "White",
@@ -3920,10 +3925,10 @@
         {
           "name": "Jazz",
           "colors": [
-            "Golden Brown Metalli",
-            "Lunar Silver Metalli",
-            "Modern Steel Metalli",
-            "Platinum White Pear",
+            "Golden Brown Metallic",
+            "Lunar Silver Metallic",
+            "Modern Steel Metallic",
+            "Platinum White Pearl",
             "Rediant Red Metallic"
           ],
           "colour_families": [
@@ -3979,11 +3984,11 @@
         {
           "name": "WR-V",
           "colors": [
-            "Golden Brown Metalli",
-            "Lunar Silver Metalli",
-            "Modern Steel Metalli",
+            "Golden Brown Metallic",
+            "Lunar Silver Metallic",
+            "Modern Steel Metallic",
             "Platinum White Pearl",
-            "Premium Amber Metall",
+            "Premium Amber Metallic",
             "Rediant Red Metallic"
           ],
           "colour_families": [
@@ -4466,7 +4471,9 @@
             "Starry Night",
             "Abyss Black",
             "Thunder Blue",
-            "Titan Grey"
+            "Titan Grey",
+            "Pearl White",
+            "Blue-Black"
           ],
           "colour_families": [],
           "body": "Hatchback (premium)",
@@ -4487,7 +4494,11 @@
             "i20 Starry Night",
             "i20 Atlas White",
             "i20 Titan Grey",
-            "i20 Amazon Grey"
+            "i20 Amazon Grey",
+            "Titan Grey",
+            "Optic White",
+            "Midnight Black Pearl",
+            "Gravity Gold Matte"
           ],
           "colour_families": [
             "White",
@@ -4709,7 +4720,13 @@
             "Sunlit Yellow",
             "Ash Gray",
             "Coral Red",
-            "Black"
+            "Black",
+            "Titan Grey",
+            "Mystic Sapphire",
+            "Hazel Blue",
+            "Dragon Red",
+            "Atlas White",
+            "Abyss Black"
           ],
           "colour_families": [
             "White",
@@ -4741,7 +4758,12 @@
             "Nexa Blue",
             "Majestic Silver",
             "Mystic White",
-            "Stellar Bronze"
+            "Stellar Bronze",
+            "Titan Grey",
+            "Hazel Blue",
+            "Dragon Red",
+            "Atlas White",
+            "Abyss Black"
           ],
           "colour_families": [],
           "body": "Compact SUV",
@@ -4762,8 +4784,11 @@
             "Starry Night",
             "Atlas White",
             "Titan Grey",
-            "Tellurian Brow",
-            "Abyss Black"
+            "Tellurian Brown",
+            "Abyss Black",
+            "Titanium Black",
+            "Classy Blue",
+            "Titan Grey (Matte & regular)"
           ],
           "colour_families": [
             "White",
@@ -5261,7 +5286,7 @@
             "Brilliant Black",
             "Grigo Magnesio Grey",
             "Exotica Red",
-            "Techno Metallic Gree",
+            "Techno Metallic Green",
             "Silvery Moon"
           ],
           "colour_families": [
@@ -5288,9 +5313,10 @@
           "name": "Grand Cherokee",
           "colors": [
             "Rocky",
-            "Diamo",
-            "Velve",
-            "Brigh"
+            "Diamond Black Crystal",
+            "Velvet Red",
+            "Bright White",
+            "Rocky Mountain"
           ],
           "colour_families": [
             "White",
@@ -5323,7 +5349,9 @@
             "Brilliant Black",
             "magnesio Grey",
             "Pearl White",
-            "Techno Metallic Gree"
+            "Techno Metallic Green",
+            "Brilliant Blue",
+            "Silvery Moon"
           ],
           "colour_families": [
             "White",
@@ -5352,7 +5380,10 @@
             "Bright White",
             "Fire Cracker Red",
             "Galaxy Blue",
-            "Granite Crystal"
+            "Granite Crystal",
+            "Billet Silver",
+            "Deep Cherry Red",
+            "Techno Metallic Green"
           ],
           "colour_families": [
             "White",
@@ -5390,7 +5421,10 @@
             "Intense Red",
             "Gravity Gray",
             "Imperial Blue",
-            "Sparkling Silver"
+            "Sparkling Silver",
+            "Clear White",
+            "Gravity Grey",
+            "Moss Brown"
           ],
           "colour_families": [
             "White",
@@ -5415,13 +5449,16 @@
         {
           "name": "Carens Clavis",
           "colors": [
-            "Glacie",
-            "Sparkl",
+            "Glacier White Pearl",
+            "Sparkling Silver",
             "Ivory",
             "Pewter",
             "Aurora",
-            "Imperi",
-            "Gravit"
+            "Imperial Blue",
+            "Gravity Gray",
+            "Pewter Olive",
+            "Aurora Black Pearl",
+            "Ivory Silver Matte"
           ],
           "colour_families": [
             "White",
@@ -5469,7 +5506,8 @@
           "colors": [
             "Aurora Black Pearl",
             "Glacier White Pearl",
-            "Steel Silver"
+            "Steel Silver",
+            "Fusion Black"
           ],
           "colour_families": [
             "White",
@@ -5522,11 +5560,12 @@
         {
           "name": "EV9",
           "colors": [
-            "Panthera Metal",
+            "Panthera Metallic",
             "Pebble Gray",
             "Aurora Black Pearl",
             "Snow White Pearl",
-            "Ocean Blue Pearl"
+            "Ocean Blue Pearl",
+            "Pebble Grey"
           ],
           "colour_families": [
             "White",
@@ -5557,7 +5596,12 @@
             "Intense Red",
             "Sparkling Silver",
             "Gravity Gray",
-            "Imperial Blue"
+            "Imperial Blue",
+            "Matte Graphite",
+            "Ivory Silver Matte",
+            "Magma Red",
+            "Morning Haze",
+            "Frost Blue"
           ],
           "colour_families": [
             "White",
@@ -5591,7 +5635,11 @@
             "Glacier White Pearl",
             "Gravity Gray",
             "Intelligence Blue",
-            "Intense Red"
+            "Intense Red",
+            "Sparkling Silver",
+            "Gravity Grey",
+            "Imperial Blue",
+            "Pewter Olive"
           ],
           "colour_families": [
             "White",
@@ -5623,7 +5671,8 @@
             "Frost Blue",
             "Aurora Black Pearl",
             "Imperial Blue",
-            "Gravity Gray"
+            "Gravity Gray",
+            "Gravity Grey"
           ],
           "colour_families": [
             "White",
@@ -6292,7 +6341,8 @@
             "Firestorm Orange",
             "Napoli Black",
             "Desert Myst Satin",
-            "Everest White Satin"
+            "Everest White Satin",
+            "Stealth Black"
           ],
           "colour_families": [
             "White",
@@ -6318,7 +6368,9 @@
           "name": "Bolero",
           "colors": [
             "Diamond White",
-            "Dsat Silver"
+            "Dsat Silver",
+            "Rocky Beige",
+            "Stealth Black"
           ],
           "colour_families": [
             "White",
@@ -6379,7 +6431,11 @@
             "Diamond White",
             "Highway Red",
             "Majestic Silver",
-            "Napoli Black"
+            "Napoli Black",
+            "Jeans Blue",
+            "Concrete Grey",
+            "Pearl White",
+            "Stealth Black"
           ],
           "colour_families": [
             "White",
@@ -6404,7 +6460,10 @@
         {
           "name": "Bolero Neo Plus",
           "colors": [
-            "White"
+            "White",
+            "Diamond White",
+            "Majestic Silver",
+            "Napoli Black"
           ],
           "colour_families": [],
           "body": "Compact SUV",
@@ -6685,7 +6744,7 @@
             "Designer Grey",
             "Fiery Orange",
             "Flamboyant Red",
-            "Flamboyant Red & Met",
+            "Flamboyant Red & Metallic",
             "Midnight black",
             "Pearl White",
             "Dazzling Silver & Me"
@@ -6781,7 +6840,8 @@
             "Iceberg White",
             "Mariner Maroon",
             "Oceanic Black",
-            "Shimmering Silver"
+            "Shimmering Silver",
+            "Poseidon Purple"
           ],
           "colour_families": [
             "White",
@@ -7028,7 +7088,12 @@
             "Black",
             "Dsat Silver",
             "Molten Red Rage",
-            "Pearl White"
+            "Pearl White",
+            "Stealth Black",
+            "Red Rage",
+            "Galaxy Grey",
+            "Everest White",
+            "Diamond White"
           ],
           "colour_families": [
             "White",
@@ -7059,7 +7124,9 @@
             "Grand Canyon",
             "Napoli Black",
             "Red Rage",
-            "Midnight Black"
+            "Midnight Black",
+            "Valyrian Silver",
+            "Stealth Black"
           ],
           "colour_families": [
             "White",
@@ -7119,7 +7186,11 @@
             "Blazing Bronze",
             "Everest White",
             "Galaxy Grey",
-            "Napoli Black"
+            "Napoli Black",
+            "Tango Red",
+            "Stealth Black",
+            "Battleship Grey Black",
+            "Deep Forest"
           ],
           "colour_families": [
             "White",
@@ -7152,7 +7223,13 @@
             "Battleship Gray",
             "Deep Forest",
             "Tango Red",
-            "Burnt Sienna"
+            "Burnt Sienna",
+            "Burnt Sienna Black",
+            "Battleship Grey Black",
+            "Nebula Blue Black",
+            "Deep Forest Black",
+            "Everest White Black",
+            "Tango Red Black"
           ],
           "colour_families": [
             "White",
@@ -7389,7 +7466,9 @@
             "Dune Beige Plus Stea",
             "Nebula Blue Plus Gal",
             "Galaxy Grey Plus Ste",
-            "Tango Red Plus Steal"
+            "Tango Red Plus Steal",
+            "Deep Forest",
+            "Citrine Yellow"
           ],
           "colour_families": [
             "White",
@@ -7533,8 +7612,8 @@
           "colors": [
             "Everest White",
             "Electic Blue",
-            "Dazzling Silv",
-            "Midnight Blac",
+            "Dazzling Silver",
+            "Midnight Black",
             "Red Rage Dt",
             "Electric Blue",
             "Red Rage",
@@ -7774,7 +7853,11 @@
             "Metallic Sizzling Re",
             "Metallic Speedy Blue",
             "Premium Earth Gold",
-            "Solid White"
+            "Solid White",
+            "Silky Silver",
+            "Earth Gold",
+            "Sizzling Red",
+            "Granite Grey"
           ],
           "colour_families": [
             "White",
@@ -7801,7 +7884,7 @@
           "colors": [
             "Pearl Arctic White",
             "Pearl Phoenix Red",
-            "Metallic Premium sil",
+            "Metallic Premium Silver",
             "Blue"
           ],
           "colour_families": [
@@ -7836,7 +7919,8 @@
             "Exuberant Blue",
             "Magma Grey",
             "Pearl Arctic White",
-            "Splendid Silver"
+            "Splendid Silver",
+            "Pearl Midnight Black"
           ],
           "colour_families": [
             "White",
@@ -7865,7 +7949,12 @@
             "Arctic White",
             "Blazing Red",
             "Silky silver",
-            "Tango Orange"
+            "Tango Orange",
+            "Speedy Blue",
+            "Fire Red",
+            "Caffeine Brown",
+            "White",
+            "Glistening Grey"
           ],
           "colour_families": [
             "White",
@@ -7892,11 +7981,18 @@
           "colors": [
             "Magma Grey",
             "Nexa Blue",
-            "Pearl Metallic Digni",
+            "Pearl Metallic Dignity",
             "Pearl Midnight Black",
             "Pearl Sangria Red",
             "Pearl Snow White",
-            "Silver Metalic"
+            "Silver Metalic",
+            "Premium Silver",
+            "Dignity Brown",
+            "Sangria Red",
+            "Midnight Black",
+            "Magma Gray",
+            "Snow White",
+            "Silver Metallic"
           ],
           "colour_families": [
             "White",
@@ -7992,7 +8088,10 @@
             "Metallic Glistening",
             "Metallic silky silve",
             "Pearl Midnight Black",
-            "Solid White"
+            "Solid White",
+            "Glistening Grey",
+            "Silky Silver",
+            "Cerulean Blue"
           ],
           "colour_families": [
             "White",
@@ -8017,10 +8116,16 @@
           "name": "Ertiga",
           "colors": [
             "Pearl Arctic White",
-            "Metallic silky silve",
+            "Metallic silky Silver",
             "Pearl Metallic Aubur",
-            "Pearl Metallic Oxfor",
-            "Metallic Magma Grey"
+            "Pearl Metallic Oxford",
+            "Metallic Magma Grey",
+            "Bluish Black",
+            "Dignity Brown",
+            "Oxford Blue",
+            "Auburn Red",
+            "Magma Grey",
+            "Splendid Silver"
           ],
           "colour_families": [
             "White",
@@ -8113,7 +8218,8 @@
             "Earthen Brown",
             "Grandeur Grey",
             "Opulent Red",
-            "Splendid Silver"
+            "Splendid Silver",
+            "Bluish Black"
           ],
           "colour_families": [
             "White",
@@ -8138,7 +8244,7 @@
         {
           "name": "Grand Vitara",
           "colors": [
-            "Arctic White Midnigh",
+            "Arctic White Midnight",
             "Arctic White",
             "Chestnut Brown",
             "Grandeur Grey",
@@ -8146,8 +8252,10 @@
             "Nexa Blue",
             "Opulent Red",
             "Opulent Red Midnight",
-            "Splendid Silver Midn",
-            "Splendid Silver"
+            "Splendid Silver Midnight",
+            "Splendid Silver",
+            "Celestial Blue",
+            "Granite Grey"
           ],
           "colour_families": [
             "White",
@@ -8207,7 +8315,9 @@
             "Lucent Orange",
             "Pearl White",
             "Silky silver",
-            "Turquoise Blue"
+            "Turquoise Blue",
+            "Pearl Arctic White",
+            "Bluish Black"
           ],
           "colour_families": [
             "White",
@@ -8418,7 +8528,11 @@
             "Metallic silky silve",
             "Pearl Starry Blue",
             "Solid Fire Red",
-            "Solid Sizzle Orange"
+            "Solid Sizzle Orange",
+            "Sizzle Orange",
+            "Granite Grey",
+            "Silky Silver",
+            "Solid Superior White"
           ],
           "colour_families": [
             "White",
@@ -8444,13 +8558,19 @@
           "name": "Swift",
           "colors": [
             "Pearl Arctic White",
-            "Pearl Metallic Lucen",
+            "Pearl Metallic Lucent",
             "Pearl Arctic White P",
-            "Metallic silky silve",
+            "Metallic silky Silver",
             "Pearl Arctic White M",
             "Solid Fire Red",
-            "Pearl Metallic Midni",
-            "Metallic Magma Grey"
+            "Pearl Metallic Midnight",
+            "Metallic Magma Grey",
+            "Splendid Silver",
+            "Magna Grey",
+            "Novel Orange",
+            "Luster Blue",
+            "Bluish Black",
+            "Sizzling Red"
           ],
           "colour_families": [
             "White",
@@ -8604,10 +8724,12 @@
           "colors": [
             "Silky silver",
             "Poolside Blue",
-            "Pearl Metallic Nutme",
+            "Pearl Metallic Nutmeg",
             "Solid White",
             "Prime-Gallant-Red",
-            "Magma Grey"
+            "Magma Grey",
+            "Gallant Red",
+            "Nutmeg Brown"
           ],
           "colour_families": [
             "White",
@@ -8637,7 +8759,11 @@
             "Brave Khaki",
             "Megma Grey",
             "Nexa Blue",
-            "Premium Silver"
+            "Premium Silver",
+            "Arctic White",
+            "Opulent Red",
+            "Grandeur Grey",
+            "Splendid Silver"
           ],
           "colour_families": [
             "White",
@@ -9937,7 +10063,9 @@
             "Dune Brown",
             "Glaze Red",
             "Havana Grey",
-            "Starry Black"
+            "Starry Black",
+            "Celadon Blue",
+            "Pearl White"
           ],
           "colour_families": [
             "White",
@@ -10014,12 +10142,15 @@
         {
           "name": "Windsor EV",
           "colors": [
-            "Pearl Whi",
+            "Pearl White",
             "Turquoise",
-            "Aurora Si",
+            "Aurora Silver",
             "Starburst",
             "Glaze Red",
-            "Celadon B"
+            "Celadon Blue",
+            "Clay Beige",
+            "Turquoise Green",
+            "Starburst Black"
           ],
           "colour_families": [
             "White",
@@ -10048,7 +10179,11 @@
             "Currant Red",
             "Ashen Silver",
             "Ferris White",
-            "Sable Black"
+            "Sable Black",
+            "Candy White",
+            "Starry Black",
+            "Aurora Silver",
+            "Glaze Red"
           ],
           "colour_families": [
             "White",
@@ -10501,7 +10636,7 @@
           "colors": [
             "Black Metallic",
             "Blue Racing",
-            "Gun Metalli",
+            "Gun Metallic",
             "Katsura Orange",
             "Pearl White",
             "Ultimate Silver",
@@ -10562,12 +10697,16 @@
         {
           "name": "Magnite",
           "colors": [
-            "Copper Orang",
+            "Copper Orange",
             "Blade Silver",
             "Onyx Black",
             "Vivid Blue &",
             "Pearl White",
-            "Fire Granet"
+            "Fire Granet",
+            "Sunrise Copper Orange",
+            "Storm White",
+            "Metallic Grey",
+            "Flare Garnet Red"
           ],
           "colour_families": [
             "White",
@@ -10749,7 +10888,8 @@
             "Diamond Black",
             "Diamond Silver",
             "Pearl White",
-            "Sapphire Blue"
+            "Sapphire Blue",
+            "Champagne Silver"
           ],
           "colour_families": [
             "White",
@@ -11215,13 +11355,17 @@
         {
           "name": "Duster",
           "colors": [
-            "Caspian Blue Metalli",
+            "Caspian Blue Metallic",
             "Cayenne Orange",
             "Mahogany Brown",
             "Moonlight Silver",
             "Outback Bronze",
             "Pearl White",
-            "Slate Grey"
+            "Slate Grey",
+            "Sunset Red",
+            "Stealth Black",
+            "River Blue",
+            "Mountain Jade Green"
           ],
           "colour_families": [
             "White",
@@ -11282,7 +11426,8 @@
             "Caspian Blue",
             "Ice Cool White",
             "Mahogany Brown",
-            "Moonlight Silver"
+            "Moonlight Silver",
+            "Stealth Black"
           ],
           "colour_families": [
             "White",
@@ -11345,7 +11490,8 @@
             "Moonlight Silver",
             "Zanskar Blue",
             "Zanskar Blue Black R",
-            "Outback Bronze"
+            "Outback Bronze",
+            "Electric Blue"
           ],
           "colour_families": [
             "White",
@@ -11466,7 +11612,10 @@
             "Ice Cool White",
             "Cedar Brown",
             "Stealth Black",
-            "Metal Mustard"
+            "Metal Mustard",
+            "Amber Terracotta",
+            "Shadow Grey",
+            "Zanskar Blue"
           ],
           "colour_families": [
             "White",
@@ -11726,7 +11875,8 @@
             "Magic Black",
             "Graphite Grey",
             "Race Blue",
-            "Velvet Red"
+            "Velvet Red",
+            "Black Magic"
           ],
           "colour_families": [
             "White",
@@ -11777,7 +11927,12 @@
             "Brilliant Silver",
             "Candy White",
             "Onyx",
-            "Tornado-Red-With-Car"
+            "Tornado-Red-With-Car",
+            "Steel Grey",
+            "Shimla Green",
+            "Cherry Red",
+            "Deep Black",
+            "Lava Blue"
           ],
           "colour_families": [
             "White",
@@ -11802,7 +11957,7 @@
         {
           "name": "Kylaq",
           "colors": [
-            "Brilliant Silv",
+            "Brilliant Silver",
             "Lava Blue",
             "Olive Gold",
             "Carbon Steel",
@@ -11949,7 +12104,9 @@
             "Tornado Red",
             "Toreador Red",
             "Brilliant Silver",
-            "Platinum White Pearl"
+            "Platinum White Pearl",
+            "Lava Blue",
+            "Deep Black"
           ],
           "colour_families": [
             "White",
@@ -11974,7 +12131,7 @@
         {
           "name": "Superb",
           "colors": [
-            "Business Grey Metall",
+            "Business Grey Metallic",
             "Lava Blue",
             "Magic Black",
             "Magnetic Brown",
@@ -12112,10 +12269,11 @@
           "name": "Altroz",
           "colors": [
             "Ember Glow",
-            "Pristine Whit",
+            "Pristine White",
             "Pure Grey",
             "Dune GLow",
-            "Royal Blue"
+            "Royal Blue",
+            "Royale Blue"
           ],
           "colour_families": [
             "White",
@@ -12235,11 +12393,11 @@
         {
           "name": "Curvv EV",
           "colors": [
-            "Virtual Sun",
+            "Virtual Sunrise",
             "Flame Red",
-            "Pristine Wh",
+            "Pristine White",
             "Pure Grey",
-            "Empowered O"
+            "Empowered Oxide"
           ],
           "colour_families": [
             "Red",
@@ -12307,7 +12465,9 @@
             "Sunlit Yellow",
             "Ash Gray",
             "Coral Red",
-            "Black"
+            "Black",
+            "Pebble Grey",
+            "Lunar White"
           ],
           "colour_families": [
             "White",
@@ -12339,7 +12499,10 @@
             "Nainital",
             "Pristine",
             "Pure Grey",
-            "Empowered"
+            "Empowered",
+            "Nainital Nocturne",
+            "Empowered Oxide",
+            "Pristine White"
           ],
           "colour_families": [
             "White",
@@ -12559,7 +12722,14 @@
             "Phantom Black",
             "Polar White",
             "Titan Grey",
-            "Typhoon Silver"
+            "Typhoon Silver",
+            "Calgary White",
+            "Pristine White",
+            "Daytona Grey",
+            "Flame Red",
+            "Pure Grey",
+            "Creative Ocean",
+            "Fearless Purple"
           ],
           "colour_families": [
             "White",
@@ -12590,7 +12760,10 @@
             "Daytona Grey",
             "Intensi Teal",
             "Ocean Blue",
-            "Purpal"
+            "Purpal",
+            "Intensi-Teal",
+            "Creative Ocean",
+            "Fearless Purple"
           ],
           "colour_families": [
             "White",
@@ -12622,7 +12795,12 @@
             "Daytona Grey",
             "Foliage Green",
             "Meteor Bronze",
-            "Atomic Orange"
+            "Atomic Orange",
+            "Caramel",
+            "Cyantafic Blue",
+            "Coorg Clouds",
+            "Bengal Rouge",
+            "Pristine White"
           ],
           "colour_families": [
             "White",
@@ -12684,7 +12862,9 @@
             "Cosmic Gold",
             "Galactic Sapphire",
             "Supernova Coper",
-            "Stellar Frost"
+            "Stellar Frost",
+            "Stealer Frost",
+            "Supernova Copper"
           ],
           "colour_families": [
             "White",
@@ -12880,7 +13060,12 @@
             "Tornado Blue",
             "Ocean Blue",
             "Pristine White",
-            "Supernova Coper"
+            "Supernova Coper",
+            "Pure Grey",
+            "Sobo Surge",
+            "Pangong Pulse",
+            "Varanasi Vibrance",
+            "Supernova Copper"
           ],
           "colour_families": [
             "White",
@@ -12909,7 +13094,11 @@
             "Teal Blue",
             "Pristine White",
             "Midnight Plum",
-            "Daytona Grey"
+            "Daytona Grey",
+            "Pure Grey",
+            "Pangong Pulse",
+            "Sobo Surge",
+            "Dehradun Dew"
           ],
           "colour_families": [
             "White",
@@ -12937,7 +13126,8 @@
             "Fire Red",
             "Foresta Green",
             "Cloudy Gray",
-            "Polar White"
+            "Polar White",
+            "Cloudy Grey"
           ],
           "colour_families": [],
           "body": "Hatchback",
@@ -12987,7 +13177,10 @@
           "colors": [
             "Daytona Grey",
             "Magnetic Red",
-            "Signature Teal Blue"
+            "Signature Teal Blue",
+            "Pristine White",
+            "Midnight Plum",
+            "Teal Blue"
           ],
           "colour_families": [
             "White",
@@ -13121,7 +13314,7 @@
             "Graphite",
             "Platinum White Pearl",
             "Silver Metallic",
-            "Precious Metal",
+            "Precious Metallic",
             "Emotional Red",
             "Dark Blue",
             "Cement Grey"
@@ -13237,13 +13430,14 @@
         {
           "name": "Fortuner",
           "colors": [
-            "Phantom Bro",
-            "Platinum Wh",
-            "Sparkling B",
+            "Phantom Brown",
+            "Platinum White Pearl",
+            "Sparkling Black",
             "Avant Garde",
-            "Attitude Bl",
-            "Silver Meta",
-            "Super White"
+            "Attitude Black",
+            "Silver Metallic",
+            "Super White",
+            "Avant-Garde Bronze"
           ],
           "colour_families": [
             "White",
@@ -13268,7 +13462,7 @@
         {
           "name": "Fortuner Legender",
           "colors": [
-            "Pl"
+            "Platinum White Pearl"
           ],
           "colour_families": [],
           "body": "Full-size SUV",
@@ -13317,7 +13511,9 @@
             "Emotional Red",
             "Grey Metallic",
             "Super White",
-            "Attitude Black"
+            "Attitude Black",
+            "White Pearl Crystal Shine",
+            "Black"
           ],
           "colour_families": [
             "White",
@@ -13346,10 +13542,13 @@
             "Garnet Red",
             "Grey",
             "Silver",
-            "Sparkling Black Crys",
+            "Sparkling Black Crystal",
             "Super white",
             "Attitude Black",
-            "White Pearl Crystal"
+            "White Pearl Crystal",
+            "Platinum White Pearl",
+            "Silver Metallic",
+            "Avant-Garde Bronze"
           ],
           "colour_families": [
             "White",
@@ -13373,12 +13572,15 @@
         {
           "name": "Innova Hycross",
           "colors": [
-            "Plati",
-            "Attit",
-            "Black",
-            "Silve",
+            "Platinum White Pearl",
+            "Attitude Black Mica",
+            "Blackish Ageha",
+            "Silver Metallic",
             "Super",
-            "Avant"
+            "Avant",
+            "Super White",
+            "Avant-Garde Bronze",
+            "Sparkling Black Pearl"
           ],
           "colour_families": [
             "White",
@@ -13526,7 +13728,8 @@
             "Cafe White",
             "Conic Grey",
             "Enticing Silver",
-            "Rustic Brown"
+            "Rustic Brown",
+            "Iconic Grey"
           ],
           "colour_families": [
             "White",
@@ -13639,8 +13842,10 @@
           "name": "Vellfire",
           "colors": [
             "Platinum White Pearl",
-            "Precious Metal",
-            "Black"
+            "Precious Metallic",
+            "Black",
+            "Silver Mica Metallic",
+            "New Pearl White"
           ],
           "colour_families": [
             "White",
@@ -13829,8 +14034,9 @@
           "colors": [
             "Oryx White",
             "Grenadilla",
-            "Moonstone G",
-            "Kings Red P"
+            "Moonstone Grey",
+            "Kings Red P",
+            "Grenadilla Black"
           ],
           "colour_families": [
             "Red",
@@ -13988,7 +14194,7 @@
             "Deep Black Pearl",
             "Petroleum Blue",
             "Habanero Orange",
-            "Platinum Gray Metall",
+            "Platinum Gray Metallic",
             "Pyrit Silver"
           ],
           "colour_families": [
@@ -14084,7 +14290,11 @@
             "Kings Red",
             "Oryx White",
             "Pure white",
-            "Reflex Silver"
+            "Reflex Silver",
+            "Grenadilla Black",
+            "Cipressino Green",
+            "Oyster Silver",
+            "Persimmon Red"
           ],
           "colour_families": [
             "White",

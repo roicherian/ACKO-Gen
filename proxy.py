@@ -257,6 +257,111 @@ def get_vehicle_reference_mime():
     return "image/jpeg"
 
 
+# Magnific only accepts these for reference_images[].mime_type
+_MAGNIFIC_REF_MIMES = frozenset({"image/png", "image/jpeg", "image/webp"})
+
+
+def sanitize_magnific_ref_mime(mime, data_uri=""):
+    """Normalize client mime aliases; infer from data URI when needed.
+    Returns a Magnific-safe mime or None if unrecoverable."""
+    m = (mime or "").split(";")[0].strip().lower()
+    if m in ("image/jpg", "image/pjpeg", "image/x-jpeg"):
+        m = "image/jpeg"
+    elif m == "image/x-png":
+        m = "image/png"
+    if m in _MAGNIFIC_REF_MIMES:
+        return m
+    uri = data_uri or ""
+    if uri.startswith("data:"):
+        try:
+            header = uri.split(",", 1)[0]  # data:image/jpeg;base64
+            raw = header[5:]  # strip "data:"
+            inferred = raw.split(";")[0].strip().lower()
+            if inferred in ("image/jpg", "image/pjpeg", "image/x-jpeg"):
+                inferred = "image/jpeg"
+            elif inferred == "image/x-png":
+                inferred = "image/png"
+            if inferred in _MAGNIFIC_REF_MIMES:
+                return inferred
+        except Exception:
+            pass
+    return None
+
+
+def sanitize_reference_images(refs):
+    """Drop / fix reference_images entries so Freepik does not 400 on mime_type."""
+    if not isinstance(refs, list):
+        return []
+    out = []
+    for item in refs:
+        if not isinstance(item, dict) or not item.get("image"):
+            continue
+        fixed = dict(item)
+        safe = sanitize_magnific_ref_mime(fixed.get("mime_type"), fixed.get("image") or "")
+        if not safe:
+            _log_gen_debug(
+                f"dropping ref with invalid mime_type={fixed.get('mime_type')!r}"
+            )
+            continue
+        fixed["mime_type"] = safe
+        out.append(fixed)
+    return out
+
+
+# Magnific/Freepik only accepts these for reference_images[].mime_type.
+_ALLOWED_REF_MIMES = frozenset({"image/png", "image/jpeg", "image/webp"})
+
+
+def sanitize_reference_mime(mime, data_uri=""):
+    """Normalize aliases (image/jpg → image/jpeg) and infer from data URI when needed.
+
+    Freepik returns HTTP 400 if mime_type is anything else (avif, heic, gif, empty…).
+    """
+    m = (mime or "").split(";")[0].strip().lower()
+    if m in ("image/jpg", "image/pjpeg", "image/x-jpeg"):
+        m = "image/jpeg"
+    elif m == "image/x-png":
+        m = "image/png"
+    if m in _ALLOWED_REF_MIMES:
+        return m
+    # Infer from data: URI header when client sent a bad/empty mime_type.
+    uri = data_uri or ""
+    if uri.startswith("data:"):
+        try:
+            header = uri.split(",", 1)[0]  # data:image/jpeg;base64
+            inferred = header[5:].split(";")[0].strip().lower()
+            if inferred in ("image/jpg", "image/pjpeg", "image/x-jpeg"):
+                inferred = "image/jpeg"
+            elif inferred == "image/x-png":
+                inferred = "image/png"
+            if inferred in _ALLOWED_REF_MIMES:
+                return inferred
+        except Exception:
+            pass
+    return ""
+
+
+def sanitize_reference_images(refs):
+    """Drop / repair reference_images entries so Magnific validation cannot 400 on mime."""
+    if not isinstance(refs, list):
+        return []
+    out = []
+    for item in refs:
+        if not isinstance(item, dict) or not item.get("image"):
+            continue
+        fixed = dict(item)
+        mime = sanitize_reference_mime(fixed.get("mime_type"), fixed.get("image") or "")
+        if not mime:
+            _log_gen_debug(
+                f"dropping ref with invalid mime={fixed.get('mime_type')!r} "
+                f"uri_prefix={(str(fixed.get('image') or ''))[:40]!r}"
+            )
+            continue
+        fixed["mime_type"] = mime
+        out.append(fixed)
+    return out
+
+
 ALLOWED_EMAIL_DOMAIN = "acko.tech"
 SESSION_TTL_SECONDS = 12 * 60 * 60  # 12 hours
 SESSION_SECRET_FILE = os.path.join(DATA_DIR, ".session_secret")
@@ -959,16 +1064,30 @@ class ProxyHandler(BaseHTTPRequestHandler):
                 ),
             }
             existing_refs = payload.get("reference_images")
-            extra = []
-            if isinstance(existing_refs, list):
-                for item in existing_refs:
-                    if isinstance(item, dict) and item.get("image"):
-                        extra.append(item)
+            client_sent_refs = isinstance(existing_refs, list) and any(
+                isinstance(x, dict) and x.get("image") for x in existing_refs
+            )
+            # Sanitize client model-identity refs (image/jpg → jpeg, etc.)
+            # before merging with Baleno/base — Freepik 400s on bad mime_type.
+            extra = sanitize_reference_images(existing_refs)
+            if client_sent_refs and not extra:
+                self.send_json(
+                    400,
+                    {
+                        "error": (
+                            "Model reference image has an unsupported mime_type "
+                            "(use PNG, JPEG, or WebP). Re-add the reference photo and try again."
+                        )
+                    },
+                )
+                return
             # Model-identity refs first (car design), then Baleno/base (camera). Cap 3.
             payload["reference_images"] = (extra[:2] + [base_ref])[:3]
             body_in = json.dumps(payload).encode()
+            mimes = [r.get("mime_type") for r in payload["reference_images"]]
             _log_gen_debug(
                 f"vehicle create refs={len(payload['reference_images'])} "
+                f"mimes={mimes} client_extra={len(extra)} "
                 f"body_bytes={len(body_in)} path={self.path}"
             )
 

@@ -1233,7 +1233,9 @@
         "Cumulus Gray",
         "Pearl White",
         "Perla Nera Black",
-        "Tijuca Blue"
+        "Tijuca Blue",
+        "Eclipse Blue",
+        "Cumulus Grey"
       ],
       "prompt": "A photorealistic studio image of a Citroen C5 Aircross in Blue, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -1833,7 +1835,8 @@
         "Lunar Silver Metalli",
         "Meteoroid Grey Metal",
         "Platinum White Pearl",
-        "Radiant Red Metallic"
+        "Radiant Red Metallic",
+        "Obsidian Blue Pearl"
       ],
       "prompt": "A photorealistic studio image of a Honda Amaze in Golden Brown Metalli, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -1888,7 +1891,8 @@
         "Meteoroid Grey Metal",
         "Obsidian Blue Pearl",
         "Platinum White Pearl",
-        "Rediant Red Metallic"
+        "Rediant Red Metallic",
+        "Radiant Red"
       ],
       "prompt": "A photorealistic studio image of a Honda City e:HEV in Lunar Silver Metalli, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -1935,7 +1939,8 @@
         "Lunar Silver Metalli",
         "Obsidian Blue Pearl",
         "Radiant Red Metallic",
-        "Radiant Red-Metallic"
+        "Radiant Red-Metallic",
+        "Meteoroid Gray"
       ],
       "prompt": "A photorealistic studio image of a Honda Elevate in Phoenix Orange Pearl, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -1943,15 +1948,15 @@
       "id": 125,
       "make": "Honda",
       "model": "Jazz",
-      "color": "Golden Brown Metalli",
+      "color": "Golden Brown Metallic",
       "colors": [
-        "Golden Brown Metalli",
-        "Lunar Silver Metalli",
-        "Modern Steel Metalli",
-        "Platinum White Pear",
+        "Golden Brown Metallic",
+        "Lunar Silver Metallic",
+        "Modern Steel Metallic",
+        "Platinum White Pearl",
         "Rediant Red Metallic"
       ],
-      "prompt": "A photorealistic studio image of a Honda Jazz in Golden Brown Metalli, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
+      "prompt": "A photorealistic studio image of a Honda Jazz in Golden Brown Metallic, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
     {
       "id": 126,
@@ -1972,16 +1977,16 @@
       "id": 127,
       "make": "Honda",
       "model": "WR-V",
-      "color": "Golden Brown Metalli",
+      "color": "Golden Brown Metallic",
       "colors": [
-        "Golden Brown Metalli",
-        "Lunar Silver Metalli",
-        "Modern Steel Metalli",
+        "Golden Brown Metallic",
+        "Lunar Silver Metallic",
+        "Modern Steel Metallic",
         "Platinum White Pearl",
-        "Premium Amber Metall",
+        "Premium Amber Metallic",
         "Rediant Red Metallic"
       ],
-      "prompt": "A photorealistic studio image of a Honda WR-V in Golden Brown Metalli, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
+      "prompt": "A photorealistic studio image of a Honda WR-V in Golden Brown Metallic, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
     {
       "id": 128,
@@ -2214,7 +2219,9 @@
         "Starry Night",
         "Abyss Black",
         "Thunder Blue",
-        "Titan Grey"
+        "Titan Grey",
+        "Pearl White",
+        "Blue-Black"
       ],
       "prompt": "A photorealistic studio image of a Hyundai i20 N Line in Blue Black, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -2229,7 +2236,11 @@
         "i20 Starry Night",
         "i20 Atlas White",
         "i20 Titan Grey",
-        "i20 Amazon Grey"
+        "i20 Amazon Grey",
+        "Titan Grey",
+        "Optic White",
+        "Midnight Black Pearl",
+        "Gravity Gold Matte"
       ],
       "prompt": "A photorealistic studio image of a Hyundai Ioniq 5 in i20 Fiery Red, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -2335,7 +2346,13 @@
         "Sunlit Yellow",
         "Ash Gray",
         "Coral Red",
-        "Black"
+        "Black",
+        "Titan Grey",
+        "Mystic Sapphire",
+        "Hazel Blue",
+        "Dragon Red",
+        "Atlas White",
+        "Abyss Black"
       ],
       "prompt": "A photorealistic studio image of a Hyundai Venue in Oberon Black, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -2348,7 +2365,12 @@
         "Nexa Blue",
         "Majestic Silver",
         "Mystic White",
-        "Stellar Bronze"
+        "Stellar Bronze",
+        "Titan Grey",
+        "Hazel Blue",
+        "Dragon Red",
+        "Atlas White",
+        "Abyss Black"
       ],
       "prompt": "A photorealistic studio image of a Hyundai Venue N Line in Nexa Blue, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -2363,8 +2385,11 @@
         "Starry Night",
         "Atlas White",
         "Titan Grey",
-        "Tellurian Brow",
-        "Abyss Black"
+        "Tellurian Brown",
+        "Abyss Black",
+        "Titanium Black",
+        "Classy Blue",
+        "Titan Grey (Matte & regular)"
       ],
       "prompt": "A photorealistic studio image of a Hyundai Verna in Fiery Red, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -2605,7 +2630,7 @@
         "Brilliant Black",
         "Grigo Magnesio Grey",
         "Exotica Red",
-        "Techno Metallic Gree",
+        "Techno Metallic Green",
         "Silvery Moon"
       ],
       "prompt": "A photorealistic studio image of a Jeep Compass in Galaxy Blue, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
@@ -2617,9 +2642,10 @@
       "color": "Rocky",
       "colors": [
         "Rocky",
-        "Diamo",
-        "Velve",
-        "Brigh"
+        "Diamond Black Crystal",
+        "Velvet Red",
+        "Bright White",
+        "Rocky Mountain"
       ],
       "prompt": "A photorealistic studio image of a Jeep Grand Cherokee in Rocky, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -2637,7 +2663,9 @@
         "Brilliant Black",
         "magnesio Grey",
         "Pearl White",
-        "Techno Metallic Gree"
+        "Techno Metallic Green",
+        "Brilliant Blue",
+        "Silvery Moon"
       ],
       "prompt": "A photorealistic studio image of a Jeep Meridian in Velvet Red, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -2651,7 +2679,10 @@
         "Bright White",
         "Fire Cracker Red",
         "Galaxy Blue",
-        "Granite Crystal"
+        "Granite Crystal",
+        "Billet Silver",
+        "Deep Cherry Red",
+        "Techno Metallic Green"
       ],
       "prompt": "A photorealistic studio image of a Jeep Wrangler in Black, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -2666,7 +2697,10 @@
         "Intense Red",
         "Gravity Gray",
         "Imperial Blue",
-        "Sparkling Silver"
+        "Sparkling Silver",
+        "Clear White",
+        "Gravity Grey",
+        "Moss Brown"
       ],
       "prompt": "A photorealistic studio image of a Kia Carens in Aurora Black Pearl, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -2674,17 +2708,20 @@
       "id": 172,
       "make": "Kia",
       "model": "Carens Clavis",
-      "color": "Glacie",
+      "color": "Glacier White Pearl",
       "colors": [
-        "Glacie",
-        "Sparkl",
+        "Glacier White Pearl",
+        "Sparkling Silver",
         "Ivory",
         "Pewter",
         "Aurora",
-        "Imperi",
-        "Gravit"
+        "Imperial Blue",
+        "Gravity Gray",
+        "Pewter Olive",
+        "Aurora Black Pearl",
+        "Ivory Silver Matte"
       ],
-      "prompt": "A photorealistic studio image of a Kia Carens Clavis in Glacie, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
+      "prompt": "A photorealistic studio image of a Kia Carens Clavis in Glacier White Pearl, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
     {
       "id": 173,
@@ -2709,7 +2746,8 @@
       "colors": [
         "Aurora Black Pearl",
         "Glacier White Pearl",
-        "Steel Silver"
+        "Steel Silver",
+        "Fusion Black"
       ],
       "prompt": "A photorealistic studio image of a Kia Carnival in Aurora Black Pearl, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -2731,15 +2769,16 @@
       "id": 176,
       "make": "Kia",
       "model": "EV9",
-      "color": "Panthera Metal",
+      "color": "Panthera Metallic",
       "colors": [
-        "Panthera Metal",
+        "Panthera Metallic",
         "Pebble Gray",
         "Aurora Black Pearl",
         "Snow White Pearl",
-        "Ocean Blue Pearl"
+        "Ocean Blue Pearl",
+        "Pebble Grey"
       ],
-      "prompt": "A photorealistic studio image of a Kia EV9 in Panthera Metal, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
+      "prompt": "A photorealistic studio image of a Kia EV9 in Panthera Metallic, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
     {
       "id": 177,
@@ -2753,7 +2792,12 @@
         "Intense Red",
         "Sparkling Silver",
         "Gravity Gray",
-        "Imperial Blue"
+        "Imperial Blue",
+        "Matte Graphite",
+        "Ivory Silver Matte",
+        "Magma Red",
+        "Morning Haze",
+        "Frost Blue"
       ],
       "prompt": "A photorealistic studio image of a Kia Seltos in Pewter Olive, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -2768,7 +2812,11 @@
         "Glacier White Pearl",
         "Gravity Gray",
         "Intelligence Blue",
-        "Intense Red"
+        "Intense Red",
+        "Sparkling Silver",
+        "Gravity Grey",
+        "Imperial Blue",
+        "Pewter Olive"
       ],
       "prompt": "A photorealistic studio image of a Kia Sonet in Aurora Black Pearl, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -2785,7 +2833,8 @@
         "Frost Blue",
         "Aurora Black Pearl",
         "Imperial Blue",
-        "Gravity Gray"
+        "Gravity Gray",
+        "Gravity Grey"
       ],
       "prompt": "A photorealistic studio image of a Kia Syros in Glacier White Pearl, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -3112,7 +3161,8 @@
         "Firestorm Orange",
         "Napoli Black",
         "Desert Myst Satin",
-        "Everest White Satin"
+        "Everest White Satin",
+        "Stealth Black"
       ],
       "prompt": "A photorealistic studio image of a Mahindra BE 6 in Everest White, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -3123,7 +3173,9 @@
       "color": "Diamond White",
       "colors": [
         "Diamond White",
-        "Dsat Silver"
+        "Dsat Silver",
+        "Rocky Beige",
+        "Stealth Black"
       ],
       "prompt": "A photorealistic studio image of a Mahindra Bolero in Diamond White, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -3157,7 +3209,11 @@
         "Diamond White",
         "Highway Red",
         "Majestic Silver",
-        "Napoli Black"
+        "Napoli Black",
+        "Jeans Blue",
+        "Concrete Grey",
+        "Pearl White",
+        "Stealth Black"
       ],
       "prompt": "A photorealistic studio image of a Mahindra Bolero Neo in Rocky Beige, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -3167,7 +3223,10 @@
       "model": "Bolero Neo Plus",
       "color": "White",
       "colors": [
-        "White"
+        "White",
+        "Diamond White",
+        "Majestic Silver",
+        "Napoli Black"
       ],
       "prompt": "A photorealistic studio image of a Mahindra Bolero Neo Plus in White, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -3315,7 +3374,7 @@
         "Designer Grey",
         "Fiery Orange",
         "Flamboyant Red",
-        "Flamboyant Red & Met",
+        "Flamboyant Red & Metallic",
         "Midnight black",
         "Pearl White",
         "Dazzling Silver & Me"
@@ -3364,7 +3423,8 @@
         "Iceberg White",
         "Mariner Maroon",
         "Oceanic Black",
-        "Shimmering Silver"
+        "Shimmering Silver",
+        "Poseidon Purple"
       ],
       "prompt": "A photorealistic studio image of a Mahindra Marazzo in Aqua Marine, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -3490,7 +3550,12 @@
         "Black",
         "Dsat Silver",
         "Molten Red Rage",
-        "Pearl White"
+        "Pearl White",
+        "Stealth Black",
+        "Red Rage",
+        "Galaxy Grey",
+        "Everest White",
+        "Diamond White"
       ],
       "prompt": "A photorealistic studio image of a Mahindra Scorpio Classic in Black, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -3506,7 +3571,9 @@
         "Grand Canyon",
         "Napoli Black",
         "Red Rage",
-        "Midnight Black"
+        "Midnight Black",
+        "Valyrian Silver",
+        "Stealth Black"
       ],
       "prompt": "A photorealistic studio image of a Mahindra Scorpio-N in Deep Forest, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -3537,7 +3604,11 @@
         "Blazing Bronze",
         "Everest White",
         "Galaxy Grey",
-        "Napoli Black"
+        "Napoli Black",
+        "Tango Red",
+        "Stealth Black",
+        "Battleship Grey Black",
+        "Deep Forest"
       ],
       "prompt": "A photorealistic studio image of a Mahindra Thar in Red Rage, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -3553,7 +3624,13 @@
         "Battleship Gray",
         "Deep Forest",
         "Tango Red",
-        "Burnt Sienna"
+        "Burnt Sienna",
+        "Burnt Sienna Black",
+        "Battleship Grey Black",
+        "Nebula Blue Black",
+        "Deep Forest Black",
+        "Everest White Black",
+        "Tango Red Black"
       ],
       "prompt": "A photorealistic studio image of a Mahindra Thar Roxx in Everest White, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -3674,7 +3751,9 @@
         "Dune Beige Plus Stea",
         "Nebula Blue Plus Gal",
         "Galaxy Grey Plus Ste",
-        "Tango Red Plus Steal"
+        "Tango Red Plus Steal",
+        "Deep Forest",
+        "Citrine Yellow"
       ],
       "prompt": "A photorealistic studio image of a Mahindra XUV 3XO in Dune Beige, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -3751,8 +3830,8 @@
       "colors": [
         "Everest White",
         "Electic Blue",
-        "Dazzling Silv",
-        "Midnight Blac",
+        "Dazzling Silver",
+        "Midnight Black",
         "Red Rage Dt",
         "Electric Blue",
         "Red Rage",
@@ -3869,7 +3948,11 @@
         "Metallic Sizzling Re",
         "Metallic Speedy Blue",
         "Premium Earth Gold",
-        "Solid White"
+        "Solid White",
+        "Silky Silver",
+        "Earth Gold",
+        "Sizzling Red",
+        "Granite Grey"
       ],
       "prompt": "A photorealistic studio image of a Maruti Suzuki Alto K10 in Metallic Granite Gre, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -3881,7 +3964,7 @@
       "colors": [
         "Pearl Arctic White",
         "Pearl Phoenix Red",
-        "Metallic Premium sil",
+        "Metallic Premium Silver",
         "Blue"
       ],
       "prompt": "A photorealistic studio image of a Maruti Suzuki Baleno in Pearl Arctic White, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
@@ -3897,7 +3980,8 @@
         "Exuberant Blue",
         "Magma Grey",
         "Pearl Arctic White",
-        "Splendid Silver"
+        "Splendid Silver",
+        "Pearl Midnight Black"
       ],
       "prompt": "A photorealistic studio image of a Maruti Suzuki Brezza in Sizzling Red, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -3911,7 +3995,12 @@
         "Arctic White",
         "Blazing Red",
         "Silky silver",
-        "Tango Orange"
+        "Tango Orange",
+        "Speedy Blue",
+        "Fire Red",
+        "Caffeine Brown",
+        "White",
+        "Glistening Grey"
       ],
       "prompt": "A photorealistic studio image of a Maruti Suzuki Celerio in Torque Blue, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -3923,11 +4012,18 @@
       "colors": [
         "Magma Grey",
         "Nexa Blue",
-        "Pearl Metallic Digni",
+        "Pearl Metallic Dignity",
         "Pearl Midnight Black",
         "Pearl Sangria Red",
         "Pearl Snow White",
-        "Silver Metalic"
+        "Silver Metalic",
+        "Premium Silver",
+        "Dignity Brown",
+        "Sangria Red",
+        "Midnight Black",
+        "Magma Gray",
+        "Snow White",
+        "Silver Metallic"
       ],
       "prompt": "A photorealistic studio image of a Maruti Suzuki Ciaz in Magma Grey, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -3972,7 +4068,10 @@
         "Metallic Glistening",
         "Metallic silky silve",
         "Pearl Midnight Black",
-        "Solid White"
+        "Solid White",
+        "Glistening Grey",
+        "Silky Silver",
+        "Cerulean Blue"
       ],
       "prompt": "A photorealistic studio image of a Maruti Suzuki Eeco in Breeze Blue, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -3983,10 +4082,16 @@
       "color": "Pearl Arctic White",
       "colors": [
         "Pearl Arctic White",
-        "Metallic silky silve",
+        "Metallic silky Silver",
         "Pearl Metallic Aubur",
-        "Pearl Metallic Oxfor",
-        "Metallic Magma Grey"
+        "Pearl Metallic Oxford",
+        "Metallic Magma Grey",
+        "Bluish Black",
+        "Dignity Brown",
+        "Oxford Blue",
+        "Auburn Red",
+        "Magma Grey",
+        "Splendid Silver"
       ],
       "prompt": "A photorealistic studio image of a Maruti Suzuki Ertiga in Pearl Arctic White, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -4034,7 +4139,8 @@
         "Earthen Brown",
         "Grandeur Grey",
         "Opulent Red",
-        "Splendid Silver"
+        "Splendid Silver",
+        "Bluish Black"
       ],
       "prompt": "A photorealistic studio image of a Maruti Suzuki Fronx in Nexa Blue, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -4042,9 +4148,9 @@
       "id": 261,
       "make": "Maruti Suzuki",
       "model": "Grand Vitara",
-      "color": "Arctic White Midnigh",
+      "color": "Arctic White Midnight",
       "colors": [
-        "Arctic White Midnigh",
+        "Arctic White Midnight",
         "Arctic White",
         "Chestnut Brown",
         "Grandeur Grey",
@@ -4052,10 +4158,12 @@
         "Nexa Blue",
         "Opulent Red",
         "Opulent Red Midnight",
-        "Splendid Silver Midn",
-        "Splendid Silver"
+        "Splendid Silver Midnight",
+        "Splendid Silver",
+        "Celestial Blue",
+        "Granite Grey"
       ],
-      "prompt": "A photorealistic studio image of a Maruti Suzuki Grand Vitara in Arctic White Midnigh, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
+      "prompt": "A photorealistic studio image of a Maruti Suzuki Grand Vitara in Arctic White Midnight, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
     {
       "id": 262,
@@ -4083,7 +4191,9 @@
         "Lucent Orange",
         "Pearl White",
         "Silky silver",
-        "Turquoise Blue"
+        "Turquoise Blue",
+        "Pearl Arctic White",
+        "Bluish Black"
       ],
       "prompt": "A photorealistic studio image of a Maruti Suzuki Ignis in Nexa Blue, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -4186,7 +4296,11 @@
         "Metallic silky silve",
         "Pearl Starry Blue",
         "Solid Fire Red",
-        "Solid Sizzle Orange"
+        "Solid Sizzle Orange",
+        "Sizzle Orange",
+        "Granite Grey",
+        "Silky Silver",
+        "Solid Superior White"
       ],
       "prompt": "A photorealistic studio image of a Maruti Suzuki S-Presso in Metallic Graphite Gr, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -4197,13 +4311,19 @@
       "color": "Pearl Arctic White",
       "colors": [
         "Pearl Arctic White",
-        "Pearl Metallic Lucen",
+        "Pearl Metallic Lucent",
         "Pearl Arctic White P",
-        "Metallic silky silve",
+        "Metallic silky Silver",
         "Pearl Arctic White M",
         "Solid Fire Red",
-        "Pearl Metallic Midni",
-        "Metallic Magma Grey"
+        "Pearl Metallic Midnight",
+        "Metallic Magma Grey",
+        "Splendid Silver",
+        "Magna Grey",
+        "Novel Orange",
+        "Luster Blue",
+        "Bluish Black",
+        "Sizzling Red"
       ],
       "prompt": "A photorealistic studio image of a Maruti Suzuki Swift in Pearl Arctic White, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -4275,10 +4395,12 @@
       "colors": [
         "Silky silver",
         "Poolside Blue",
-        "Pearl Metallic Nutme",
+        "Pearl Metallic Nutmeg",
         "Solid White",
         "Prime-Gallant-Red",
-        "Magma Grey"
+        "Magma Grey",
+        "Gallant Red",
+        "Nutmeg Brown"
       ],
       "prompt": "A photorealistic studio image of a Maruti Suzuki Wagon R in Silky silver, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -4293,7 +4415,11 @@
         "Brave Khaki",
         "Megma Grey",
         "Nexa Blue",
-        "Premium Silver"
+        "Premium Silver",
+        "Arctic White",
+        "Opulent Red",
+        "Grandeur Grey",
+        "Splendid Silver"
       ],
       "prompt": "A photorealistic studio image of a Maruti Suzuki XL6 in Artic White, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -4950,7 +5076,9 @@
         "Dune Brown",
         "Glaze Red",
         "Havana Grey",
-        "Starry Black"
+        "Starry Black",
+        "Celadon Blue",
+        "Pearl White"
       ],
       "prompt": "A photorealistic studio image of a MG Hector / Hector Plus in Aurora Silver, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -4983,16 +5111,19 @@
       "id": 322,
       "make": "MG",
       "model": "Windsor EV",
-      "color": "Pearl Whi",
+      "color": "Pearl White",
       "colors": [
-        "Pearl Whi",
+        "Pearl White",
         "Turquoise",
-        "Aurora Si",
+        "Aurora Silver",
         "Starburst",
         "Glaze Red",
-        "Celadon B"
+        "Celadon Blue",
+        "Clay Beige",
+        "Turquoise Green",
+        "Starburst Black"
       ],
-      "prompt": "A photorealistic studio image of a MG Windsor EV in Pearl Whi, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
+      "prompt": "A photorealistic studio image of a MG Windsor EV in Pearl White, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
     {
       "id": 323,
@@ -5004,7 +5135,11 @@
         "Currant Red",
         "Ashen Silver",
         "Ferris White",
-        "Sable Black"
+        "Sable Black",
+        "Candy White",
+        "Starry Black",
+        "Aurora Silver",
+        "Glaze Red"
       ],
       "prompt": "A photorealistic studio image of a MG ZS EV in Blue, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -5229,7 +5364,7 @@
       "colors": [
         "Black Metallic",
         "Blue Racing",
-        "Gun Metalli",
+        "Gun Metallic",
         "Katsura Orange",
         "Pearl White",
         "Ultimate Silver",
@@ -5256,16 +5391,20 @@
       "id": 339,
       "make": "Nissan",
       "model": "Magnite",
-      "color": "Copper Orang",
+      "color": "Copper Orange",
       "colors": [
-        "Copper Orang",
+        "Copper Orange",
         "Blade Silver",
         "Onyx Black",
         "Vivid Blue &",
         "Pearl White",
-        "Fire Granet"
+        "Fire Granet",
+        "Sunrise Copper Orange",
+        "Storm White",
+        "Metallic Grey",
+        "Flare Garnet Red"
       ],
-      "prompt": "A photorealistic studio image of a Nissan Magnite in Copper Orang, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
+      "prompt": "A photorealistic studio image of a Nissan Magnite in Copper Orange, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
     {
       "id": 340,
@@ -5351,7 +5490,8 @@
         "Diamond Black",
         "Diamond Silver",
         "Pearl White",
-        "Sapphire Blue"
+        "Sapphire Blue",
+        "Champagne Silver"
       ],
       "prompt": "A photorealistic studio image of a Nissan X Trail in Bronze, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -5574,17 +5714,21 @@
       "id": 359,
       "make": "Renault",
       "model": "Duster",
-      "color": "Caspian Blue Metalli",
+      "color": "Caspian Blue Metallic",
       "colors": [
-        "Caspian Blue Metalli",
+        "Caspian Blue Metallic",
         "Cayenne Orange",
         "Mahogany Brown",
         "Moonlight Silver",
         "Outback Bronze",
         "Pearl White",
-        "Slate Grey"
+        "Slate Grey",
+        "Sunset Red",
+        "Stealth Black",
+        "River Blue",
+        "Mountain Jade Green"
       ],
-      "prompt": "A photorealistic studio image of a Renault Duster in Caspian Blue Metalli, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
+      "prompt": "A photorealistic studio image of a Renault Duster in Caspian Blue Metallic, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
     {
       "id": 360,
@@ -5612,7 +5756,8 @@
         "Caspian Blue",
         "Ice Cool White",
         "Mahogany Brown",
-        "Moonlight Silver"
+        "Moonlight Silver",
+        "Stealth Black"
       ],
       "prompt": "A photorealistic studio image of a Renault Kiger in Radiant Red, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -5644,7 +5789,8 @@
         "Moonlight Silver",
         "Zanskar Blue",
         "Zanskar Blue Black R",
-        "Outback Bronze"
+        "Outback Bronze",
+        "Electric Blue"
       ],
       "prompt": "A photorealistic studio image of a Renault Kwid in Fiery Red, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -5704,7 +5850,10 @@
         "Ice Cool White",
         "Cedar Brown",
         "Stealth Black",
-        "Metal Mustard"
+        "Metal Mustard",
+        "Amber Terracotta",
+        "Shadow Grey",
+        "Zanskar Blue"
       ],
       "prompt": "A photorealistic studio image of a Renault Triber in Moonlight Silver, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -5831,7 +5980,8 @@
         "Magic Black",
         "Graphite Grey",
         "Race Blue",
-        "Velvet Red"
+        "Velvet Red",
+        "Black Magic"
       ],
       "prompt": "A photorealistic studio image of a Skoda Kodiaq in Steel Grey, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -5861,7 +6011,12 @@
         "Brilliant Silver",
         "Candy White",
         "Onyx",
-        "Tornado-Red-With-Car"
+        "Tornado-Red-With-Car",
+        "Steel Grey",
+        "Shimla Green",
+        "Cherry Red",
+        "Deep Black",
+        "Lava Blue"
       ],
       "prompt": "A photorealistic studio image of a Skoda Kushaq in Honey Orange, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -5869,9 +6024,9 @@
       "id": 378,
       "make": "Skoda",
       "model": "Kylaq",
-      "color": "Brilliant Silv",
+      "color": "Brilliant Silver",
       "colors": [
-        "Brilliant Silv",
+        "Brilliant Silver",
         "Lava Blue",
         "Olive Gold",
         "Carbon Steel",
@@ -5879,7 +6034,7 @@
         "Tornado Red",
         "Candy White"
       ],
-      "prompt": "A photorealistic studio image of a Skoda Kylaq in Brilliant Silv, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
+      "prompt": "A photorealistic studio image of a Skoda Kylaq in Brilliant Silver, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
     {
       "id": 379,
@@ -5950,7 +6105,9 @@
         "Tornado Red",
         "Toreador Red",
         "Brilliant Silver",
-        "Platinum White Pearl"
+        "Platinum White Pearl",
+        "Lava Blue",
+        "Deep Black"
       ],
       "prompt": "A photorealistic studio image of a Skoda Slavia in Crystal Blue, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -5958,9 +6115,9 @@
       "id": 384,
       "make": "Skoda",
       "model": "Superb",
-      "color": "Business Grey Metall",
+      "color": "Business Grey Metallic",
       "colors": [
-        "Business Grey Metall",
+        "Business Grey Metallic",
         "Lava Blue",
         "Magic Black",
         "Magnetic Brown",
@@ -5968,7 +6125,7 @@
         "Brilliant Silver",
         "Graphite Grey"
       ],
-      "prompt": "A photorealistic studio image of a Skoda Superb in Business Grey Metall, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
+      "prompt": "A photorealistic studio image of a Skoda Superb in Business Grey Metallic, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
     {
       "id": 385,
@@ -6025,10 +6182,11 @@
       "color": "Ember Glow",
       "colors": [
         "Ember Glow",
-        "Pristine Whit",
+        "Pristine White",
         "Pure Grey",
         "Dune GLow",
-        "Royal Blue"
+        "Royal Blue",
+        "Royale Blue"
       ],
       "prompt": "A photorealistic studio image of a Tata Altroz in Ember Glow, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -6082,15 +6240,15 @@
       "id": 392,
       "make": "Tata",
       "model": "Curvv EV",
-      "color": "Virtual Sun",
+      "color": "Virtual Sunrise",
       "colors": [
-        "Virtual Sun",
+        "Virtual Sunrise",
         "Flame Red",
-        "Pristine Wh",
+        "Pristine White",
         "Pure Grey",
-        "Empowered O"
+        "Empowered Oxide"
       ],
-      "prompt": "A photorealistic studio image of a Tata Curvv EV in Virtual Sun, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
+      "prompt": "A photorealistic studio image of a Tata Curvv EV in Virtual Sunrise, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
     {
       "id": 393,
@@ -6122,7 +6280,9 @@
         "Sunlit Yellow",
         "Ash Gray",
         "Coral Red",
-        "Black"
+        "Black",
+        "Pebble Grey",
+        "Lunar White"
       ],
       "prompt": "A photorealistic studio image of a Tata Harrier in Oberon Black, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -6135,7 +6295,10 @@
         "Nainital",
         "Pristine",
         "Pure Grey",
-        "Empowered"
+        "Empowered",
+        "Nainital Nocturne",
+        "Empowered Oxide",
+        "Pristine White"
       ],
       "prompt": "A photorealistic studio image of a Tata Harrier EV in Nainital, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -6245,7 +6408,14 @@
         "Phantom Black",
         "Polar White",
         "Titan Grey",
-        "Typhoon Silver"
+        "Typhoon Silver",
+        "Calgary White",
+        "Pristine White",
+        "Daytona Grey",
+        "Flame Red",
+        "Pure Grey",
+        "Creative Ocean",
+        "Fearless Purple"
       ],
       "prompt": "A photorealistic studio image of a Tata Nexon in Fiery Red, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -6261,7 +6431,10 @@
         "Daytona Grey",
         "Intensi Teal",
         "Ocean Blue",
-        "Purpal"
+        "Purpal",
+        "Intensi-Teal",
+        "Creative Ocean",
+        "Fearless Purple"
       ],
       "prompt": "A photorealistic studio image of a Tata Nexon EV in Pristine White, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -6278,7 +6451,12 @@
         "Daytona Grey",
         "Foliage Green",
         "Meteor Bronze",
-        "Atomic Orange"
+        "Atomic Orange",
+        "Caramel",
+        "Cyantafic Blue",
+        "Coorg Clouds",
+        "Bengal Rouge",
+        "Pristine White"
       ],
       "prompt": "A photorealistic studio image of a Tata Punch in Tornado Blue, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -6310,7 +6488,9 @@
         "Cosmic Gold",
         "Galactic Sapphire",
         "Supernova Coper",
-        "Stellar Frost"
+        "Stellar Frost",
+        "Stealer Frost",
+        "Supernova Copper"
       ],
       "prompt": "A photorealistic studio image of a Tata Safari in Oberon Black, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -6409,7 +6589,12 @@
         "Tornado Blue",
         "Ocean Blue",
         "Pristine White",
-        "Supernova Coper"
+        "Supernova Coper",
+        "Pure Grey",
+        "Sobo Surge",
+        "Pangong Pulse",
+        "Varanasi Vibrance",
+        "Supernova Copper"
       ],
       "prompt": "A photorealistic studio image of a Tata Tiago in Arizona Blue, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -6423,7 +6608,11 @@
         "Teal Blue",
         "Pristine White",
         "Midnight Plum",
-        "Daytona Grey"
+        "Daytona Grey",
+        "Pure Grey",
+        "Pangong Pulse",
+        "Sobo Surge",
+        "Dehradun Dew"
       ],
       "prompt": "A photorealistic studio image of a Tata Tiago EV in Tropical Mist, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -6436,7 +6625,8 @@
         "Fire Red",
         "Foresta Green",
         "Cloudy Gray",
-        "Polar White"
+        "Polar White",
+        "Cloudy Grey"
       ],
       "prompt": "A photorealistic studio image of a Tata Tiago NRG in Fire Red, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -6465,7 +6655,10 @@
       "colors": [
         "Daytona Grey",
         "Magnetic Red",
-        "Signature Teal Blue"
+        "Signature Teal Blue",
+        "Pristine White",
+        "Midnight Plum",
+        "Teal Blue"
       ],
       "prompt": "A photorealistic studio image of a Tata Tigor EV in Daytona Grey, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -6526,7 +6719,7 @@
         "Graphite",
         "Platinum White Pearl",
         "Silver Metallic",
-        "Precious Metal",
+        "Precious Metallic",
         "Emotional Red",
         "Dark Blue",
         "Cement Grey"
@@ -6582,27 +6775,28 @@
       "id": 424,
       "make": "Toyota",
       "model": "Fortuner",
-      "color": "Phantom Bro",
+      "color": "Phantom Brown",
       "colors": [
-        "Phantom Bro",
-        "Platinum Wh",
-        "Sparkling B",
+        "Phantom Brown",
+        "Platinum White Pearl",
+        "Sparkling Black",
         "Avant Garde",
-        "Attitude Bl",
-        "Silver Meta",
-        "Super White"
+        "Attitude Black",
+        "Silver Metallic",
+        "Super White",
+        "Avant-Garde Bronze"
       ],
-      "prompt": "A photorealistic studio image of a Toyota Fortuner in Phantom Bro, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
+      "prompt": "A photorealistic studio image of a Toyota Fortuner in Phantom Brown, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
     {
       "id": 425,
       "make": "Toyota",
       "model": "Fortuner Legender",
-      "color": "Pl",
+      "color": "Platinum White Pearl",
       "colors": [
-        "Pl"
+        "Platinum White Pearl"
       ],
-      "prompt": "A photorealistic studio image of a Toyota Fortuner Legender in Pl, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
+      "prompt": "A photorealistic studio image of a Toyota Fortuner Legender in Platinum White Pearl, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
     {
       "id": 426,
@@ -6628,7 +6822,9 @@
         "Emotional Red",
         "Grey Metallic",
         "Super White",
-        "Attitude Black"
+        "Attitude Black",
+        "White Pearl Crystal Shine",
+        "Black"
       ],
       "prompt": "A photorealistic studio image of a Toyota Hilux in White Pearl Crystal, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -6642,10 +6838,13 @@
         "Garnet Red",
         "Grey",
         "Silver",
-        "Sparkling Black Crys",
+        "Sparkling Black Crystal",
         "Super white",
         "Attitude Black",
-        "White Pearl Crystal"
+        "White Pearl Crystal",
+        "Platinum White Pearl",
+        "Silver Metallic",
+        "Avant-Garde Bronze"
       ],
       "prompt": "A photorealistic studio image of a Toyota Innova Crysta in Avant garde bronze, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -6653,16 +6852,19 @@
       "id": 429,
       "make": "Toyota",
       "model": "Innova Hycross",
-      "color": "Plati",
+      "color": "Platinum White Pearl",
       "colors": [
-        "Plati",
-        "Attit",
-        "Black",
-        "Silve",
+        "Platinum White Pearl",
+        "Attitude Black Mica",
+        "Blackish Ageha",
+        "Silver Metallic",
         "Super",
-        "Avant"
+        "Avant",
+        "Super White",
+        "Avant-Garde Bronze",
+        "Sparkling Black Pearl"
       ],
-      "prompt": "A photorealistic studio image of a Toyota Innova Hycross in Plati, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
+      "prompt": "A photorealistic studio image of a Toyota Innova Hycross in Platinum White Pearl, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
     {
       "id": 430,
@@ -6733,7 +6935,8 @@
         "Cafe White",
         "Conic Grey",
         "Enticing Silver",
-        "Rustic Brown"
+        "Rustic Brown",
+        "Iconic Grey"
       ],
       "prompt": "A photorealistic studio image of a Toyota Rumion in Spunky Blue, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -6787,8 +6990,10 @@
       "color": "Platinum White Pearl",
       "colors": [
         "Platinum White Pearl",
-        "Precious Metal",
-        "Black"
+        "Precious Metallic",
+        "Black",
+        "Silver Mica Metallic",
+        "New Pearl White"
       ],
       "prompt": "A photorealistic studio image of a Toyota Vellfire in Platinum White Pearl, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -6875,8 +7080,9 @@
       "colors": [
         "Oryx White",
         "Grenadilla",
-        "Moonstone G",
-        "Kings Red P"
+        "Moonstone Grey",
+        "Kings Red P",
+        "Grenadilla Black"
       ],
       "prompt": "A photorealistic studio image of a Volkswagen Golf GTI in Oryx White, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
@@ -6951,7 +7157,7 @@
         "Deep Black Pearl",
         "Petroleum Blue",
         "Habanero Orange",
-        "Platinum Gray Metall",
+        "Platinum Gray Metallic",
         "Pyrit Silver"
       ],
       "prompt": "A photorealistic studio image of a Volkswagen T-Roc in Kurkuma Yellow, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
@@ -7002,7 +7208,11 @@
         "Kings Red",
         "Oryx White",
         "Pure white",
-        "Reflex Silver"
+        "Reflex Silver",
+        "Grenadilla Black",
+        "Cipressino Green",
+        "Oyster Silver",
+        "Persimmon Red"
       ],
       "prompt": "A photorealistic studio image of a Volkswagen Tiguan in Nightshade Blue, shot from the driver-side front 3/4 angle, matching the exact camera angle, height, and perspective of the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] . The car's wheel/tyre angle must remain perfectly straight — do not turn, angle, or steer the front wheels; match the reference image's tyre orientation strictly exactly. Lighting must replicate the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] : same direction, softness, and intensity of light and highlights on the body panels. Include a realistic, soft-edged contact shadow directly beneath the car where the tyres meet the ground, consistent with the lighting direction in the @[0a99b260-c95c-4535-9af7-b8e4e90b8825:Honda Car Reference:output] strictly — no floating car, no hard black blob shadow. Remove the number plate (front and rear) and leave that area clean/blank as if no plate was ever fitted. Keep all badges, logos, and emblems (grille logo, wheel center caps, model badging) . The background must be completely transparent — true alpha transparency, no white, no gray, no checkerboard pattern baked into the image, no floor, no wall, no gradient, nothing except the car and its ground shadow. Ultra-realistic automotive photography style, sharp focus, accurate reflections on paint and glass, correct tyre and rim detail, natural paint texture. keep all the details very strictly and prompt"
     },
