@@ -1,0 +1,48 @@
+/* styles/fonts.css */
+@font-face {
+    font-family: 'EuclidCircular';
+    src: url('https://acko-cms.ackoassets.com/Euclid_Circular_B_Light_300_Web_S_98f622553b.woff2') format('woff2');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: 'EuclidCircular';
+    src: url('https://acko-cms.ackoassets.com/Euclid_Circular_B_Regular_400_Web_S_a31e7a3455.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: 'EuclidCircular';
+    src: url('https://acko-cms.ackoassets.com/Euclid_Circular_B_Medium_500_Web_S_bf3c7fb713.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: 'EuclidCircular';
+    src: url('https://acko-cms.ackoassets.com/Euclid_Circular_B_Semibold_600_Web_S_0f96e67491.woff2') format('woff2');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: 'EuclidCircular';
+    src: url('https://acko-cms.ackoassets.com/Euclid_Circular_B_Bold_700_Web_S_186a4f5fbd.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  :root {
+    --font-family: 'EuclidCircular', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  html, body {
+    font-family: var(--font-family);
+  }
+  

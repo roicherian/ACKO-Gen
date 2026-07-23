@@ -31,6 +31,61 @@ ENV_FILE = os.path.join(HTML_DIR, ".env")
 # Defaults to living alongside the code, which is fine for local dev.
 DATA_DIR = os.environ.get("DATA_DIR", HTML_DIR)
 os.makedirs(DATA_DIR, exist_ok=True)
+# Local image store (S3 later). All generations / edits / cutouts land here.
+GENERATED_DIR = os.path.join(DATA_DIR, "generated")
+os.makedirs(GENERATED_DIR, exist_ok=True)
+
+
+def _ext_for_mime(mime):
+    mime = (mime or "").split(";")[0].strip().lower()
+    return {
+        "image/png": ".png",
+        "image/jpeg": ".jpg",
+        "image/jpg": ".jpg",
+        "image/webp": ".webp",
+        "image/gif": ".gif",
+    }.get(mime, ".png")
+
+
+def save_generated_bytes(raw_bytes, mime="image/png", kind="generate", email=""):
+    """
+    Persist image bytes under ./generated for local durability.
+    Returns metadata including a same-origin URL (/generated/<file>).
+    """
+    if not raw_bytes:
+        raise ValueError("No image bytes to save.")
+    safe_kind = "".join(c if c.isalnum() or c in "-_" else "-" for c in (kind or "generate"))[:40] or "generate"
+    stamp = time.strftime("%Y%m%d_%H%M%S")
+    short = uuid.uuid4().hex[:10]
+    filename = f"{stamp}_{safe_kind}_{short}{_ext_for_mime(mime)}"
+    fpath = os.path.join(GENERATED_DIR, filename)
+    with open(fpath, "wb") as f:
+        f.write(raw_bytes)
+    meta_path = fpath + ".json"
+    try:
+        with open(meta_path, "w", encoding="utf-8") as mf:
+            json.dump(
+                {
+                    "filename": filename,
+                    "mime": mime or "image/png",
+                    "kind": kind or "generate",
+                    "email": email or "",
+                    "bytes": len(raw_bytes),
+                    "ts": int(time.time() * 1000),
+                },
+                mf,
+                indent=2,
+            )
+    except Exception:
+        pass
+    return {
+        "id": short,
+        "filename": filename,
+        "path": os.path.join("generated", filename),
+        "url": f"/generated/{filename}",
+        "mime": mime or "image/png",
+        "bytes": len(raw_bytes),
+    }
 
 
 def load_env_file(path):
@@ -379,6 +434,75 @@ class ProxyHandler(BaseHTTPRequestHandler):
                 self.end_headers()
             return
 
+        # Local generated images (disk store; S3 later).
+        if path_no_query.startswith("/generated/"):
+            rel = path_no_query[len("/generated/"):]
+            if ".." in rel or rel.startswith("/") or not rel or "/" in rel:
+                self.send_response(400)
+                self.end_headers()
+                return
+            fpath = os.path.join(GENERATED_DIR, rel)
+            try:
+                with open(fpath, "rb") as f:
+                    body = f.read()
+            except FileNotFoundError:
+                self.send_response(404)
+                self.end_headers()
+                return
+            lower = rel.lower()
+            if lower.endswith(".png"):
+                ctype = "image/png"
+            elif lower.endswith(".jpg") or lower.endswith(".jpeg"):
+                ctype = "image/jpeg"
+            elif lower.endswith(".webp"):
+                ctype = "image/webp"
+            elif lower.endswith(".gif"):
+                ctype = "image/gif"
+            else:
+                ctype = "application/octet-stream"
+            self.send_response(200)
+            self.send_header("Content-Type", ctype)
+            self.send_header("Content-Length", len(body))
+            self.send_header("Cache-Control", "private, max-age=86400")
+            self.send_cors()
+            self.end_headers()
+            self.wfile.write(body)
+            return
+
+        # Design-system Skills (tokens, fonts) — read-only static assets.
+        if path_no_query.startswith("/Skills/"):
+            rel = path_no_query[len("/Skills/"):]
+            if ".." in rel or rel.startswith("/"):
+                self.send_response(400)
+                self.end_headers()
+                return
+            fpath = os.path.join(HTML_DIR, "Skills", rel)
+            try:
+                with open(fpath, "rb") as f:
+                    body = f.read()
+            except FileNotFoundError:
+                self.send_response(404)
+                self.end_headers()
+                return
+            if rel.endswith(".css"):
+                ctype = "text/css; charset=utf-8"
+            elif rel.endswith(".woff2"):
+                ctype = "font/woff2"
+            elif rel.endswith(".woff"):
+                ctype = "font/woff"
+            elif rel.endswith(".mdc"):
+                ctype = "text/plain; charset=utf-8"
+            else:
+                ctype = "application/octet-stream"
+            self.send_response(200)
+            self.send_header("Content-Type", ctype)
+            self.send_header("Content-Length", len(body))
+            self.send_header("Cache-Control", "public, max-age=3600")
+            self.send_cors()
+            self.end_headers()
+            self.wfile.write(body)
+            return
+
         # CoreUI Icons (npm) — only this package tree is exposed.
         if path_no_query.startswith("/node_modules/@coreui/icons/"):
             rel = path_no_query[len("/node_modules/@coreui/icons/"):]
@@ -611,6 +735,68 @@ class ProxyHandler(BaseHTTPRequestHandler):
             self.send_json(200, {"user": updated})
             return
 
+        # Persist any generation / edit / cutout to ./generated (local disk; S3 later).
+        if self.path == "/api/generated/save":
+            ok, email = verify_session(self.headers.get("x-session-token", ""))
+            if not ok:
+                self.send_json(401, {"error": "Not signed in. Please sign in with your acko.tech email."})
+                return
+            perm_ok, perm_err = require_permission(email, user_store.IMAGE_GEN_ALLOWED)
+            if not perm_ok:
+                self.send_json(403, perm_err)
+                return
+            length = int(self.headers.get("Content-Length", 0))
+            try:
+                data = json.loads(self.rfile.read(length) or b"{}")
+            except Exception:
+                self.send_json(400, {"error": "Invalid request body."})
+                return
+            kind = str(data.get("kind") or "generate").strip() or "generate"
+            mime = str(data.get("mime") or "image/png").strip() or "image/png"
+            image_b64 = str(data.get("image_b64") or "").strip()
+            image_url = str(data.get("image_url") or "").strip()
+            raw = None
+            if image_b64.startswith("data:"):
+                try:
+                    header, image_b64 = image_b64.split(",", 1)
+                    if ";base64" in header and ":" in header:
+                        maybe_mime = header.split(":", 1)[1].split(";", 1)[0]
+                        if maybe_mime.startswith("image/"):
+                            mime = maybe_mime
+                except ValueError:
+                    image_b64 = ""
+            if image_b64:
+                try:
+                    raw = base64.b64decode(image_b64, validate=False)
+                except Exception:
+                    self.send_json(400, {"error": "Invalid image_b64."})
+                    return
+            elif image_url.startswith("http://") or image_url.startswith("https://"):
+                try:
+                    req = urllib.request.Request(
+                        image_url,
+                        headers={"User-Agent": "ACKO-Gen-Proxy/1.0", "Accept": "image/*,*/*"},
+                        method="GET",
+                    )
+                    with urllib.request.urlopen(req, timeout=60) as r:
+                        raw = r.read()
+                        ctype = (r.headers.get("Content-Type") or "").split(";")[0].strip()
+                        if ctype.startswith("image/"):
+                            mime = ctype
+                except Exception as ex:
+                    self.send_json(502, {"error": f"Could not download image for local save: {ex}"})
+                    return
+            else:
+                self.send_json(400, {"error": "Provide image_b64 or image_url."})
+                return
+            try:
+                saved = save_generated_bytes(raw, mime=mime, kind=kind, email=email)
+            except Exception as ex:
+                self.send_json(500, {"error": f"Failed to save generated image: {ex}"})
+                return
+            self.send_json(200, saved)
+            return
+
         # Vehicle / results: background removal via remove.bg (car mode).
         # Same API as https://github.com/remove-bg/remove-bg-cli
         if self.path == "/api/vehicle/remove-bg":
@@ -683,14 +869,24 @@ class ProxyHandler(BaseHTTPRequestHandler):
                 self.send_json(502, {"error": f"Background removal failed: {ex}"})
                 return
 
-            self.send_json(200, {
+            saved = None
+            try:
+                saved = save_generated_bytes(png_bytes, mime="image/png", kind="no-bg", email=email)
+            except Exception as ex:
+                _log_gen_debug(f"local save (no-bg) failed: {ex}")
+            payload = {
                 "b64": base64.b64encode(png_bytes).decode("ascii"),
                 "mime": "image/png",
                 "provider": meta.get("provider", "remove.bg"),
                 "shadow": meta.get("shadow", "car"),
                 "credits_charged": meta.get("credits_charged"),
                 "detected_type": meta.get("detected_type"),
-            })
+            }
+            if saved:
+                payload["local_url"] = saved["url"]
+                payload["local_path"] = saved["path"]
+                payload["local_filename"] = saved["filename"]
+            self.send_json(200, payload)
             return
 
         target, provider = route(self.path)
@@ -829,7 +1025,8 @@ if __name__ == "__main__":
     # external traffic to whatever port the process binds, not just localhost).
     server = HTTPServer(("0.0.0.0", PORT), ProxyHandler)
     print(f"\n  ACKO Image Generator proxy running on port {PORT}")
-    print(f"  Open in browser → http://localhost:{PORT}/generate.html\n")
+    print(f"  Open in browser → http://localhost:{PORT}/generate.html")
+    print(f"  Local image store → {GENERATED_DIR}\n")
     if not MAGNIFIC_KEY:
         print("  WARNING: MAGNIFIC_KEY is not set in .env — image generation will fail with a 401/403 until it is.\n")
     if not REMOVE_BG_API_KEY:

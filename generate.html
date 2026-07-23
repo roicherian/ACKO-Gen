@@ -1,43 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ACKO Gen</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/Skills/font-euclid.css">
+<link rel="stylesheet" href="/Skills/acko-tokens.css">
 <link rel="stylesheet" href="/node_modules/@coreui/icons/css/free.min.css">
 <style>
-:root {
-  --purple: #5B2BE0;
-  --purple-d: #4A22B8;
-  --purple-l: #EDE8FF;
-  --purple-pale: #F7F5FF;
-  --ink: #0D0B1E;
-  --text: #1A1830;
-  --sub: #4A4860;
-  --muted: #9896A8;
-  --border: rgba(0,0,0,.08);
-  --border-s: rgba(0,0,0,.13);
-  --bg: #F0EEF8;
-  --white: #FFFFFF;
-  --sidebar-w: 200px;
-  --green: #16A34A;
-  --red: #DC2626;
-  --orange: #D97706;
-  --purple-2: #7C4DFF;
-  --grad: linear-gradient(135deg, var(--purple) 0%, var(--purple-2) 100%);
-  --r-sm: 10px;
-  --r-md: 14px;
-  --r-lg: 18px;
-  --shadow-xs: 0 1px 2px rgba(20,10,60,.04);
-  --shadow-sm: 0 2px 8px rgba(20,10,60,.06);
-  --shadow-md: 0 8px 24px rgba(20,10,60,.08);
-  --shadow-lg: 0 20px 48px rgba(20,10,60,.16);
-}
+/* App shell vars come from Skills/acko-tokens.css (dark semantics + aliases). */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; }
-body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; display: flex; flex-direction: column; overflow: hidden; }
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-14-size);
+  line-height: var(--font-14-line);
+  background: var(--color-surface);
+  color: var(--color-text-default);
+  -webkit-font-smoothing: antialiased;
+  display: flex; flex-direction: column; overflow: hidden;
+}
+
+/* Dark-theme logo (acko-dark.mdc — Primary Dark BG) */
+.acko-wordmark, .login-wordmark { fill: var(--grey-50) !important; }
+.acko-lens, .login-lens { fill: var(--purple-400) !important; }
+.acko-hex-light, .login-hex-light { fill: var(--purple-500) !important; }
+.acko-hex-dark, .login-hex-dark { fill: var(--purple-700) !important; }
 
 /* APP SHELL */
 .app { display: flex; height: 100vh; overflow: hidden; background: var(--bg); }
@@ -128,19 +116,21 @@ body.vehicle-mode .center-head .btn-adv,
 body.vehicle-mode .neg-accordion { display: none !important; }
 .center-form-stack { display: flex; flex-direction: column; }
 
-/* ═══ Vehicle Image Gen — studio layout (Magnific-inspired) ═══ */
-body.vehicle-mode {
-  font-family: 'Outfit', 'Inter', sans-serif;
-  --vg-bg: #0b0b0f;
-  --vg-surface: #14141a;
-  --vg-elev: #1c1c24;
-  --vg-line: rgba(255,255,255,.08);
-  --vg-text: #f3f3f7;
-  --vg-muted: #8b8b9a;
-  --vg-accent: #c4b5fd;
-  --vg-accent-2: #8b5cf6;
+/* ═══ Vehiclegen / Imagen shared dark studio tokens (Skills) ═══ */
+body.studio-ui,
+body.vehicle-mode,
+[data-theme="dark"] {
+  font-family: var(--font-family);
+  --vg-bg: var(--color-surface);
+  --vg-surface: var(--color-surface-raised);
+  --vg-elev: var(--color-card-bg);
+  --vg-line: var(--color-border);
+  --vg-text: var(--color-text-primary);
+  --vg-muted: var(--color-text-secondary);
+  --vg-accent: var(--purple-300);
+  --vg-accent-2: var(--purple-500);
 }
-body.vehicle-mode .app {
+body.studio-ui .app {
   background:
     radial-gradient(1000px 480px at 70% -10%, rgba(139,92,246,.18), transparent 55%),
     radial-gradient(700px 400px at 10% 100%, rgba(56,189,248,.08), transparent 50%),
@@ -149,27 +139,27 @@ body.vehicle-mode .app {
   grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
   grid-template-rows: auto minmax(0, 1fr);
 }
-body.vehicle-mode .sidebar {
+body.studio-ui .sidebar {
   grid-row: 1 / -1;
   background: rgba(12,12,16,.92);
   border-right: 1px solid var(--vg-line);
   box-shadow: none;
 }
-body.vehicle-mode .sidebar-logo { border-bottom-color: var(--vg-line); }
-body.vehicle-mode .logo-sub { color: var(--vg-muted); }
-body.vehicle-mode .acko-wordmark { fill: #f3f3f7 !important; }
-body.vehicle-mode .nav-item { color: #b8b8c6; }
-body.vehicle-mode .nav-item:hover { background: rgba(255,255,255,.05); color: #fff; }
-body.vehicle-mode .nav-item.active {
+body.studio-ui .sidebar-logo { border-bottom-color: var(--vg-line); }
+body.studio-ui .logo-sub { color: var(--vg-muted); }
+body.studio-ui .acko-wordmark { fill: #f3f3f7 !important; }
+body.studio-ui .nav-item { color: #b8b8c6; }
+body.studio-ui .nav-item:hover { background: rgba(255,255,255,.05); color: #fff; }
+body.studio-ui .nav-item.active {
   background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);
   color: #fff;
 }
-body.vehicle-mode .sidebar-user { border-top-color: var(--vg-line); }
-body.vehicle-mode .sidebar-user-email { color: var(--vg-muted); }
-body.vehicle-mode .sidebar-signout:hover { background: rgba(255,255,255,.06); }
+body.studio-ui .sidebar-user { border-top-color: var(--vg-line); }
+body.studio-ui .sidebar-user-email { color: var(--vg-muted); }
+body.studio-ui .sidebar-signout:hover { background: rgba(255,255,255,.06); }
 
-body.vehicle-mode #view-generate { display: contents; }
-body.vehicle-mode .center {
+body.studio-ui #view-generate { display: contents; }
+body.studio-ui .center {
   grid-column: 2;
   grid-row: 1;
   max-width: none;
@@ -181,7 +171,7 @@ body.vehicle-mode .center {
   display: flex;
   flex-direction: column;
 }
-body.vehicle-mode .right {
+body.studio-ui .right {
   grid-column: 2;
   grid-row: 2;
   min-width: 0;
@@ -190,22 +180,106 @@ body.vehicle-mode .right {
   overflow-y: auto;
   border: none;
 }
-body.vehicle-mode .center-head { margin-bottom: 14px; }
-body.vehicle-mode .center-title {
+body.studio-ui .center-head { margin-bottom: 14px; }
+body.studio-ui .center-title {
   font-size: 26px; font-weight: 800; letter-spacing: -.03em;
   color: var(--vg-text);
 }
-body.vehicle-mode .center-sub { color: var(--vg-muted); }
+body.studio-ui .center-sub { color: var(--vg-muted); }
 
-/* Composer order: title → prompt (with vehicle selectors) → generate */
-body.vehicle-mode .center-head { order: 0; }
-body.vehicle-mode .center-form-stack { order: 1; }
-body.vehicle-mode .prompt-block { order: 2; margin-bottom: 8px !important; }
-body.vehicle-mode .action-row,
-body.vehicle-mode .enhanced-wrap,
-body.vehicle-mode .neg-accordion { order: 3; }
+/* Composer order: title → prompt (in-box config) → enhance / negative (Imagen) */
+body.studio-ui .center-head { order: 0; }
+body.studio-ui .center-form-stack { display: none !important; }
+body.studio-ui .prompt-block { order: 1; margin-bottom: 8px !important; }
+body.studio-ui .action-row { order: 2; }
+body.studio-ui .enhanced-wrap { order: 3; }
+body.studio-ui .neg-accordion { order: 4; }
 
-body.vehicle-mode .prompt-wrap .vehicle-car-panel {
+/* Imagen enhance / negative / advanced — Vehiclegen studio chrome */
+body.imagen-mode .center-head .btn-adv {
+  background: var(--vg-elev);
+  border: 1px solid var(--vg-line);
+  color: #cfcfd8;
+  border-radius: 999px;
+}
+body.imagen-mode .center-head .btn-adv:hover {
+  border-color: rgba(196,181,253,.45);
+  color: #e9e0ff;
+}
+body.imagen-mode .action-row { margin-bottom: 10px; }
+body.imagen-mode .btn-action {
+  background: var(--vg-elev);
+  border: 1px solid var(--vg-line);
+  color: #cfcfd8;
+  border-radius: 999px;
+  box-shadow: none;
+}
+body.imagen-mode .btn-action:hover {
+  border-color: rgba(196,181,253,.45);
+  color: #e9e0ff;
+  background: rgba(124,58,237,.18);
+}
+body.imagen-mode .enhanced-wrap {
+  background: linear-gradient(180deg, #17171f 0%, #121218 100%);
+  border: 1px solid var(--vg-line);
+  border-radius: 18px;
+  box-shadow: 0 12px 36px rgba(0,0,0,.28);
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+body.imagen-mode .enhanced-head {
+  border-bottom: 1px solid var(--vg-line);
+  background: rgba(255,255,255,.02);
+}
+body.imagen-mode .enhanced-title,
+body.imagen-mode .editable-hint { color: var(--vg-text); }
+body.imagen-mode .enhanced-body {
+  color: var(--vg-text);
+  background: transparent;
+  min-height: 88px;
+}
+body.imagen-mode .enhanced-body:empty:before { color: #6d6d7c; }
+body.imagen-mode .btn-copy-sm {
+  background: var(--vg-elev);
+  border-color: var(--vg-line);
+  color: #cfcfd8;
+}
+body.imagen-mode .neg-accordion {
+  background: linear-gradient(180deg, #17171f 0%, #121218 100%);
+  border: 1px solid var(--vg-line);
+  border-radius: 18px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+body.imagen-mode .neg-toggle {
+  color: var(--vg-text);
+  background: transparent;
+}
+body.imagen-mode .neg-optional,
+body.imagen-mode .neg-note { color: var(--vg-muted); }
+body.imagen-mode .neg-body textarea {
+  background: var(--vg-elev);
+  border: 1px solid var(--vg-line);
+  color: var(--vg-text);
+  border-radius: 12px;
+}
+body.imagen-mode .enhanced-body:hover { background: rgba(124,58,237,.08); }
+body.imagen-mode .enhanced-body:focus {
+  background: rgba(255,255,255,.02);
+  box-shadow: inset 0 0 0 2px rgba(139,92,246,.28);
+}
+
+/* Hard-guard: Imagen enhance / neg / advanced stay visible in imagen-mode only
+   (:not(.vehicle-mode) so vehicle locks still win if both classes ever collide) */
+body.imagen-mode:not(.vehicle-mode) .action-row { display: flex !important; }
+body.imagen-mode:not(.vehicle-mode) .enhanced-wrap,
+body.imagen-mode:not(.vehicle-mode) .neg-accordion { display: block !important; }
+body.imagen-mode:not(.vehicle-mode) .center-head .btn-adv { display: flex !important; }
+body.imagen-mode:not(.vehicle-mode) #imagenConfigPanel.visible { display: block !important; }
+body.vehicle-mode #imagenConfigPanel { display: none !important; }
+
+/* Shared in-prompt config panel chrome (Imagen settings + Vehicle make/model) */
+body.studio-ui .prompt-wrap .vehicle-car-panel {
   display: none;
   background: transparent;
   border: none;
@@ -216,14 +290,14 @@ body.vehicle-mode .prompt-wrap .vehicle-car-panel {
   position: relative;
   z-index: 5;
 }
-body.vehicle-mode .prompt-wrap .vehicle-car-panel.visible { display: block; }
+body.studio-ui .prompt-wrap .vehicle-car-panel.visible { display: block; }
 body.vehicle-mode .prompt-wrap .vg-combo-panel { z-index: 90; }
-body.vehicle-mode .vehicle-car-panel-head { margin-bottom: 10px; }
-body.vehicle-mode .vehicle-car-panel-label {
+body.studio-ui .vehicle-car-panel-head { margin-bottom: 10px; }
+body.studio-ui .vehicle-car-panel-label {
   font-size: 11px; font-weight: 600; letter-spacing: .08em;
   text-transform: uppercase; color: var(--vg-muted);
 }
-body.vehicle-mode .vehicle-car-panel-meta { color: var(--vg-muted); }
+body.studio-ui .vehicle-car-panel-meta { color: var(--vg-muted); }
 
 /* Model-identity reference upload (vehicle prompt box) */
 .vg-model-ref {
@@ -283,18 +357,18 @@ body.vehicle-mode .vg-model-ref { display: flex; }
 }
 .vg-ref-clear:hover { background: rgba(248,113,113,.35); }
 
-body.vehicle-mode .vehicle-select-row {
+body.studio-ui .prompt-wrap .vehicle-select-row {
   display: flex; flex-wrap: wrap; gap: 8px;
   margin-bottom: 0;
 }
-body.vehicle-mode .vehicle-select-row .form-group {
+body.studio-ui .prompt-wrap .vehicle-select-row .form-group {
   width: auto; flex: 0 1 auto; min-width: 0;
 }
-body.vehicle-mode .vehicle-select-row .form-label {
+body.studio-ui .prompt-wrap .vehicle-select-row .form-label {
   position: absolute; width: 1px; height: 1px; overflow: hidden;
   clip: rect(0,0,0,0); white-space: nowrap;
 }
-body.vehicle-mode .vehicle-select-row .sel-wrap {
+body.studio-ui .prompt-wrap .vehicle-select-row .sel-wrap {
   height: 36px;
   border-radius: 999px;
   background: var(--vg-elev);
@@ -303,12 +377,12 @@ body.vehicle-mode .vehicle-select-row .sel-wrap {
   padding: 0 12px 0 14px;
   transition: border-color .15s, background .15s;
 }
-body.vehicle-mode .vehicle-select-row .sel-wrap:focus-within {
+body.studio-ui .prompt-wrap .vehicle-select-row .sel-wrap:focus-within {
   border-color: rgba(196,181,253,.55);
   box-shadow: 0 0 0 3px rgba(139,92,246,.18);
   background: #22222c;
 }
-body.vehicle-mode .vehicle-select-row select {
+body.studio-ui .prompt-wrap .vehicle-select-row select {
   font: 500 12.5px/1 Outfit, sans-serif;
   color: var(--vg-text);
   max-width: 168px;
@@ -316,10 +390,12 @@ body.vehicle-mode .vehicle-select-row select {
   margin-right: -22px;
   padding-right: 26px;
 }
-body.vehicle-mode .vehicle-select-row select option {
-  color: #111; background: #fff;
+body.studio-ui .prompt-wrap .vehicle-select-row select option {
+  color: var(--color-text-primary); background: var(--color-surface-raised);
 }
-body.vehicle-mode .vehicle-select-row .sel-caret { color: var(--vg-muted); }
+body.studio-ui .prompt-wrap .vehicle-select-row .sel-caret { color: var(--vg-muted); }
+body.imagen-mode .imagen-select-row #ratioGroup select { max-width: 210px; }
+body.imagen-mode .imagen-select-row #aiModelGroup select { max-width: 180px; }
 body.vehicle-mode .vg-year-ref-locked {
   opacity: .55;
   pointer-events: none;
@@ -462,12 +538,12 @@ body.vehicle-mode .vg-combo-trigger:focus-visible {
 }
 body.vehicle-mode .vg-combo-label.is-placeholder { color: #8b8b9a; }
 body.vehicle-mode .vg-combo-caret { color: var(--vg-muted); }
-body.vehicle-mode .vehicle-select-row .vg-combo {
+body.studio-ui .prompt-wrap .vehicle-select-row .vg-combo {
   width: auto;
 }
 
-body.vehicle-mode .prompt-block > .form-label { display: none; }
-body.vehicle-mode .prompt-wrap {
+body.studio-ui .prompt-block > .form-label { display: none; }
+body.studio-ui .prompt-wrap {
   background: linear-gradient(180deg, #17171f 0%, #121218 100%);
   border: 1px solid var(--vg-line);
   border-radius: 22px;
@@ -475,30 +551,34 @@ body.vehicle-mode .prompt-wrap {
   /* visible so Make/Model combo panels are not clipped (was blocking selection → gen) */
   overflow: visible;
 }
-body.vehicle-mode .prompt-wrap:focus-within {
+body.studio-ui .prompt-wrap:focus-within {
   border-color: rgba(196,181,253,.45);
   box-shadow: 0 0 0 3px rgba(139,92,246,.16), 0 18px 50px rgba(0,0,0,.35);
 }
-body.vehicle-mode .prompt-wrap textarea {
+body.studio-ui .prompt-wrap textarea {
   min-height: 96px;
   max-height: 180px;
   padding: 18px 20px 8px;
-  font: 400 14.5px/1.55 Outfit, sans-serif;
+  font: 400 14.5px/1.55 var(--font-family);
   color: var(--vg-text);
   background: transparent;
+}
+body.imagen-mode .prompt-wrap textarea {
+  min-height: 120px;
+  max-height: 240px;
 }
 body.vehicle-mode .prompt-wrap textarea.prompt-locked {
   cursor: default;
   opacity: .92;
   user-select: text;
 }
-body.vehicle-mode .prompt-wrap textarea::placeholder { color: #6d6d7c; }
-body.vehicle-mode .prompt-footer {
+body.studio-ui .prompt-wrap textarea::placeholder { color: #6d6d7c; }
+body.studio-ui .prompt-footer {
   padding: 8px 12px 12px 18px;
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
 }
-body.vehicle-mode .char-count { color: var(--vg-muted); font-size: 11.5px; }
-body.vehicle-mode .prompt-footer .btn-gen {
+body.studio-ui .char-count { color: var(--vg-muted); font-size: 11.5px; }
+body.studio-ui .prompt-footer .btn-gen {
   width: auto; min-width: 148px;
   margin: 0;
   padding: 11px 18px;
@@ -507,70 +587,80 @@ body.vehicle-mode .prompt-footer .btn-gen {
   background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
   box-shadow: 0 8px 24px rgba(99,102,241,.35);
 }
-body.vehicle-mode .prompt-footer .btn-gen:hover:not(:disabled) {
+body.studio-ui .prompt-footer .btn-gen:hover:not(:disabled) {
   transform: translateY(-1px);
   box-shadow: 0 12px 28px rgba(99,102,241,.45);
 }
 
-body.vehicle-mode .right-head { margin-bottom: 4px; }
-body.vehicle-mode .right-title { color: var(--vg-text); font-size: 14px; }
-body.vehicle-mode .status-pill {
+body.studio-ui .right-head { margin-bottom: 4px; }
+body.studio-ui .right-title { color: var(--vg-text); font-size: 14px; }
+body.studio-ui .status-pill {
   background: var(--vg-elev);
   border-color: var(--vg-line);
   color: var(--vg-muted);
 }
-body.vehicle-mode .btn-clear {
+body.studio-ui .btn-clear {
   background: var(--vg-elev);
   border-color: var(--vg-line);
   color: #cfcfd8;
 }
-body.vehicle-mode .btn-clear:hover { border-color: #f87171; color: #f87171; }
-body.vehicle-mode .progress-card {
+body.studio-ui .btn-clear:hover { border-color: #f87171; color: #f87171; }
+body.studio-ui .progress-card {
   background: var(--vg-surface);
   border-color: var(--vg-line);
   box-shadow: none;
 }
-body.vehicle-mode .progress-title { color: var(--vg-text); }
-body.vehicle-mode .progress-sub { color: var(--vg-muted); }
-body.vehicle-mode .ring-bg { stroke: #2a2a35; }
-body.vehicle-mode .ring-fill { stroke: #a78bfa; }
-body.vehicle-mode .ring-pct { color: var(--vg-text); }
-body.vehicle-mode .progress-cancel {
+body.studio-ui .progress-title { color: var(--vg-text); }
+body.studio-ui .progress-sub { color: var(--vg-muted); }
+body.studio-ui .ring-bg { stroke: #2a2a35; }
+body.studio-ui .ring-fill { stroke: #a78bfa; }
+body.studio-ui .ring-pct { color: var(--vg-text); }
+body.studio-ui .progress-cancel {
   border-color: var(--vg-line);
   color: var(--vg-muted);
 }
-body.vehicle-mode .results-head { color: var(--vg-text); font-size: 14px; }
-body.vehicle-mode .results-sub { color: var(--vg-muted); }
-body.vehicle-mode .results-grid {
+body.studio-ui .results-head { color: var(--vg-text); font-size: 14px; }
+body.studio-ui .results-sub { color: var(--vg-muted); }
+body.studio-ui .results-grid {
   gap: 14px;
 }
-body.vehicle-mode .results-grid.n1 { grid-template-columns: minmax(0, 1fr); max-width: 960px; }
-body.vehicle-mode .results-grid.n2 { grid-template-columns: 1fr 1fr; }
-body.vehicle-mode .img-card {
+body.studio-ui .results-grid.n1 { grid-template-columns: minmax(0, 1fr); max-width: 960px; }
+body.studio-ui .results-grid.n2 { grid-template-columns: 1fr 1fr; }
+body.studio-ui .img-card {
   border-radius: 16px;
   border-color: var(--vg-line);
   background: var(--vg-elev);
   box-shadow: 0 10px 30px rgba(0,0,0,.28);
 }
-body.vehicle-mode .empty-ph {
+body.studio-ui .empty-ph {
   background: var(--vg-surface);
   border: 1px dashed var(--vg-line);
   border-radius: 16px;
   color: #555566;
 }
-body.vehicle-mode .img-badge {
+body.studio-ui .img-badge {
   background: rgba(20,20,28,.88);
   color: #fff;
   border: 1px solid rgba(255,255,255,.1);
 }
-body.vehicle-mode .img-badge.cutout {
+body.studio-ui .img-badge.cutout {
   background: #7c3aed;
   border-color: transparent;
 }
+/* Shared studio gallery panel (Imagen + Vehiclegen) */
 body.vehicle-mode #resultsSectionClassic,
 body.vehicle-mode #progressCard,
-body.vehicle-mode .right-head { display: none !important; }
-body.vehicle-mode #vehicleGallerySection { display: block !important; }
+body.vehicle-mode .right-head,
+body.imagen-mode #resultsSectionClassic,
+body.imagen-mode #progressCard,
+body.imagen-mode .right-head { display: none !important; }
+body.vehicle-mode #vehicleGallerySection,
+body.imagen-mode #vehicleGallerySection { display: block !important; }
+/* Imagen: hide vehicle-only gallery chrome (collections / make·year filters) */
+body.imagen-mode .vg-view-toggle,
+body.imagen-mode #vgBreadcrumb,
+body.imagen-mode #vgFilterMakeWrap,
+body.imagen-mode #vgFilterYearWrap { display: none !important; }
 
 .vehicle-gallery-section { display: none; }
 .vg-gallery-head { margin-bottom: 12px; }
@@ -626,6 +716,12 @@ body.vehicle-mode #vehicleGallerySection { display: block !important; }
   overflow: hidden;
 }
 .vg-thumb.ratio-4-3 { aspect-ratio: 4/3; }
+.vg-thumb.ratio-1-1 { aspect-ratio: 1/1; }
+.vg-thumb.ratio-9-16 { aspect-ratio: 9/16; }
+.vg-thumb.ratio-3-4 { aspect-ratio: 3/4; }
+.vg-thumb.ratio-4-5 { aspect-ratio: 4/5; }
+.vg-thumb.ratio-3-2 { aspect-ratio: 3/2; }
+.vg-thumb.ratio-2-1 { aspect-ratio: 2/1; }
 .vg-thumb img {
   width: 100%; height: 100%; object-fit: contain; display: block;
 }
@@ -800,11 +896,11 @@ body.vehicle-mode #vehicleGallerySection { display: block !important; }
 .vg-filter-make-wrap.is-hidden { display: none !important; }
 
 @media (max-width: 900px) {
-  body.vehicle-mode .app {
+  body.studio-ui .app {
     grid-template-columns: 1fr;
     grid-template-rows: auto auto minmax(0, 1fr);
   }
-  body.vehicle-mode .sidebar {
+  body.studio-ui .sidebar {
     grid-row: auto;
     width: 100%;
     flex-direction: row;
@@ -812,8 +908,8 @@ body.vehicle-mode #vehicleGallerySection { display: block !important; }
     height: auto;
     padding: 10px 0;
   }
-  body.vehicle-mode .center,
-  body.vehicle-mode .right {
+  body.studio-ui .center,
+  body.studio-ui .right {
     grid-column: 1;
   }
 }
@@ -915,13 +1011,13 @@ body.vehicle-mode #vehicleGallerySection { display: block !important; }
   gap: 10px; flex-wrap: wrap;
 }
 .char-count { font-size: 11px; color: var(--muted); }
-/* Regular Generate: keep full-width Generate button under the prompt */
-body:not(.vehicle-mode) .prompt-footer {
+/* Legacy non-studio layout only — studio-ui uses Vehiclegen-style footer */
+body:not(.studio-ui):not(.vehicle-mode) .prompt-footer {
   flex-direction: column;
   align-items: stretch;
 }
-body:not(.vehicle-mode) .prompt-footer .char-count { align-self: flex-start; }
-body:not(.vehicle-mode) .prompt-footer .btn-gen { width: 100%; margin-top: 2px; }
+body:not(.studio-ui):not(.vehicle-mode) .prompt-footer .char-count { align-self: flex-start; }
+body:not(.studio-ui):not(.vehicle-mode) .prompt-footer .btn-gen { width: 100%; margin-top: 2px; }
 
 /* ACTION BUTTONS */
 .action-row { display: flex; gap: 8px; margin-bottom: 14px; }
@@ -1078,7 +1174,7 @@ body:not(.vehicle-mode) .prompt-footer .btn-gen { width: 100%; margin-top: 2px; 
 }
 .switch-thumb {
   position: absolute; top: 2.5px; left: 2.5px; width: 18px; height: 18px; border-radius: 50%;
-  background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .18s;
+  background: var(--color-on-primary); box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .18s;
 }
 .switch input:checked + .switch-track { background: var(--grad); }
 .switch input:checked + .switch-track .switch-thumb { transform: translateX(17px); }
@@ -1270,7 +1366,7 @@ body:not(.vehicle-mode) .prompt-footer .btn-gen { width: 100%; margin-top: 2px; 
 .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; align-content: start; }
 .gcard {
   position: relative; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-s);
-  background: #fff; aspect-ratio: 1/1; cursor: pointer; transition: transform .15s, box-shadow .15s;
+  background: var(--color-card-bg); aspect-ratio: 1/1; cursor: pointer; transition: transform .15s, box-shadow .15s;
 }
 .gcard:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,.10); }
 .gcard:hover .img-zoom-hint { opacity: 1; }
@@ -1613,7 +1709,8 @@ body:not(.vehicle-mode) .prompt-footer .btn-gen { width: 100%; margin-top: 2px; 
 
 /* LOGIN GATE */
 .login-overlay {
-  position: fixed; inset: 0; z-index: 300; background: var(--bg);
+  position: fixed; inset: 0; z-index: 300;
+  background: var(--color-surface-overlay); backdrop-filter: blur(8px);
   display: flex; align-items: center; justify-content: center; padding: 24px;
 }
 .login-overlay.hidden { display: none; }
@@ -1622,38 +1719,153 @@ body:not(.vehicle-mode) .prompt-footer .btn-gen { width: 100%; margin-top: 2px; 
 .vehicle-select-row .form-group.hidden,
 .vg-filter.hidden { display: none !important; }
 .login-card {
-  width: 380px; max-width: 100%; background: var(--white); border-radius: var(--r-lg);
-  box-shadow: var(--shadow-lg); padding: 36px 32px 32px; display: flex; flex-direction: column;
+  width: 380px; max-width: 100%;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-4xl);
+  box-shadow: var(--shadow-modal); padding: 36px 32px 32px; display: flex; flex-direction: column;
   align-items: center; text-align: center; gap: 6px;
 }
 .login-logo { width: 130px; height: auto; margin-bottom: 14px; }
-.login-title { font-size: 18px; font-weight: 800; color: var(--ink); letter-spacing: -.02em; }
-.login-sub { font-size: 12.5px; color: var(--muted); margin-bottom: 18px; line-height: 1.5; }
+.login-title {
+  font-size: var(--font-18-size); line-height: var(--font-18-line);
+  font-weight: 700; color: var(--color-text-primary); letter-spacing: -.02em;
+}
+.login-sub { font-size: var(--font-12-size); color: var(--color-text-secondary); margin-bottom: 18px; line-height: 1.5; }
 .login-input {
-  width: 100%; padding: 11px 13px; border: 1px solid var(--border-s); border-radius: var(--r-sm);
-  font: 400 13.5px/1 'Inter', sans-serif; color: var(--text); outline: none;
+  width: 100%; padding: 11px 13px;
+  border: 1px solid var(--color-input-border); border-radius: var(--radius-full);
+  font: 400 var(--font-14-size)/1 var(--font-family);
+  color: var(--color-text-default); background: var(--color-input-bg); outline: none;
   transition: border-color .15s, box-shadow .15s; margin-bottom: 6px;
 }
-.login-input:focus { border-color: var(--purple); box-shadow: 0 0 0 3px var(--purple-l); }
+.login-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-focus-ring);
+}
 .login-error {
-  min-height: 16px; font-size: 11.5px; color: var(--red); margin-bottom: 8px; text-align: left;
+  min-height: 16px; font-size: var(--font-12-size); color: var(--color-text-error); margin-bottom: 8px; text-align: left;
   width: 100%;
 }
 .login-btn {
-  width: 100%; padding: 12px; border-radius: var(--r-md); border: none;
-  background: var(--grad); font: 700 14px/1 'Inter', sans-serif; color: #fff;
-  cursor: pointer; transition: transform .15s, box-shadow .15s; box-shadow: var(--shadow-sm);
+  width: 100%; padding: 12px; border-radius: var(--radius-full); border: none;
+  background: var(--grad); font: 600 var(--font-14-size)/1 var(--font-family); color: var(--color-on-primary);
+  cursor: pointer; transition: transform .15s var(--ease-out-cubic), box-shadow .15s;
+  box-shadow: var(--shadow-btn-inner), var(--shadow-subtle);
 }
-.login-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.login-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: var(--shadow-btn-hover); }
 .login-btn:disabled { opacity: .6; cursor: not-allowed; }
 
-/* SCROLLBAR */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border-s); border-radius: 99px; }
+/* Global dark app chrome (Imagen + galleries + admin) — Skills tokens */
+[data-theme="dark"] .app {
+  background:
+    radial-gradient(1000px 480px at 70% -10%, rgba(122, 98, 240, .16), transparent 55%),
+    radial-gradient(700px 400px at 10% 100%, rgba(62, 34, 144, .14), transparent 50%),
+    var(--color-surface);
+}
+[data-theme="dark"] .sidebar {
+  background: rgba(15, 15, 16, .94);
+  border-right: 1px solid var(--color-border);
+  box-shadow: none;
+}
+[data-theme="dark"] .sidebar-logo { border-bottom-color: var(--color-border); }
+[data-theme="dark"] .nav-item { color: var(--color-text-secondary); }
+[data-theme="dark"] .nav-item:hover {
+  background: var(--color-surface-ghost-hover);
+  color: var(--color-text-primary);
+}
+[data-theme="dark"] .nav-item.active {
+  background: var(--grad);
+  color: var(--color-on-primary);
+  box-shadow: var(--shadow-subtle);
+}
+[data-theme="dark"] .sel-wrap,
+[data-theme="dark"] .prompt-wrap,
+[data-theme="dark"] .btn-adv,
+[data-theme="dark"] .btn-action,
+[data-theme="dark"] .admin-tab,
+[data-theme="dark"] .admin-select {
+  background: var(--color-input-bg);
+  border-color: var(--color-input-border);
+  color: var(--color-text-default);
+  box-shadow: none;
+}
+[data-theme="dark"] .sel-wrap:focus-within,
+[data-theme="dark"] .prompt-wrap:focus-within,
+[data-theme="dark"] .admin-select:focus {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-focus-ring);
+}
+[data-theme="dark"] .prompt-wrap textarea,
+[data-theme="dark"] .sel-wrap select {
+  color: var(--color-text-default);
+  background: transparent;
+}
+[data-theme="dark"] .admin-table,
+[data-theme="dark"] .admin-table th,
+[data-theme="dark"] .admin-table td {
+  color: var(--color-text-default);
+  border-color: var(--color-table-border);
+}
+[data-theme="dark"] .admin-table th {
+  background: var(--color-table-header-bg);
+  color: var(--color-table-header-text);
+}
+[data-theme="dark"] .admin-table tr:hover td { background: var(--color-table-row-hover); }
+[data-theme="dark"] .gallery-view,
+[data-theme="dark"] .admin-view,
+[data-theme="dark"] .right {
+  background: transparent;
+}
+[data-theme="dark"] .img-card,
+[data-theme="dark"] .gcard {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-4xl);
+  box-shadow: var(--shadow-card);
+}
+[data-theme="dark"] .edit-modal,
+[data-theme="dark"] .adv-modal {
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-default);
+  box-shadow: var(--shadow-modal);
+  border-radius: var(--radius-4xl);
+}
+[data-theme="dark"] .edit-textarea {
+  background: var(--color-input-bg);
+  border-color: var(--color-input-border);
+  color: var(--color-text-default);
+}
+[data-theme="dark"] .center-title,
+[data-theme="dark"] .gallery-title,
+[data-theme="dark"] .admin-title,
+[data-theme="dark"] .right-title {
+  color: var(--color-text-primary);
+  font-family: var(--font-family);
+}
+[data-theme="dark"] .center-sub,
+[data-theme="dark"] .gallery-sub,
+[data-theme="dark"] .results-sub {
+  color: var(--color-text-secondary);
+}
+[data-theme="dark"] body,
+[data-theme="dark"] button,
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+  font-family: var(--font-family);
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 </style>
 </head>
-<body>
+<body class="studio-ui imagen-mode">
 
 <!-- LOGIN GATE -->
 <div class="login-overlay" id="loginOverlay">
@@ -1763,85 +1975,75 @@ body:not(.vehicle-mode) .prompt-footer .btn-gen { width: 100%; margin-top: 2px; 
       </button>
     </div>
 
-    <div class="center-form-stack">
-    <!-- AI Model + Num Images -->
-    <div class="form-row" id="modelNumRow">
-      <div class="form-group" id="aiModelGroup">
-        <label class="form-label">Model</label>
-        <div class="sel-wrap">
-          <div class="sel-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-          </div>
-          <select id="modelSelect" onchange="onModelChange()">
-            <optgroup label="Google">
-              <option value="nano-banana" selected>Nano Banana 2</option>
-            </optgroup>
-            <optgroup label="Magnific">
-              <option value="gpt-2">Magnific (classic)</option>
-            </optgroup>
-          </select>
-          <div class="sel-caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
-        </div>
-      </div>
-      <div class="form-group" id="numImagesGroup">
-        <label class="form-label">Number of Images</label>
-        <div class="sel-wrap">
-          <div class="sel-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-          </div>
-          <select id="numSelect">
-            <option value="1">1 image</option>
-            <option value="2">2 images</option>
-            <option value="3">3 images</option>
-            <option value="4" selected>4 images</option>
-          </select>
-          <div class="sel-caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
-        </div>
-      </div>
-    </div>
+    <!-- Legacy external config stack — studio UI uses in-prompt dropdowns instead -->
+    <div class="center-form-stack" id="modelNumRow" hidden aria-hidden="true"></div>
 
-    <!-- Resolution + Aspect Ratio (hidden in Vehicle Image Gen — aspect set in vehicle panel) -->
-    <div class="form-row" id="resRatioRow">
-      <div class="form-group" id="resGroup">
-        <label class="form-label">Resolution</label>
-        <div class="sel-wrap">
-          <div class="sel-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-          </div>
-          <select id="resSelect">
-            <option value="1K">1K</option>
-            <option value="2K" selected>2K</option>
-            <option value="4K">4K</option>
-          </select>
-          <div class="sel-caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
-        </div>
-      </div>
-      <div class="form-group" id="ratioGroup">
-        <label class="form-label">Aspect Ratio</label>
-        <div class="sel-wrap">
-          <div class="sel-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
-          </div>
-          <select id="ratioSelect" onchange="updatePrompt()">
-            <option value="widescreen_16_9" data-label="16:9" selected>16:9 — Widescreen</option>
-            <option value="social_post_4_5" data-label="4:5">4:5 — Social Post</option>
-            <option value="social_story_9_16" data-label="9:16">9:16 — Stories</option>
-            <option value="square_1_1" data-label="1:1">1:1 — Square</option>
-            <option value="classic_4_3" data-label="4:3">4:3 — Classic</option>
-            <option value="traditional_3_4" data-label="3:4">3:4 — Portrait</option>
-            <option value="standard_3_2" data-label="3:2">3:2 — Standard</option>
-            <option value="horizontal_2_1" data-label="2:1">2:1 — Panoramic</option>
-          </select>
-          <div class="sel-caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
-        </div>
-      </div>
-    </div>
-    </div><!-- /.center-form-stack -->
-
-    <!-- Prompt (Vehicle Image Gen: selectors + optional model reference live inside this box) -->
+    <!-- Prompt (Imagen + Vehicle: settings / selectors live inside this box) -->
     <div class="form-group prompt-block" style="margin-bottom:10px">
       <label class="form-label">Prompt</label>
       <div class="prompt-wrap">
+        <!-- Imagen: model / res / count / aspect — same in-box chrome as Vehiclegen -->
+        <div id="imagenConfigPanel" class="vehicle-car-panel imagen-config-panel">
+          <div class="vehicle-car-panel-head">
+            <div class="vehicle-car-panel-label">Generation settings</div>
+            <div class="vehicle-car-panel-meta" id="imagenConfigMeta">Model · resolution · count · aspect</div>
+          </div>
+          <div class="vehicle-select-row imagen-select-row" id="resRatioRow">
+            <div class="form-group" id="aiModelGroup">
+              <label class="form-label">Model</label>
+              <div class="sel-wrap">
+                <select id="modelSelect" onchange="onModelChange()">
+                  <optgroup label="Google">
+                    <option value="nano-banana" selected>Nano Banana 2</option>
+                  </optgroup>
+                  <optgroup label="Magnific">
+                    <option value="gpt-2">Magnific (classic)</option>
+                  </optgroup>
+                </select>
+                <div class="sel-caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+              </div>
+            </div>
+            <div class="form-group" id="resGroup">
+              <label class="form-label">Resolution</label>
+              <div class="sel-wrap">
+                <select id="resSelect" onchange="syncImagenConfigMeta()">
+                  <option value="1K">1K</option>
+                  <option value="2K" selected>2K</option>
+                  <option value="4K">4K</option>
+                </select>
+                <div class="sel-caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+              </div>
+            </div>
+            <div class="form-group" id="numImagesGroup">
+              <label class="form-label">Number of Images</label>
+              <div class="sel-wrap">
+                <select id="numSelect" onchange="syncImagenConfigMeta()">
+                  <option value="1">1 image</option>
+                  <option value="2">2 images</option>
+                  <option value="3">3 images</option>
+                  <option value="4" selected>4 images</option>
+                </select>
+                <div class="sel-caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+              </div>
+            </div>
+            <div class="form-group" id="ratioGroup">
+              <label class="form-label">Aspect Ratio</label>
+              <div class="sel-wrap">
+                <select id="ratioSelect" onchange="updatePrompt(); syncImagenConfigMeta()">
+                  <option value="widescreen_16_9" data-label="16:9" selected>16:9 — Widescreen</option>
+                  <option value="social_post_4_5" data-label="4:5">4:5 — Social Post</option>
+                  <option value="social_story_9_16" data-label="9:16">9:16 — Stories</option>
+                  <option value="square_1_1" data-label="1:1">1:1 — Square</option>
+                  <option value="classic_4_3" data-label="4:3">4:3 — Classic</option>
+                  <option value="traditional_3_4" data-label="3:4">3:4 — Portrait</option>
+                  <option value="standard_3_2" data-label="3:2">3:2 — Standard</option>
+                  <option value="horizontal_2_1" data-label="2:1">2:1 — Panoramic</option>
+                </select>
+                <div class="sel-caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+              </div>
+            </div>
+          </div>
+        </div>
         <div id="vehicleCarPanel" class="vehicle-car-panel">
           <div class="vehicle-car-panel-head">
             <div class="vehicle-car-panel-label">Vehicle selection</div>
@@ -2061,8 +2263,8 @@ body:not(.vehicle-mode) .prompt-footer .btn-gen { width: 100%; margin-top: 2px; 
     <div class="vehicle-gallery-section" id="vehicleGallerySection" hidden>
       <div class="vg-gallery-head">
         <div>
-          <div class="results-head">Vehicle gallery</div>
-          <div class="results-sub" id="vgGalleryMeta">Saved vehicle generations appear here.</div>
+          <div class="results-head" id="vgGalleryTitle">Gallery</div>
+          <div class="results-sub" id="vgGalleryMeta">Saved generations appear here.</div>
         </div>
         <div class="vg-gallery-head-actions">
           <div class="vg-view-toggle" role="tablist" aria-label="Gallery view">
@@ -2087,7 +2289,7 @@ body:not(.vehicle-mode) .prompt-footer .btn-gen { width: 100%; margin-top: 2px; 
           </select>
           <div class="sel-caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
         </div>
-        <div class="sel-wrap vg-filter">
+        <div class="sel-wrap vg-filter" id="vgFilterYearWrap">
           <select id="vgFilterYear" onchange="onVehicleGalleryFilterChange()">
             <option value="">All years</option>
           </select>
@@ -2445,7 +2647,7 @@ const GEN_MODES = {
   },
 };
 
-// Vehicle Image Gen — catalog from India-Vehicles-Master-List (Cars + Luxury cars).
+// Vehicle Image Gen — catalog from Vehicles-data/India-Vehicles-Master-List.xlsx (Cars + Luxury cars).
 // Base reference image lives ONLY on the server (Vehicles-data/vehicle_base_reference.png)
 // and is attached by proxy.py — never embed/display it in the prompt UI.
 // India RHD: driver sits on the RIGHT. Driver-side front 3/4 = camera at front-RIGHT
@@ -2605,16 +2807,26 @@ function proxiedImageUrl(remoteUrl) {
 function resolveItemImageSrc(item) {
   if (!item) return '';
   if (item.id && imageSrcCache.has(item.id)) return imageSrcCache.get(item.id);
+  // Prefer durable local disk copies under /generated/
+  const local = item.localUrl
+    || (item.imageData && item.imageData.localUrl)
+    || (item.src && String(item.src).startsWith('/generated/') ? item.src : '');
+  if (local) return local;
   if (item.imageData && item.imageData.b64) {
     return `data:${item.imageData.mime || 'image/png'};base64,${item.imageData.b64}`;
   }
   if (item.src && String(item.src).startsWith('data:')) return item.src;
+  if (item.src && String(item.src).startsWith('/')) return item.src;
   // Temp Magnific URLs — serve via same-origin proxy (img + fetch both work)
   const remote = (item.src && /^https?:\/\//i.test(item.src))
     ? item.src
     : (item.sourceUrl && /^https?:\/\//i.test(item.sourceUrl) ? item.sourceUrl : '');
   if (remote) return proxiedImageUrl(remote);
-  if (item.imageData && item.imageData.url) return proxiedImageUrl(item.imageData.url);
+  if (item.imageData && item.imageData.url) {
+    const u = item.imageData.url;
+    if (String(u).startsWith('/generated/')) return u;
+    return proxiedImageUrl(u);
+  }
   return '';
 }
 
@@ -2658,25 +2870,121 @@ function purgeUnloadableVehicleHistory() {
   return next;
 }
 
+function isGalleryVariantItem(item) {
+  if (!item) return true;
+  return !!(item.isMirror || item.isEdit || item.isCutout
+    || item.badge === 'Mirrored' || item.badge === 'Edited' || item.badge === 'No BG'
+    || (item.variantOf && (item.badge === 'No BG' || item.isMirror || item.isEdit || item.isCutout)));
+}
+
 function getVehicleGallerySourceItems() {
   purgeUnloadableVehicleHistory();
   // Pipeline shows root cars only; mirror/edit/no-BG live as lightbox siblings
   return storeGet('history').filter(item =>
     isVehicleHistoryItem(item)
     && hasLoadableVehicleImage(item)
-    && !item.isMirror
-    && !item.isEdit
-    && !item.isCutout
-    && item.badge !== 'Mirrored'
-    && item.badge !== 'Edited'
-    && item.badge !== 'No BG'
-    && !(item.variantOf && (item.badge === 'No BG' || item.isMirror || item.isEdit || item.isCutout))
+    && !isGalleryVariantItem(item)
   );
+}
+
+function isImagenGalleryMode() {
+  return genMode === 'generate';
+}
+
+function getImagenGallerySourceItems() {
+  return storeGet('history').filter(item =>
+    !isVehicleHistoryItem(item)
+    && hasLoadableVehicleImage(item)
+    && !isGalleryVariantItem(item)
+  );
+}
+
+function getStudioGallerySourceItems() {
+  return isImagenGalleryMode() ? getImagenGallerySourceItems() : getVehicleGallerySourceItems();
+}
+
+function galleryThumbRatioClass(aspectOrRatio) {
+  const r = String(aspectOrRatio || '');
+  if (r === '4:3' || /4\s*:\s*3|classic_4_3/i.test(r)) return ' ratio-4-3';
+  if (r === '1:1' || /Square|square_1_1/i.test(r)) return ' ratio-1-1';
+  if (r === '9:16' || /social_story_9_16/i.test(r)) return ' ratio-9-16';
+  if (r === '3:4' || /traditional_3_4/i.test(r)) return ' ratio-3-4';
+  if (r === '4:5' || /social_post_4_5/i.test(r)) return ' ratio-4-5';
+  if (r === '3:2' || /standard_3_2/i.test(r)) return ' ratio-3-2';
+  if (r === '2:1' || /horizontal_2_1/i.test(r)) return ' ratio-2-1';
+  return '';
+}
+
+function galleryCardTitle(item) {
+  if (isVehicleHistoryItem(item)) {
+    const v = getItemVehicleMeta(item) || {};
+    return [v.make, v.model].filter(Boolean).join(' ') || 'Vehicle';
+  }
+  const prompt = String(item.prompt || '').trim();
+  if (!prompt) return 'Generated image';
+  return prompt.length > 72 ? prompt.slice(0, 69) + '…' : prompt;
+}
+
+function galleryCardLine(item) {
+  if (isVehicleHistoryItem(item)) {
+    const v = getItemVehicleMeta(item) || {};
+    return [v.year, v.color].filter(Boolean).join(' · ') || '—';
+  }
+  return [item.model, item.ratio].filter(Boolean).join(' · ') || '—';
+}
+
+function snapshotImagenPendingMeta() {
+  const modelOpt = document.getElementById('modelSelect')?.selectedOptions?.[0];
+  const ratioOpt = document.getElementById('ratioSelect')?.selectedOptions?.[0];
+  const res = document.getElementById('resSelect')?.value || '';
+  const num = document.getElementById('numSelect')?.value || '';
+  const modelLabel = (modelOpt && modelOpt.textContent.trim()) || 'Model';
+  const ratioLabel = ratioOpt ? (ratioOpt.dataset.label || ratioOpt.textContent.trim()) : '';
+  const scene = (document.getElementById('sceneInput')?.value || '').trim();
+  const enh = (document.getElementById('enhancedBody')?.textContent || '').trim();
+  const promptBit = (enh || scene || 'Generating…');
+  return {
+    title: promptBit.length > 56 ? promptBit.slice(0, 53) + '…' : promptBit,
+    line: [modelLabel, res, ratioLabel, num ? `${num}×` : ''].filter(Boolean).join(' · '),
+    aspect: ratioLabel,
+  };
+}
+
+function syncImagenConfigMeta() {
+  const meta = document.getElementById('imagenConfigMeta');
+  if (!meta) return;
+  const modelOpt = document.getElementById('modelSelect')?.selectedOptions?.[0];
+  const ratioOpt = document.getElementById('ratioSelect')?.selectedOptions?.[0];
+  const res = document.getElementById('resSelect')?.value || '';
+  const num = document.getElementById('numSelect')?.value || '';
+  const modelLabel = (modelOpt && modelOpt.textContent.trim()) || 'Model';
+  const ratioLabel = ratioOpt ? (ratioOpt.dataset.label || ratioOpt.textContent.trim()) : '';
+  meta.textContent = [modelLabel, res, `${num || '—'} image${num === '1' ? '' : 's'}`, ratioLabel]
+    .filter(Boolean).join(' · ');
+}
+
+function syncStudioGalleryChrome() {
+  const title = document.getElementById('vgGalleryTitle');
+  const search = document.getElementById('vgSearch');
+  const imagen = isImagenGalleryMode();
+  if (title) title.textContent = imagen ? 'Image gallery' : 'Vehicle gallery';
+  if (search) {
+    search.placeholder = imagen
+      ? 'Search prompt, model, ratio…'
+      : 'Search make, model, year, color…';
+  }
 }
 
 function filteredVehicleGalleryItems() {
   const q = (vehicleGalleryFilters.q || '').trim().toLowerCase();
-  return getVehicleGallerySourceItems().filter(item => {
+  const imagen = isImagenGalleryMode();
+  return getStudioGallerySourceItems().filter(item => {
+    if (imagen) {
+      if (!q) return true;
+      const hay = [item.prompt, item.fullPrompt, item.model, item.ratio, item.badge, item.provider]
+        .join(' ').toLowerCase();
+      return hay.includes(q);
+    }
     const v = getItemVehicleMeta(item) || {};
     if (vehicleGalleryFilters.make && v.make !== vehicleGalleryFilters.make) return false;
     if (vehicleGalleryFilters.year && String(v.year) !== String(vehicleGalleryFilters.year)) return false;
@@ -2815,14 +3123,17 @@ function buildVehicleGalleryCard(item) {
   const v = getItemVehicleMeta(item) || {};
   const src = resolveItemImageSrc(item);
   if (!src) return null;
+  const isVehicle = isVehicleHistoryItem(item);
+  const cardTitle = galleryCardTitle(item);
+  const cardLine = galleryCardLine(item);
 
   const wrap = document.createElement('div');
   wrap.className = 'vg-card';
   wrap.dataset.itemId = item.id;
 
   const thumb = document.createElement('div');
-  const ratio = v.aspect || item.ratio || '';
-  thumb.className = `vg-thumb${ratio === '4:3' ? ' ratio-4-3' : ''}${item.isCutout || item.badge === 'No BG' ? ' has-alpha' : ''}`;
+  const ratio = (isVehicle ? (v.aspect || item.ratio) : item.ratio) || '';
+  thumb.className = `vg-thumb${galleryThumbRatioClass(ratio)}${item.isCutout || item.badge === 'No BG' ? ' has-alpha' : ''}`;
   thumb.onclick = () => openLightbox(item.id, 'history');
 
   if (item.badge) {
@@ -2834,7 +3145,7 @@ function buildVehicleGalleryCard(item) {
 
   const img = document.createElement('img');
   img.src = src;
-  img.alt = `${v.make || ''} ${v.model || ''}`.trim() || 'Vehicle';
+  img.alt = cardTitle;
   img.onerror = () => {
     // Expired / corrupt — drop the card and purge history
     removeHistoryItemById(item.id);
@@ -2848,13 +3159,12 @@ function buildVehicleGalleryCard(item) {
   body.className = 'vg-card-body';
   const title = document.createElement('div');
   title.className = 'vg-card-title';
-  title.textContent = [v.make, v.model].filter(Boolean).join(' ') || 'Vehicle';
+  title.textContent = cardTitle;
   body.appendChild(title);
 
   const line1 = document.createElement('div');
   line1.className = 'vg-card-line';
-  // Aspect / side / camera / bg are locked — keep card copy to year + color only
-  line1.textContent = [v.year, v.color].filter(Boolean).join(' · ') || '—';
+  line1.textContent = cardLine;
   body.appendChild(line1);
 
   const actions = document.createElement('div');
@@ -2914,7 +3224,7 @@ function buildVehiclePendingCard(pending) {
   wrap.dataset.pendingId = pending.id;
 
   const thumb = document.createElement('div');
-  thumb.className = `vg-thumb${(v.aspect === '4:3') ? ' ratio-4-3' : ''}`;
+  thumb.className = `vg-thumb${galleryThumbRatioClass(v.aspect)}`;
   const inner = document.createElement('div');
   inner.className = 'vg-pending-inner';
   inner.innerHTML = `
@@ -2924,11 +3234,18 @@ function buildVehiclePendingCard(pending) {
   thumb.appendChild(inner);
   wrap.appendChild(thumb);
 
+  const title = v.title
+    || [v.make, v.model].filter(Boolean).join(' ')
+    || (isImagenGalleryMode() ? 'Image' : 'Vehicle');
+  const line = v.line
+    || [v.year, v.color].filter(Boolean).join(' · ')
+    || '—';
+
   const body = document.createElement('div');
   body.className = 'vg-card-body';
   body.innerHTML = `
-    <div class="vg-card-title">${esc([v.make, v.model].filter(Boolean).join(' ') || 'Vehicle')}</div>
-    <div class="vg-card-line">${esc([v.year, v.color].filter(Boolean).join(' · ') || '—')}</div>`;
+    <div class="vg-card-title">${esc(title)}</div>
+    <div class="vg-card-line">${esc(line)}</div>`;
   wrap.appendChild(body);
   return wrap;
 }
@@ -2942,10 +3259,18 @@ function renderVehicleGallery() {
   const makeWrap = document.getElementById('vgFilterMakeWrap');
   if (!grid || !section) return;
 
-  syncVehicleGalleryFilterOptions();
+  const imagen = isImagenGalleryMode();
+  // Imagen shares the gallery shell but not make-folder collections
+  if (imagen) {
+    vehicleGalleryMode = 'pipeline';
+    vehicleCollectionOpenMake = null;
+  }
+
+  syncStudioGalleryChrome();
+  if (!imagen) syncVehicleGalleryFilterOptions();
   const items = filteredVehicleGalleryItems();
   grid.innerHTML = '';
-  grid.classList.toggle('is-folders', vehicleGalleryMode === 'collections' && !vehicleCollectionOpenMake);
+  grid.classList.toggle('is-folders', !imagen && vehicleGalleryMode === 'collections' && !vehicleCollectionOpenMake);
 
   // Make filter is redundant in Collections (folders are already by make)
   if (makeWrap) {
@@ -2953,7 +3278,7 @@ function renderVehicleGallery() {
   }
 
   if (crumb) {
-    const showCrumb = vehicleGalleryMode === 'collections' && !!vehicleCollectionOpenMake;
+    const showCrumb = !imagen && vehicleGalleryMode === 'collections' && !!vehicleCollectionOpenMake;
     crumb.classList.toggle('visible', showCrumb);
     if (crumbMake) crumbMake.textContent = vehicleCollectionOpenMake || '';
   }
@@ -2963,8 +3288,8 @@ function renderVehicleGallery() {
   if (pipelineBtn) pipelineBtn.classList.toggle('on', vehicleGalleryMode === 'pipeline');
   if (collectionsBtn) collectionsBtn.classList.toggle('on', vehicleGalleryMode === 'collections');
 
-  // Collections: folder grid by make
-  if (vehicleGalleryMode === 'collections' && !vehicleCollectionOpenMake) {
+  // Collections: folder grid by make (Vehiclegen only)
+  if (!imagen && vehicleGalleryMode === 'collections' && !vehicleCollectionOpenMake) {
     // Pending gens still surface at top as cards spanning pipeline feel
     vehiclePendingGens.forEach(p => grid.appendChild(buildVehiclePendingCard(p)));
 
@@ -3000,7 +3325,7 @@ function renderVehicleGallery() {
 
   // Pipeline, or a single make folder inside Collections
   let list = items;
-  if (vehicleGalleryMode === 'collections' && vehicleCollectionOpenMake) {
+  if (!imagen && vehicleGalleryMode === 'collections' && vehicleCollectionOpenMake) {
     list = items.filter(item => {
       const make = ((getItemVehicleMeta(item) || {}).make || '').trim() || 'Unknown make';
       return make === vehicleCollectionOpenMake;
@@ -3008,7 +3333,7 @@ function renderVehicleGallery() {
   }
 
   const pendingForView = vehiclePendingGens.filter(p => {
-    if (vehicleGalleryMode !== 'collections' || !vehicleCollectionOpenMake) return true;
+    if (imagen || vehicleGalleryMode !== 'collections' || !vehicleCollectionOpenMake) return true;
     const make = (p.meta && p.meta.make) || 'Unknown make';
     return make === vehicleCollectionOpenMake;
   });
@@ -3021,20 +3346,27 @@ function renderVehicleGallery() {
   if (!pendingForView.length && !list.length) {
     const empty = document.createElement('div');
     empty.className = 'vg-empty';
-    empty.textContent = vehicleGalleryFilters.q || vehicleGalleryFilters.make || vehicleGalleryFilters.year
-      ? 'No vehicles match your search / filters.'
-      : (vehicleCollectionOpenMake
-        ? `No images in ${vehicleCollectionOpenMake} yet.`
-        : 'No vehicle images yet — generate one to start the gallery.');
+    if (imagen) {
+      empty.textContent = vehicleGalleryFilters.q
+        ? 'No images match your search.'
+        : 'No images yet — generate one to start the gallery.';
+    } else {
+      empty.textContent = vehicleGalleryFilters.q || vehicleGalleryFilters.make || vehicleGalleryFilters.year
+        ? 'No vehicles match your search / filters.'
+        : (vehicleCollectionOpenMake
+          ? `No images in ${vehicleCollectionOpenMake} yet.`
+          : 'No vehicle images yet — generate one to start the gallery.');
+    }
     grid.appendChild(empty);
   }
 
   if (meta) {
     const n = list.length;
     const p = pendingForView.length;
-    const bits = [`${n} vehicle image${n === 1 ? '' : 's'}`];
+    const noun = imagen ? 'image' : 'vehicle image';
+    const bits = [`${n} ${noun}${n === 1 ? '' : 's'}`];
     if (p) bits.push(`${p} generating`);
-    if (vehicleGalleryMode === 'collections' && vehicleCollectionOpenMake) {
+    if (!imagen && vehicleGalleryMode === 'collections' && vehicleCollectionOpenMake) {
       bits.push(vehicleCollectionOpenMake);
     } else {
       bits.push('Generation pipeline');
@@ -3788,7 +4120,7 @@ const VEHICLE_LOCKED = { num: '1', res: '2K' };
 let genSettingsBackup = null;
 
 function applyVehicleLocks(enabled) {
-  document.body.classList.toggle('vehicle-mode', enabled);
+  // Mode body classes are owned by applyGenMode — only lock values / row layout here.
   const numSel = document.getElementById('numSelect');
   const resSel = document.getElementById('resSelect');
   const ratioSel = document.getElementById('ratioSelect');
@@ -3834,6 +4166,11 @@ function applyGenMode(mode) {
   const subEl = document.getElementById('genSub');
   const sceneEl = document.getElementById('sceneInput');
   const panel = document.getElementById('vehicleCarPanel');
+  const imagenPanel = document.getElementById('imagenConfigPanel');
+  // Shared Vehiclegen studio shell for Imagen + Vehiclegen
+  document.body.classList.add('studio-ui');
+  document.body.classList.toggle('imagen-mode', mode === 'generate');
+  document.body.classList.toggle('vehicle-mode', mode === 'vehicle');
   if (titleEl) titleEl.textContent = cfg.title;
   if (subEl) subEl.textContent = cfg.sub;
   if (sceneEl) {
@@ -3846,25 +4183,28 @@ function applyGenMode(mode) {
     sceneEl.classList.toggle('prompt-locked', mode === 'vehicle');
   }
   if (panel) panel.classList.toggle('visible', mode === 'vehicle');
+  if (imagenPanel) imagenPanel.classList.toggle('visible', mode === 'generate');
   renderVehicleModelRefUI();
   applyVehicleLocks(mode === 'vehicle');
+  if (mode === 'generate') syncImagenConfigMeta();
   const genLabel = document.getElementById('genBtnLabel');
   if (genLabel && !isGenerating) {
     genLabel.textContent = 'Generate';
   }
+  // Both modes share the vehicle gallery panel (classic results stay unused)
   const classicResults = document.getElementById('resultsSectionClassic');
   const vehicleGallery = document.getElementById('vehicleGallerySection');
-  if (classicResults) classicResults.hidden = mode === 'vehicle';
-  if (vehicleGallery) vehicleGallery.hidden = mode !== 'vehicle';
-  const clearBtn = document.querySelector('.right-head .btn-clear');
-  if (clearBtn) {
-    clearBtn.onclick = mode === 'vehicle' ? clearVehicleGalleryFilters : clearResults;
-    clearBtn.title = mode === 'vehicle' ? 'Clear search & filters' : 'Clear results';
-  }
+  if (classicResults) classicResults.hidden = true;
+  if (vehicleGallery) vehicleGallery.hidden = false;
+  // Drop in-flight placeholders when switching modes so cards don't leak across
+  if (!isGenerating) vehiclePendingGens = [];
+  syncStudioGalleryChrome();
   if (mode === 'vehicle') {
     initVehicleSelectors()
       .then(() => renderVehicleGallery())
       .catch(err => console.warn(err));
+  } else {
+    renderVehicleGallery();
   }
 }
 
@@ -3902,7 +4242,11 @@ function navigateTo(view) {
   document.querySelectorAll('.nav-item').forEach(el => {
     el.classList.toggle('active', el.dataset.view === view);
   });
-  if (showGenerate) applyGenMode(view);
+  if (showGenerate) {
+    applyGenMode(view);
+  } else {
+    document.body.classList.remove('studio-ui', 'imagen-mode', 'vehicle-mode');
+  }
   if (view === 'admin') loadAdminData();
   else if (!showGenerate) renderGallery(view);
 }
@@ -3926,15 +4270,25 @@ const EMPTY_STATES = {
 
 function storeGet(kind) { try { return JSON.parse(localStorage.getItem(STORE_KEYS[kind])) || []; } catch { return []; } }
 function slimHistoryItemForStorage(item) {
-  // Keep metadata + remote URL; drop huge base64 from localStorage (quota ~5MB).
+  // Keep metadata + durable /generated URL; drop huge base64 from localStorage (quota ~5MB).
   const slim = { ...item };
+  const local = slim.localUrl
+    || (slim.imageData && slim.imageData.localUrl)
+    || (slim.src && String(slim.src).startsWith('/generated/') ? slim.src : '');
+  if (local) slim.localUrl = local;
   if (slim.imageData && slim.imageData.b64) {
     const mime = slim.imageData.mime || 'image/png';
-    const remote = slim.sourceUrl || slim.imageData.url || '';
-    slim.imageData = remote ? { url: remote, mime } : { mime, hasBytes: true };
+    const remote = local || slim.sourceUrl || slim.imageData.url || '';
+    slim.imageData = remote
+      ? { url: remote, mime, localUrl: local || undefined }
+      : { mime, hasBytes: true, localUrl: local || undefined };
+  } else if (slim.imageData && local) {
+    slim.imageData = { ...slim.imageData, localUrl: local, url: slim.imageData.url || local };
   }
   if (slim.src && String(slim.src).startsWith('data:') && slim.src.length > 8000) {
-    slim.src = slim.sourceUrl || '';
+    slim.src = local || slim.sourceUrl || '';
+  } else if (local && (!slim.src || String(slim.src).startsWith('data:'))) {
+    slim.src = local;
   }
   return slim;
 }
@@ -4782,7 +5136,7 @@ async function lbMirrorImage() {
     'and the current exterior left/right body orientation exactly.';
 
   const saveMirrorItem = async (imageData, fullPromptNote) => {
-    const persisted = await persistImageDataForHistory(imageData);
+    const persisted = await persistImageDataForHistory(imageData, { kind: 'mirror' });
     const src = persisted
       ? persisted.src
       : (imageData.b64
@@ -4792,6 +5146,7 @@ async function lbMirrorImage() {
     const mirrorItem = {
       id: newItemId(),
       src,
+      localUrl: (persisted && persisted.localUrl) || '',
       sourceUrl: (persisted && persisted.sourceUrl) || imageData.url || '',
       imageData: (persisted && persisted.imageData) || imageData,
       prompt: `${root.prompt || ''} — mirrored`,
@@ -4815,7 +5170,6 @@ async function lbMirrorImage() {
     root.mirrorId = mirrorItem.id;
     root.badge = root.badge || 'Original';
     refreshOpenView();
-    if (genMode === 'vehicle') renderVehicleGallery();
     openLightbox(root.id, lbFromView || 'history');
     selectLbVersion(mirrorItem.id);
     return mirrorItem;
@@ -4918,7 +5272,6 @@ async function lbRemoveBackground() {
     const cutout = await removeBackgroundForItem(source, { root });
     imageSrcCache.set(cutout.id, cutout.src);
     refreshOpenView();
-    if (genMode === 'vehicle') renderVehicleGallery();
     openLightbox(root.id, lbFromView || 'history');
     selectLbVersion(cutout.id);
     label.textContent = 'No-BG ready';
@@ -4942,17 +5295,32 @@ async function lbRegenerate() {
   label.textContent = 'Regenerating…';
   try {
     const imageData = await doRegenerate(item);
-    const src = imageData.b64
-      ? `data:${imageData.mime || 'image/png'};base64,${imageData.b64}`
-      : imageData.url;
+    const persisted = await persistImageDataForHistory(imageData, {
+      kind: item.kind === 'vehicle' || item.vehicle ? 'vehicle-regen' : 'regen',
+    });
+    const src = persisted
+      ? persisted.src
+      : (imageData.b64
+        ? `data:${imageData.mime || 'image/png'};base64,${imageData.b64}`
+        : proxiedImageUrl(imageData.url));
+    if (!src) throw new Error('No image returned.');
     const newItem = {
-      id: newItemId(), src,
+      id: newItemId(),
+      src,
+      localUrl: (persisted && persisted.localUrl) || '',
+      sourceUrl: (persisted && persisted.sourceUrl) || imageData.url || '',
+      imageData: (persisted && persisted.imageData) || imageData,
       prompt: item.prompt, fullPrompt: item.fullPrompt, model: item.model, modelId: item.modelId,
-      provider: item.provider, ratio: item.ratio, ts: Date.now(), regeneratedFrom: item.id,
+      provider: item.provider, ratio: item.ratio,
+      kind: item.kind || (item.vehicle ? 'vehicle' : 'generate'),
+      vehicle: item.vehicle ? { ...item.vehicle } : null,
+      ts: Date.now(), regeneratedFrom: item.id,
+      badge: 'Original',
     };
+    imageSrcCache.set(newItem.id, src);
     saveToHistory(newItem);
     refreshOpenView();
-    openLightbox(newItem.id, 'history');
+    openLightbox(newItem.id, lbFromView || 'history');
   } catch (e) {
     alert('Regenerate failed: ' + e.message);
   } finally {
@@ -4971,7 +5339,8 @@ async function doRegenerate(item) {
 function refreshOpenView() {
   const active = document.querySelector('.nav-item.active');
   const v = active ? active.dataset.view : 'generate';
-  if (v !== 'generate' && v !== 'vehicle') renderGallery(v);
+  if (v === 'generate' || v === 'vehicle') renderVehicleGallery();
+  else renderGallery(v);
 }
 
 // ─── EDIT IMAGE ───────────────────────────────────────────────────────────────
@@ -5005,7 +5374,7 @@ async function applyEdit() {
   try {
     const root = getLbRootItem(editItem) || editItem;
     const imageData = await doRegenerateEdit(editItem, instruction);
-    const persisted = await persistImageDataForHistory(imageData);
+    const persisted = await persistImageDataForHistory(imageData, { kind: 'edit' });
     const src = persisted
       ? persisted.src
       : (imageData.b64
@@ -5016,6 +5385,7 @@ async function applyEdit() {
     const newItem = {
       id: newItemId(),
       src,
+      localUrl: (persisted && persisted.localUrl) || '',
       sourceUrl: (persisted && persisted.sourceUrl) || imageData.url || '',
       imageData: (persisted && persisted.imageData) || imageData,
       prompt: `${root.prompt || editItem.prompt} — edited: ${instruction}`,
@@ -5047,7 +5417,6 @@ async function applyEdit() {
 
     closeEditModal();
     refreshOpenView();
-    if (genMode === 'vehicle') renderVehicleGallery();
     openLightbox(root.id, lbFromView || 'history');
     selectLbVersion(newItem.id);
   } catch (e) {
@@ -5484,7 +5853,9 @@ function onModelChange() {
   const id = document.getElementById('modelSelect').value;
   const m  = MODELS[id];
   document.getElementById('subModelSection').style.display = m.supportsSubModel ? '' : 'none';
-  document.getElementById('resSelect').closest('.form-group').style.opacity = m.supportsRes ? '1' : '0.4';
+  const resGroup = document.getElementById('resSelect')?.closest('.form-group');
+  if (resGroup) resGroup.style.opacity = m.supportsRes ? '1' : '0.4';
+  syncImagenConfigMeta();
 }
 
 // ─── PILLS ────────────────────────────────────────────────────────────────────
@@ -5540,7 +5911,10 @@ function setProgress(pct) {
 function cancelGeneration() {
   state.cancelRequested = true;
   setStatus('err', 'Cancelled');
-  document.getElementById('progressCard').classList.add('hidden');
+  const progressCard = document.getElementById('progressCard');
+  if (progressCard) progressCard.classList.add('hidden');
+  vehiclePendingGens = [];
+  if (typeof renderVehicleGallery === 'function') renderVehicleGallery();
 }
 
 function clearResults() {
@@ -5666,36 +6040,10 @@ async function generate() {
     document.getElementById('genBtnLabel').innerHTML = '<span class="btn-spinner"></span>&nbsp; Generating…';
     setStatus('working', 'Generating…');
 
-    if (genMode === 'vehicle') {
-      for (let i = 0; i < num; i++) {
-        pendingIds.push(startVehicleGalleryPending(vehicleMeta));
-      }
-    } else {
-      document.getElementById('progressCard').classList.remove('hidden');
-      setProgress(0);
-      const acls = getAspectCls();
-      const grid = document.getElementById('resultsGrid');
-      grid.className = `results-grid n${num}`;
-      grid.innerHTML = Array.from({length: num}, (_, i) =>
-        `<div class="img-ph${acls?' '+acls:''}" id="ph_${i}">
-          <div class="ph-spinner"></div>
-          <div class="ph-msg">Generating…</div>
-          <div class="ph-time" id="pht_${i}">0s</div>
-        </div>`
-      ).join('');
-      document.getElementById('resultsSub').textContent = `Generating ${num} image${num>1?'s':''}…`;
-
-      const startTime = Date.now();
-      timerInterval = setInterval(() => {
-        const elapsed = Math.round((Date.now() - startTime) / 1000);
-        document.querySelectorAll('[id^="pht_"]').forEach(el => {
-          if (el.parentElement.classList.contains('img-ph')) {
-            el.textContent = `${elapsed}s`;
-          }
-        });
-        const fakePct = Math.min(90, elapsed * 2.5);
-        setProgress(fakePct);
-      }, 1000);
+    // Shared gallery pending cards (Imagen + Vehiclegen)
+    const pendingMeta = genMode === 'vehicle' ? vehicleMeta : snapshotImagenPendingMeta();
+    for (let i = 0; i < num; i++) {
+      pendingIds.push(startVehicleGalleryPending(pendingMeta));
     }
 
     const tasks = Array.from({length: num}, (_, i) =>
@@ -5706,23 +6054,17 @@ async function generate() {
     if (timerInterval) clearInterval(timerInterval);
 
     if (state.cancelRequested) {
-      if (genMode === 'vehicle') pendingIds.forEach(finishVehicleGalleryPending);
+      pendingIds.forEach(finishVehicleGalleryPending);
       setStatus('err', 'Cancelled');
       return;
     }
 
     const successes = results.filter(r => r.status === 'fulfilled').length;
     const firstErr = results.find(r => r.status === 'rejected');
-    if (genMode !== 'vehicle') {
-      setProgress(100);
-      document.getElementById('progressCard').classList.add('hidden');
-      document.getElementById('resultsSub').textContent = `${successes} image${successes!==1?'s':''} generated.`;
-    } else {
-      pendingIds.forEach(id => {
-        if (vehiclePendingGens.some(p => p.id === id)) finishVehicleGalleryPending(id);
-      });
-      renderVehicleGallery();
-    }
+    pendingIds.forEach(id => {
+      if (vehiclePendingGens.some(p => p.id === id)) finishVehicleGalleryPending(id);
+    });
+    renderVehicleGallery();
     if (successes) {
       setStatus('done', `${successes} of ${num} completed`);
     } else {
@@ -5731,9 +6073,7 @@ async function generate() {
         : 'Generation failed — check status and try again';
       setStatus('err', detail.slice(0, 120));
       console.error('Generation failed:', firstErr && firstErr.reason);
-      if (genMode === 'vehicle') {
-        alert('Generation failed:\n' + detail);
-      }
+      alert('Generation failed:\n' + detail);
     }
   } catch (e) {
     console.error('generate() error:', e);
@@ -5763,8 +6103,7 @@ async function runGeneration(model, prompt, negPrompt, ratio, res, guidance, see
   } catch(e) {
     if (!state.cancelRequested) {
       if (pendingId) finishVehicleGalleryPending(pendingId);
-      if (genMode !== 'vehicle') showError(idx, e.message);
-      else setStatus('err', e.message.slice(0, 80));
+      setStatus('err', e.message.slice(0, 80));
     }
     throw e;
   }
@@ -5917,46 +6256,97 @@ async function blobToPersisted(blob, sourceUrl) {
   };
 }
 
-async function persistImageDataForHistory(imageData) {
+/** Save image bytes to server ./generated (local disk; S3 later). */
+async function saveGeneratedToLocalDisk({ b64, mime, url, kind }) {
+  const body = { kind: kind || (genMode === 'vehicle' ? 'vehicle' : 'generate'), mime: mime || 'image/png' };
+  if (b64) body.image_b64 = String(b64).startsWith('data:') ? b64 : `data:${body.mime};base64,${b64}`;
+  else if (url) body.image_url = url;
+  else return null;
+  const res = await fetch('/api/generated/save', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-session-token': getSessionToken(),
+    },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(parseApiError(res.status, await res.text()));
+  return await res.json();
+}
+
+async function persistImageDataForHistory(imageData, opts = {}) {
+  const kind = opts.kind
+    || (genMode === 'vehicle' || (lastGenMeta && lastGenMeta.kind === 'vehicle') ? 'vehicle' : 'generate');
+  let persisted = null;
+
   if (imageData && imageData.b64) {
-    return {
+    persisted = {
       src: `data:${imageData.mime || 'image/png'};base64,${imageData.b64}`,
       sourceUrl: imageData.url || '',
       imageData: { b64: imageData.b64, mime: imageData.mime || 'image/png', url: imageData.url || '' },
     };
-  }
-  const url = imageData && imageData.url;
-  if (!url) return null;
+  } else {
+    const url = imageData && imageData.url;
+    if (!url) return null;
 
-  // 1) Direct fetch (works when CDN sends CORS)
-  try {
-    const r = await fetch(url);
-    if (r.ok) return await blobToPersisted(await r.blob(), url);
-  } catch (e) {
-    console.warn('Direct image fetch failed, trying proxy…', e);
+    // 1) Direct fetch (works when CDN sends CORS)
+    try {
+      const r = await fetch(url);
+      if (r.ok) persisted = await blobToPersisted(await r.blob(), url);
+    } catch (e) {
+      console.warn('Direct image fetch failed, trying proxy…', e);
+    }
+
+    // 2) Same-origin proxy (fixes CORS) — this is why gens were vanishing
+    if (!persisted) {
+      try {
+        const r = await fetch(proxiedImageUrl(url), {
+          headers: { 'x-session-token': getSessionToken() },
+        });
+        if (!r.ok) throw new Error('proxy fetch ' + r.status);
+        persisted = await blobToPersisted(await r.blob(), url);
+      } catch (e) {
+        console.warn('Could not persist image bytes; keeping proxied URL.', e);
+        // Still return a displayable src so the card does not disappear
+        return {
+          src: proxiedImageUrl(url),
+          sourceUrl: url,
+          imageData: { url, mime: 'image/png' },
+        };
+      }
+    }
   }
 
-  // 2) Same-origin proxy (fixes CORS) — this is why gens were vanishing
+  // 3) Always write a durable copy under ./generated on the server
   try {
-    const r = await fetch(proxiedImageUrl(url), {
-      headers: { 'x-session-token': getSessionToken() },
+    const saved = await saveGeneratedToLocalDisk({
+      b64: persisted.imageData && persisted.imageData.b64,
+      mime: (persisted.imageData && persisted.imageData.mime) || 'image/png',
+      url: persisted.sourceUrl || (imageData && imageData.url) || '',
+      kind,
     });
-    if (!r.ok) throw new Error('proxy fetch ' + r.status);
-    return await blobToPersisted(await r.blob(), url);
+    if (saved && saved.url) {
+      persisted.localUrl = saved.url;
+      persisted.localPath = saved.path;
+      persisted.localFilename = saved.filename;
+      // Prefer disk URL for display so refresh still works without huge localStorage
+      persisted.src = saved.url;
+      if (persisted.imageData) {
+        persisted.imageData = {
+          ...persisted.imageData,
+          localUrl: saved.url,
+          url: persisted.imageData.url || saved.url,
+        };
+      }
+    }
   } catch (e) {
-    console.warn('Could not persist image bytes; keeping proxied URL.', e);
-    // Still return a displayable src so the card does not disappear
-    return {
-      src: proxiedImageUrl(url),
-      sourceUrl: url,
-      imageData: { url, mime: 'image/png' },
-    };
+    console.warn('Local disk save failed; keeping in-memory image.', e);
   }
+  return persisted;
 }
 
 async function showImage(idx, imageData, pendingId) {
   const persisted = await persistImageDataForHistory(imageData);
-  const isVehicle = genMode === 'vehicle' || lastGenMeta.kind === 'vehicle' || !!pendingId;
 
   if (!persisted && !imageData) {
     if (pendingId) finishVehicleGalleryPending(pendingId);
@@ -5981,6 +6371,7 @@ async function showImage(idx, imageData, pendingId) {
   const item = {
     id: newItemId(),
     src,
+    localUrl: (persisted && persisted.localUrl) || (src && String(src).startsWith('/generated/') ? src : ''),
     sourceUrl: (persisted && persisted.sourceUrl) || imageData.url || '',
     imageData: (persisted && persisted.imageData) || imageData,
     prompt: lastGenMeta.prompt, fullPrompt: lastGenMeta.fullPrompt,
@@ -5995,17 +6386,9 @@ async function showImage(idx, imageData, pendingId) {
   imageSrcCache.set(item.id, src);
   saveToHistory(item);
 
-  if (isVehicle) {
-    if (pendingId) finishVehicleGalleryPending(pendingId);
-    else renderVehicleGallery();
-    return;
-  }
-
-  const ph = document.getElementById(`ph_${idx}`);
-  if (!ph) return;
-  const card = buildResultCard(item, { showRemoveBg: true });
-  ph.replaceWith(card);
-  updateResultsGridLayout();
+  // Shared studio gallery (Imagen + Vehiclegen)
+  if (pendingId) finishVehicleGalleryPending(pendingId);
+  else renderVehicleGallery();
 }
 
 function buildResultCard(item, { showRemoveBg = true } = {}) {
@@ -6104,27 +6487,21 @@ function updateResultsGridLayout() {
 }
 
 function appendResultThumbnail(item) {
-  if (genMode === 'vehicle' || item.kind === 'vehicle' || item.vehicle) {
-    // Keep vehicle meta on cutout variants
-    if (!item.vehicle && item.variantOf) {
-      const parent = storeGet('history').find(x => x.id === item.variantOf);
-      if (parent && parent.vehicle) item.vehicle = { ...parent.vehicle };
-      if (parent && parent.kind) item.kind = parent.kind;
+  // Keep vehicle meta on cutout variants; always refresh shared studio gallery
+  if (!item.vehicle && item.variantOf) {
+    const parent = storeGet('history').find(x => x.id === item.variantOf);
+    if (parent && parent.vehicle) item.vehicle = { ...parent.vehicle };
+    if (parent && parent.kind) item.kind = parent.kind;
+    if (item.vehicle || item.kind) {
       const hist = storeGet('history');
       const hi = hist.findIndex(x => x.id === item.id);
       if (hi >= 0) {
-        hist[hi] = { ...hist[hi], vehicle: item.vehicle, kind: item.kind || 'vehicle' };
+        hist[hi] = { ...hist[hi], vehicle: item.vehicle, kind: item.kind || hist[hi].kind };
         storeSet('history', hist);
       }
     }
-    renderVehicleGallery();
-    return;
   }
-  const grid = document.getElementById('resultsGrid');
-  if (!grid) return;
-  const card = buildResultCard(item, { showRemoveBg: !item.variantOf });
-  grid.appendChild(card);
-  updateResultsGridLayout();
+  renderVehicleGallery();
 }
 
 async function removeBackgroundForItem(item, opts = {}) {
@@ -6169,13 +6546,20 @@ async function removeBackgroundForItem(item, opts = {}) {
   const data = await res.json();
   if (!data.b64) throw new Error('No cutout returned from remove.bg.');
 
-  const finalSrc = `data:${data.mime || 'image/png'};base64,${data.b64}`;
+  const finalSrc = data.local_url
+    || `data:${data.mime || 'image/png'};base64,${data.b64}`;
 
   const cutoutItem = {
     id: newItemId(),
     src: finalSrc,
+    localUrl: data.local_url || '',
     sourceUrl: '',
-    imageData: { b64: finalSrc.split(',')[1], mime: 'image/png' },
+    imageData: {
+      b64: data.b64,
+      mime: 'image/png',
+      localUrl: data.local_url || '',
+      url: data.local_url || '',
+    },
     prompt: `${root.prompt || item.prompt || ''} — no BG`,
     fullPrompt: root.fullPrompt || item.fullPrompt || item.prompt || '',
     model: item.model || root.model,
@@ -6372,6 +6756,8 @@ document.addEventListener('DOMContentLoaded', () => {
   wireSelectWraps();
   wireVehicleCombos();
   wireLbPanZoom();
+  // Default landing: Imagen with shared Vehiclegen studio shell + Imagen controls
+  applyGenMode('generate');
   checkSession();
 });
 </script>

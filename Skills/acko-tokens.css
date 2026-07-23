@@ -1,0 +1,215 @@
+/**
+ * ACKO design tokens — built from Skills/
+ * primitives → semantics → app compatibility aliases
+ * Default theme: dark ([data-theme="dark"] on <html>)
+ */
+
+:root {
+  /* ── Primitives (colors-primitive) ── */
+  --grey-white: #FFFFFF;
+  --grey-50: #FBFBFB;
+  --grey-100: #F5F5F5;
+  --grey-150: #EBEBEB;
+  --grey-200: #E0E0E1;
+  --grey-250: #CCCCCD;
+  --grey-300: #B7B7B8;
+  --grey-350: #8F8E92;
+  --grey-400: #7A7B7D;
+  --grey-450: #605F63;
+  --grey-500: #474649;
+  --grey-550: #333333;
+  --grey-600: #242324;
+  --grey-650: #19191A;
+  --grey-700: #141414;
+  --grey-750: #0F0F10;
+  --grey-800: #0A0A0A;
+  --grey-black: #000000;
+
+  --purple-50: #F5F3FF;
+  --purple-100: #EAEAFD;
+  --purple-200: #D9D8FC;
+  --purple-300: #BDB8FA;
+  --purple-400: #9B8FF6;
+  --purple-500: #7A62F0;
+  --purple-600: #6841E6;
+  --purple-700: #582FD2;
+  --purple-800: #4E29BB;
+  --purple-900: #3E2290;
+  --purple-950: #241362;
+
+  --red-400: #F87171;
+  --red-600: #DC2626;
+  --red-700: #B91C1C;
+  --green-400: #4ADE80;
+  --green-500: #22C55E;
+  --green-600: #16A34A;
+  --green-700: #15803D;
+  --orange-400: #FFA85C;
+  --orange-500: #FF8D28;
+  --orange-600: #EB740A;
+  --orange-700: #B65C0C;
+
+  /* ── Radii (radii.mdc) ── */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 10px;
+  --radius-2xl: 12px;
+  --radius-3xl: 16px;
+  --radius-4xl: 20px;
+  --radius-full: 9999px;
+
+  /* ── Shadows (shadows.mdc) — dark-weighted defaults ── */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.28);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.32);
+  --shadow-lg: 0 2px 16px 4px rgba(0, 0, 0, 0.36);
+  --shadow-xl: 0 4px 24px rgba(0, 0, 0, 0.45);
+  --shadow-2xl: 0 8px 32px rgba(0, 0, 0, 0.55);
+  --shadow-border: 0 0 0 1px rgba(255, 255, 255, 0.06);
+
+  /* ── Motion (motion.mdc) ── */
+  --ease-out-quad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-out-cubic: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --ease-in-out-cubic: cubic-bezier(0.645, 0.045, 0.355, 1);
+  --ease-in-out-quart: cubic-bezier(0.77, 0, 0.175, 1);
+
+  /* ── Type scale (typography.mdc) ── */
+  --font-10-size: 10px; --font-10-line: 12px;
+  --font-12-size: 12px; --font-12-line: 16px;
+  --font-14-size: 14px; --font-14-line: 20px;
+  --font-16-size: 16px; --font-16-line: 24px;
+  --font-18-size: 18px; --font-18-line: 24px;
+  --font-20-size: 20px; --font-20-line: 28px;
+  --font-24-size: 24px; --font-24-line: 32px;
+  --font-30-size: 30px; --font-30-line: 36px;
+  --font-family: 'EuclidCircular', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* ── Layout ── */
+  --sidebar-w: 200px;
+  --gutter-mobile: 16px;
+  --gutter-tablet: 32px;
+  --gutter-desktop: 40px;
+  --content-max: 1280px;
+}
+
+/* ── Dark semantic theme (acko-dark.mdc + colors-semantic) ── */
+:root,
+[data-theme="dark"] {
+  --color-primary: var(--purple-500);
+  --color-primary-hover: var(--purple-400);
+  --color-primary-active: var(--purple-300);
+  --color-primary-muted: var(--purple-600);
+  --color-primary-subtle: var(--purple-900);
+  --color-primary-ring: var(--purple-800);
+  --color-on-primary: var(--grey-white);
+
+  --color-surface: var(--grey-750);
+  --color-surface-raised: var(--grey-700);
+  --color-surface-raised-hover: var(--grey-650);
+  --color-surface-raised-active: var(--grey-600);
+  --color-surface-overlay: rgba(0, 0, 0, 0.7);
+  --color-surface-ghost-hover: rgba(255, 255, 255, 0.05);
+
+  --color-text-primary: var(--grey-50);
+  --color-text-default: var(--grey-100);
+  --color-text-supporting: var(--grey-200);
+  --color-text-secondary: var(--grey-350);
+  --color-text-disabled: var(--grey-450);
+  --color-text-invert: var(--grey-white);
+  --color-text-brand: var(--purple-500);
+  --color-text-error: var(--red-400);
+  --color-text-success: var(--green-400);
+  --color-text-static: var(--grey-white);
+
+  --color-border: var(--grey-600);
+  --color-border-strong: var(--grey-550);
+  --color-border-subtle: var(--grey-650);
+
+  --color-disabled-bg: var(--grey-600);
+  --color-disabled-text: var(--grey-450);
+  --color-disabled-border: var(--grey-600);
+
+  --color-error: var(--red-600);
+  --color-error-text: var(--red-400);
+  --color-success: var(--green-500);
+  --color-success-text: var(--green-400);
+  --color-warning: var(--orange-500);
+  --color-warning-text: var(--orange-400);
+
+  --color-card-bg: var(--grey-650);
+  --color-card-border: var(--grey-650);
+  --color-card-elevated-bg: var(--grey-650);
+  --color-card-demoted-bg: var(--grey-750);
+
+  --color-input-bg: var(--grey-750);
+  --color-input-border: var(--grey-600);
+  --color-input-hover-border: var(--grey-550);
+  --color-input-filled-border: var(--grey-550);
+  --color-input-focus-border: var(--grey-550);
+  --color-input-disabled-bg: var(--grey-650);
+  --color-input-disabled-border: var(--grey-600);
+  --color-input-option-hover: var(--grey-650);
+  --color-input-option-selected-bg: var(--purple-900);
+  --color-input-option-selected-text: var(--purple-300);
+
+  --color-table-header-bg: var(--grey-700);
+  --color-table-header-text: var(--grey-350);
+  --color-table-border: var(--grey-600);
+  --color-table-row-hover: var(--grey-650);
+  --color-table-stripe: rgba(255, 255, 255, 0.02);
+
+  --color-btn-secondary-bg: var(--grey-650);
+  --color-btn-secondary-border: var(--purple-600);
+  --color-btn-secondary-text: var(--grey-50);
+  --color-btn-ghost-color: var(--purple-500);
+  --color-btn-ghost-hover-bg: var(--grey-600);
+  --color-btn-disabled-bg: var(--grey-600);
+  --color-btn-disabled-text: var(--grey-450);
+
+  --shadow-card: var(--shadow-md);
+  --shadow-dropdown: var(--shadow-lg);
+  --shadow-modal: var(--shadow-xl);
+  --shadow-subtle: var(--shadow-sm);
+  --shadow-btn-inner: inset 0 1px 2px rgba(255, 255, 255, 0.15);
+  --shadow-btn-hover: 0 4px 8px rgba(0, 0, 0, 0.3);
+  --shadow-focus-ring: 0 0 0 3px var(--color-primary-ring);
+
+  /* App compatibility aliases (legacy generate.html vars → dark semantics) */
+  --purple: var(--color-primary);
+  --purple-d: var(--color-primary-hover);
+  --purple-l: var(--color-primary-subtle);
+  --purple-pale: var(--color-primary-subtle);
+  --purple-2: var(--purple-400);
+  --ink: var(--color-text-primary);
+  --text: var(--color-text-default);
+  --sub: var(--color-text-supporting);
+  --muted: var(--color-text-secondary);
+  --border: var(--color-border-subtle);
+  --border-s: var(--color-border);
+  --bg: var(--color-surface);
+  --white: var(--color-surface-raised);
+  --green: var(--color-success);
+  --red: var(--color-error);
+  --orange: var(--color-warning);
+  --grad: linear-gradient(135deg, var(--purple-500) 0%, var(--purple-400) 100%);
+  --r-sm: var(--radius-xl);
+  --r-md: var(--radius-2xl);
+  --r-lg: var(--radius-4xl);
+  --r: var(--radius-4xl);
+}
+
+/* Dark scrollbar (acko-dark.mdc) */
+[data-theme="dark"] {
+  color-scheme: dark;
+  scrollbar-color: var(--grey-550) var(--grey-750);
+}
+[data-theme="dark"] ::-webkit-scrollbar { width: 10px; height: 10px; }
+[data-theme="dark"] ::-webkit-scrollbar-track { background: var(--grey-750); }
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: var(--grey-550);
+  border-radius: var(--radius-full);
+  border: 2px solid var(--grey-750);
+}
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover { background: var(--grey-450); }

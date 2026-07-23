@@ -1,0 +1,311 @@
+---
+description: Typography tokens — font family, type scale, weight rules, and sizing guidelines
+globs: "**/*.css,**/*.tsx"
+alwaysApply: true
+---
+# Typography Tokens
+
+## Documentation scope
+
+**Portable across platforms:** Font family (Euclid Circular B), weights, the **type scale** (display / heading / body / label levels and their px sizes, line heights, letter spacing), sentence-case content rules, and Typography **color intent** (`primary`, `secondary`, `brand`, etc.) as *roles*.
+
+**Web-specific in this file:** CSS `var(--font-*-*)` examples, Tailwind class equivalents (`text-base`, `font-medium`). On Flutter, use `TextStyle` or themed text styles with the **same numeric scale**.
+
+## Font Family
+
+**Euclid Circular B** — all text across the system.
+
+```css
+font-family: 'Euclid Circular B', -apple-system, BlinkMacSystemFont, sans-serif;
+```
+
+CDN base: `https://pub-c050457d48794d5bb9ffc2b4649de2c1.r2.dev/Euclid%20Font/`
+
+Weights: Light (300), Regular (400), Medium (500), Semibold (600), Bold (700).
+
+## Size Ramp
+
+The system defines **15 font sizes**. Every text-bearing component must reference this scale — no hardcoded sizes outside of it.
+
+| Step | Size | Line Height | Token (CSS) | Tailwind |
+|------|------|-------------|-------------|----------|
+| 1 | 10px | 12px | `--font-10-size` / `--font-10-line` | `text-[10px] leading-[12px]` |
+| 2 | 12px | 16px | `--font-12-size` / `--font-12-line` | `text-xs leading-[16px]` |
+| 3 | 14px | 20px | `--font-14-size` / `--font-14-line` | `text-sm leading-[20px]` |
+| 4 | 16px | 24px | `--font-16-size` / `--font-16-line` | `text-base leading-[24px]` |
+| 5 | 18px | 24px | `--font-18-size` / `--font-18-line` | `text-lg leading-[24px]` |
+| 6 | 20px | 28px | `--font-20-size` / `--font-20-line` | `text-xl leading-[28px]` |
+| 7 | 24px | 32px | `--font-24-size` / `--font-24-line` | `text-2xl leading-[32px]` |
+| 8 | 30px | 36px | `--font-30-size` / `--font-30-line` | `text-[30px] leading-[36px]` |
+| 9 | 36px | 44px | `--font-36-size` / `--font-36-line` | `text-[36px] leading-[44px]` |
+| 10 | 48px | 56px | `--font-48-size` / `--font-48-line` | `text-[48px] leading-[56px]` |
+| 11 | 54px | 64px | `--font-54-size` / `--font-54-line` | `text-[54px] leading-[64px]` |
+| 12 | 60px | 72px | `--font-60-size` / `--font-60-line` | `text-[60px] leading-[72px]` |
+| 13 | 72px | 80px | `--font-72-size` / `--font-72-line` | `text-[72px] leading-[80px]` |
+| 14 | 96px | 108px | `--font-96-size` / `--font-96-line` | `text-[96px] leading-[108px]` |
+| 15 | 128px | 140px | `--font-128-size` / `--font-128-line` | `text-[128px] leading-[140px]` |
+
+## Style Variants
+
+Each of the 15 sizes carries **10 named style variants**. A variant combines **weight**, **font-style**, and **text-decoration**.
+
+| # | Variant name | Weight | Italic | Underline | Tailwind utilities |
+|---|--------------|--------|--------|-----------|--------------------|
+| 1 | `normal` | 400 (Regular) | — | — | `font-normal` |
+| 2 | `medium` | 500 (Medium) | — | — | `font-medium` |
+| 3 | `bold` | 700 (Bold) | — | — | `font-bold` |
+| 4 | `italic` | 400 (Regular) | yes | — | `font-normal italic` |
+| 5 | `medium-italic` | 500 (Medium) | yes | — | `font-medium italic` |
+| 6 | `underline` | 400 (Regular) | — | yes | `font-normal underline` |
+| 7 | `medium-underline` | 500 (Medium) | — | yes | `font-medium underline` |
+| 8 | `bold-underline` | 700 (Bold) | — | yes | `font-bold underline` |
+| 9 | `underline-italic` | 400 (Regular) | yes | yes | `font-normal italic underline` |
+| 10 | `medium-under-italic` | 500 (Medium) | yes | yes | `font-medium italic underline` |
+
+**Total combinations:** 15 sizes × 10 variants = **150 text styles**.
+
+### How to reference a style
+
+Pattern: `{size}/{variant}` — e.g. **10/normal**, **24/bold**, **48/medium-italic**.
+
+CSS token pattern per combination:
+```css
+--font-{size}-{variant}-weight   /* e.g. --font-24-bold-weight: 700 */
+--font-{size}-{variant}-style    /* e.g. --font-24-bold-style: normal */
+--font-{size}-{variant}-decoration /* e.g. --font-24-bold-decoration: none */
+```
+
+Size and line-height are shared across all 10 variants of the same step — only weight, font-style, and text-decoration change.
+
+### Example usage in CSS
+
+```css
+.my-heading {
+  font-size: var(--font-24-size);
+  line-height: var(--font-24-line);
+  font-weight: var(--font-24-bold-weight);
+  font-style: var(--font-24-bold-style);
+  text-decoration: var(--font-24-bold-decoration);
+}
+```
+
+Tailwind shorthand for the same:
+```html
+<span class="text-2xl leading-[32px] font-bold">…</span>
+```
+
+## Semantic Aliases (Role-Based)
+
+Semantic tokens map to the size ramp above. Components should prefer semantic aliases when the usage context matches a defined role; fall back to the numeric size ramp for anything outside these roles.
+
+### Display (marketing, heroes)
+
+| Alias | Maps to | Letter Spacing | Default variant |
+|-------|---------|----------------|-----------------|
+| `--font-display-xl-*` | 72px / 80px | -2px | `bold` (700) |
+| `--font-display-lg-*` | 60px / 72px | -1.5px | `bold` (700) |
+| `--font-display-md-*` | 48px / 56px | -1px | `bold` (700) |
+| `--font-display-sm-*` | 36px / 44px | -0.5px | `medium` (500) |
+
+### Heading (UI sections)
+
+| Alias | Maps to | Letter Spacing | Default variant |
+|-------|---------|----------------|-----------------|
+| `--font-heading-xl-*` | 30px / 36px | -0.5px | `medium` (500) |
+| `--font-heading-lg-*` | 24px / 32px | -0.3px | `medium` (500) |
+| `--font-heading-md-*` | 20px / 28px | -0.2px | `medium` (500) |
+| `--font-heading-sm-*` | 18px / 24px | 0px | `medium` (500) |
+
+### Body (content)
+
+| Alias | Maps to | Letter Spacing | Default variant |
+|-------|---------|----------------|-----------------|
+| `--font-body-lg-*` | 18px / 24px | 0px | `normal` (400) |
+| `--font-body-md-*` | 16px / 24px | 0px | `normal` (400) |
+| `--font-body-sm-*` | 14px / 20px | 0px | `normal` (400) |
+
+### Labels & Utility
+
+| Alias | Maps to | Letter Spacing | Default variant |
+|-------|---------|----------------|-----------------|
+| `--font-label-lg-*` | 14px / 20px | 0.1px | `medium` (500) |
+| `--font-label-md-*` | 12px / 16px | 0.2px | `medium` (500) |
+| `--font-label-sm-*` | 10px / 12px | 0.3px | `medium` (500) |
+| `--font-caption-*` | 12px / 16px | 0px | `normal` (400) |
+| `--font-overline-*` | 10px / 12px | 0.5px | `medium` (500) |
+
+## Tailwind Mapping
+
+### Size utilities
+
+| Size | Tailwind class | Notes |
+|------|----------------|-------|
+| 10px | `text-[10px]` | Custom value |
+| 12px | `text-xs` | Built-in |
+| 14px | `text-sm` | Built-in |
+| 16px | `text-base` | Built-in |
+| 18px | `text-lg` | Built-in |
+| 20px | `text-xl` | Built-in |
+| 24px | `text-2xl` | Built-in |
+| 30px | `text-[30px]` | Custom value |
+| 36px | `text-[36px]` | Custom value |
+| 48px | `text-[48px]` | Custom value |
+| 54px | `text-[54px]` | Custom value |
+| 60px | `text-[60px]` | Custom value |
+| 72px | `text-[72px]` | Custom value |
+| 96px | `text-[96px]` | Custom value |
+| 128px | `text-[128px]` | Custom value |
+
+### Line-height utilities
+
+| Line Height | Tailwind class |
+|-------------|----------------|
+| 12px | `leading-[12px]` |
+| 16px | `leading-[16px]` |
+| 20px | `leading-[20px]` |
+| 24px | `leading-[24px]` |
+| 28px | `leading-[28px]` |
+| 32px | `leading-[32px]` |
+| 36px | `leading-[36px]` |
+| 44px | `leading-[44px]` |
+| 56px | `leading-[56px]` |
+| 64px | `leading-[64px]` |
+| 72px | `leading-[72px]` |
+| 80px | `leading-[80px]` |
+| 108px | `leading-[108px]` |
+| 140px | `leading-[140px]` |
+
+### Weight utilities
+
+| Weight | Tailwind class |
+|--------|----------------|
+| 300 (Light) | `font-light` |
+| 400 (Regular) | `font-normal` |
+| 500 (Medium) | `font-medium` |
+| 600 (Semibold) | `font-semibold` |
+| 700 (Bold) | `font-bold` |
+
+### Style & decoration utilities
+
+| Property | Tailwind class |
+|----------|----------------|
+| Italic | `italic` |
+| Not italic | `not-italic` |
+| Underline | `underline` |
+| No underline | `no-underline` |
+
+## Rules
+
+- Every text-bearing component must reference the **15-step size ramp** and **10 style variants** defined above — no component-specific hardcoded font sizes.
+- Minimum 14px for body text, 12px for labels, 10px absolute minimum (use sparingly).
+- Medium (500) for emphasis in body — not Bold.
+- Bold (700) is reserved for display-level text and the `bold` / `bold-underline` variants.
+- Tighter letter-spacing for large text, looser for small text.
+- Use `text-wrap: balance` on headings.
+- `font-variant-numeric: tabular-nums` for dynamic numbers.
+- When a semantic alias exists for the context (e.g. heading, body, label), prefer the alias over the raw numeric size token.
+
+Typography tokens are **theme-agnostic** — they do not change between themes.
+
+## Text Casing
+
+All UI text must follow **sentence case** — capitalize only the first word and proper nouns/exceptions. This applies across the entire system: headings, buttons, labels, tabs, breadcrumbs, navigation items, links, and toast actions.
+
+> Capitalize only the first word of a text label. All other words are lowercase unless they are proper nouns or fall under the exceptions below.
+
+### Examples
+
+**Correct**
+
+- `Get a quote`
+- `View my policy`
+- `Continue to payment`
+- `Check IDV`
+- `Claim your NCB`
+- `Pay with ACKO Drive`
+- `Find clinics near Bengaluru`
+
+**Incorrect**
+
+- `Get A Quote`
+- `View My Policy`
+- `Continue To Payment`
+- `Check Idv`
+- `Claim Your NCB`
+- `find clinics near bengaluru`
+
+### Exceptions
+
+These terms always retain their defined casing regardless of position in the label.
+
+#### Brand names
+
+- `ACKO` — always all-caps
+- `ACKO [Product]` — sub-brands retain their casing (e.g., `ACKO Drive`, `ACKO Clinic`)
+
+#### Proper nouns
+
+City names, state names, country names, and person names retain their standard capitalization. Sentence case applies to common nouns and verbs — not proper nouns.
+
+- `Check plans in Hyderabad` — correct
+- `Check plans in hyderabad` — incorrect
+- `Aadhaar` — always capitalized as a proper noun (not `AADHAAR` or `aadhaar`)
+
+#### Regulatory & government bodies
+
+- `IRDAI` — Insurance Regulatory and Development Authority of India
+
+#### Insurance & financial acronyms
+
+- `IDV` — Insured Declared Value
+- `NCB` — No Claim Bonus
+- `KYC` — Know Your Customer
+- `GST` — Goods and Services Tax
+- `EMI` — Equated Monthly Instalment
+- `OTP` — One Time Password
+
+#### Identity & document acronyms
+
+- `PAN` — Permanent Account Number
+
+### All-caps emphasis
+
+Words like `FREE`, `NEW`, `SAVE` must remain lowercase in button, label, and navigation text. All-caps emphasis belongs in the `<Badge>` component (which defaults to `textCase="uppercase"`) — not in text labels.
+
+- `Get a free quote` — correct (button)
+- `Get a FREE quote` — incorrect (button)
+- `FREE` — correct (inside a `<Badge>`)
+
+### Common nouns
+
+Product and coverage terms like `premium`, `claim`, `policy`, `cover` are common nouns — always lowercase unless they start the sentence.
+
+### Where this applies
+
+| Component | Applies? |
+|-----------|----------|
+| Button labels | Yes |
+| Tab labels | Yes |
+| Breadcrumb text | Yes |
+| Navigation items | Yes |
+| Link text | Yes |
+| Toast action labels | Yes |
+| Dialog action buttons | Yes |
+| Headings | Yes |
+| Badge | No — Badge has its own `textCase` prop (`uppercase` or `sentence`, default: `uppercase`). See `badge.react.mdc` → **Text Case Selection** for the decision table. |
+
+## Typography Color System
+
+The `<Typography>` component's `color` prop uses 7 intent-based values. Each prop maps 1:1 to a `--color-text-{prop}` token:
+
+| Value | Token | Use case |
+|-------|-------|----------|
+| `primary` (default) | `--color-text-primary` | General use — headings, values, main content |
+| `secondary` | `--color-text-secondary` | Subtext — captions, helpers, descriptions |
+| `invert` | `--color-text-invert` | Text on dark/filled surfaces (opposite of current theme) |
+| `brand` | `--color-text-brand` | Brand-colored text — links, emphasis |
+| `error` | `--color-text-error` | Error messages |
+| `success` | `--color-text-success` | Success messages |
+| `static` | `--color-text-static` | Fixed color across themes — white in both light and dark |
+
+All tokens except `static` auto-adapt across light and dark themes. `static` produces an identical color (`grey-white`) in both themes — use it for text that must remain fixed regardless of theme (e.g., white text on a photo overlay).

@@ -1,0 +1,170 @@
+---
+description: Spacing, sizing, opacity, z-index, and utility tokens — numeric foundation for the design system
+---
+
+# Spacing & Sizing
+
+All numeric foundations for the design system: spacing, component sizing, and utility tokens. All tokens on this page are **theme-agnostic** — they do not change between themes.
+
+## Documentation scope
+
+**Portable across platforms:** Numeric intent — “8px gap”, “48px control height”, inter-component spacing table, opacity and z-index scales, hairline border behavior. These values should match in Flutter (`SizedBox`, `EdgeInsets`, theme spacing constants) even if the *syntax* differs.
+
+**Web-specific in this file:** Tailwind v4 utilities (`gap-8`, `h-48`, `@apply`, `@theme inline` `--spacing`). Flutter does not use these class names; map the **pixel column** to your spacing API.
+
+## Spacing System
+
+Spacing is powered by Tailwind v4 utilities with a **1px base**:
+
+```css
+/* theme.css */
+@theme inline {
+  --spacing: 0.0625rem; /* 1px at 16px root */
+}
+```
+
+**The utility number equals the pixel value.** No math, no indirection:
+
+- `gap-12` = 12px
+- `p-16` = 16px
+- `h-48` = 48px
+- `w-240` = 240px
+
+Because the base is `0.0625rem` (1/16 of a rem), all spacing scales proportionally with the root font-size. A consumer app can use `clamp()` on `html { font-size }` and every spacing/sizing utility will scale fluidly.
+
+### Rules
+
+1. **Never use `var(--scale-*)` or `var(--space-*)`** — these tokens have been removed
+2. **Never use raw `px` values** for spacing — always use a Tailwind utility via `@apply`
+3. **Never use the old 4px-multiplier mapping** (`gap-2` for 8px is wrong; use `gap-8`)
+4. All spacing in component CSS goes through `@apply` — zero inline `px` values for gaps, padding, margins, or dimensions
+
+## Spacing Reference
+
+Use Tailwind utilities directly. The number is the pixel value.
+
+| Utility | Pixels | Use Case |
+|---------|--------|----------|
+| `gap-4` / `p-4` | 4px | Micro gaps |
+| `gap-8` / `p-8` | 8px | Icon padding, tight gaps, inline elements |
+| `gap-12` / `p-12` | 12px | Form field gaps, small component padding |
+| `gap-16` / `p-16` | 16px | Standard padding, card gaps, button padding |
+| `gap-20` / `p-20` | 20px | Medium gaps, card padding (md) |
+| `gap-24` / `p-24` | 24px | Card padding (lg), section gaps |
+| `gap-28` | 28px | Component internal spacing |
+| `gap-32` | 32px | Large component gaps |
+| `gap-36` | 36px | Section padding |
+| `gap-40` | 40px | Large spacing |
+| `gap-48` | 48px | Section margins |
+| `gap-64` | 64px | Page sections |
+| `gap-80` | 80px | Hero spacing |
+| `gap-96` | 96px | Large section breaks |
+
+## Component Sizing Scale
+
+Fixed heights for interactive components — use `h-*` utilities:
+
+| Utility | Pixels | Used by |
+|---------|--------|---------|
+| `h-32` | 32px | Button xs |
+| `h-36` | 36px | Switch sm track, InputGroup sm |
+| `h-40` | 40px | Button sm, TextInput sm, Dropdown sm |
+| `h-44` | 44px | Switch md track, InputGroup md, min tap target |
+| `h-48` | 48px | Button md, TextInput md, Dropdown md |
+| `h-52` | 52px | InputGroup lg |
+| `h-56` | 56px | Button lg, TextInput lg, Dropdown lg |
+| `h-64` | 64px | Button xl |
+
+## Inter-Component Spacing
+
+| Between | Utility |
+|---------|---------|
+| Label and input | `gap-8` (8px) |
+| Input and helper/error text | `gap-8` (8px) |
+| Form fields | `gap-20` (20px) |
+| Section heading and content | `gap-32` (32px) |
+| Cards in a grid | `gap-16` mobile, `gap-24` desktop |
+| Buttons in a group | `gap-12` (12px) |
+| Icon and adjacent text | `gap-8` (8px) |
+
+## Tailwind Utility Examples
+
+With `--spacing: 0.0625rem`, utility numbers map 1:1 to pixels:
+
+| Intent | Utility | CSS Output |
+|--------|---------|------------|
+| 8px gap | `gap-8` | `gap: calc(var(--spacing) * 8)` → 8px |
+| 16px padding | `p-16` | `padding: calc(var(--spacing) * 16)` → 16px |
+| 48px height | `h-48` | `height: calc(var(--spacing) * 48)` → 48px |
+| 40px height | `h-40` | `height: calc(var(--spacing) * 40)` → 40px |
+| 56px height | `h-56` | `height: calc(var(--spacing) * 56)` → 56px |
+| 240px width | `w-240` | `width: calc(var(--spacing) * 240)` → 240px |
+| 12px margin-top | `mt-12` | `margin-top: calc(var(--spacing) * 12)` → 12px |
+
+### Anti-patterns
+
+| Don't | Do |
+|-------|----|
+| `gap-2` for 8px (old 4px base) | `gap-8` for 8px |
+| `h-12` for 48px (old 4px base) | `h-48` for 48px |
+| `gap-[var(--scale-8)]` | `gap-8` |
+| `padding: var(--scale-16)` | `@apply p-16` |
+| `width: 240px` | `@apply w-240` |
+| `height: 48px` | `@apply h-48` |
+
+## Opacity Scale (`--opacity-*`)
+
+Direct decimal values from 0 to 1. The token number represents the percentage (e.g., `--opacity-48` = 0.48).
+
+| Token | Value | | Token | Value |
+|-------|-------|-|-------|-------|
+| `--opacity-0` | 0 | | `--opacity-44` | 0.44 |
+| `--opacity-2` | 0.02 | | `--opacity-48` | 0.48 |
+| `--opacity-4` | 0.04 | | `--opacity-52` | 0.52 |
+| `--opacity-6` | 0.06 | | `--opacity-56` | 0.56 |
+| `--opacity-8` | 0.08 | | `--opacity-64` | 0.64 |
+| `--opacity-10` | 0.10 | | `--opacity-72` | 0.72 |
+| `--opacity-12` | 0.12 | | `--opacity-80` | 0.80 |
+| `--opacity-16` | 0.16 | | `--opacity-88` | 0.88 |
+| `--opacity-20` | 0.20 | | `--opacity-96` | 0.96 |
+| `--opacity-24` | 0.24 | | `--opacity-100` | 1.00 |
+| `--opacity-28` | 0.28 | | | |
+| `--opacity-32` | 0.32 | | | |
+| `--opacity-36` | 0.36 | | | |
+| `--opacity-40` | 0.40 | | | |
+
+## Z-Index Scale (`--z-*`)
+
+| Token | Value | Use Case |
+|-------|-------|----------|
+| `--z-dropdown` | 100 | Dropdown menus, select popups |
+| `--z-sticky` | 150 | Sticky headers, floating elements |
+| `--z-modal` | 200 | Modal dialogs, sheets |
+| `--z-tooltip` | 300 | Tooltips, popovers |
+| `--z-toast` | 400 | Toast notifications |
+
+## Responsive Breakpoints
+
+See `foundation/layout.mdc` for the canonical breakpoint definitions, section containers, gutters, and full-bleed rules.
+
+| Name | Range | Media Query |
+|------|-------|-------------|
+| Mobile | 0 – 767px | Base styles (no media query) |
+| Tablet | 768px – 1023px | `@media (min-width: 768px)` |
+| Desktop | ≥ 1024px | `@media (min-width: 1024px)` |
+
+## Hairline Border (`--border-hairline`)
+
+A responsive border width that renders as 0.5px on retina displays:
+
+```css
+:root {
+  --border-hairline: 1px;
+}
+
+@media (min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  :root {
+    --border-hairline: 0.5px;
+  }
+}
+```

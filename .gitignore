@@ -5,3 +5,5 @@ node_modules/
 .DS_Store
 gen_debug.log
 pending_requests.json
+generated/*
+!generated/.gitkeep
