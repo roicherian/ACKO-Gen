@@ -840,6 +840,30 @@ class ProxyHandler(BaseHTTPRequestHandler):
             self.send_json(200, {"user": updated})
             return
 
+        # Admin-only: permanently remove a user (and any pending request) from the store.
+        if self.path == "/admin/users/delete":
+            ok, admin_email = require_admin(self.headers.get("x-session-token", ""))
+            if not ok:
+                self.send_json(403, {"error": "Admin access required."})
+                return
+            length = int(self.headers.get("Content-Length", 0))
+            try:
+                data = json.loads(self.rfile.read(length) or b"{}")
+            except Exception:
+                self.send_json(400, {"error": "Invalid request body."})
+                return
+            target_email = str(data.get("email", "")).strip().lower()
+            if target_email == admin_email:
+                self.send_json(400, {"error": "You can't delete your own admin account."})
+                return
+            try:
+                user_store.delete_user(target_email)
+            except ValueError as e:
+                self.send_json(400, {"error": str(e)})
+                return
+            self.send_json(200, {"ok": True})
+            return
+
         # Persist any generation / edit / cutout to ./generated (local disk; S3 later).
         if self.path == "/api/generated/save":
             ok, email = verify_session(self.headers.get("x-session-token", ""))

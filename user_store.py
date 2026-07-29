@@ -171,6 +171,20 @@ def set_permission(email, new_permission, granted_by):
     return _row_to_dict(row)
 
 
+def delete_user(email):
+    """Admin action: permanently removes a user row (pending request or granted
+    access alike). Raises ValueError for an unknown email — callers turn that
+    into a 400."""
+    email = email.strip().lower()
+    with _lock:
+        conn = _connect()
+        row = conn.execute("SELECT email FROM users WHERE email = ?", (email,)).fetchone()
+        if row is None:
+            raise ValueError(f"No such user: {email}")
+        conn.execute("DELETE FROM users WHERE email = ?", (email,))
+        conn.commit()
+
+
 def bootstrap_admins(emails):
     """Ensures each given email exists and is set to 'Admin'. Called once at proxy
     startup from the ADMIN_EMAILS env var — without this, a fresh database has

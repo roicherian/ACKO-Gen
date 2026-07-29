@@ -21,11 +21,12 @@ body {
   display: flex; flex-direction: column; overflow: hidden;
 }
 
-/* Dark-theme logo (acko-dark.mdc — Primary Dark BG) */
+/* Dark-theme logo — colors matched to the official ACKO_Logo.svg brand file
+   (wordmark stays white here since the file's navy #28205f is meant for a light bg). */
 .acko-wordmark, .login-wordmark { fill: var(--grey-50) !important; }
-.acko-lens, .login-lens { fill: var(--purple-400) !important; }
-.acko-hex-light, .login-hex-light { fill: var(--purple-500) !important; }
-.acko-hex-dark, .login-hex-dark { fill: var(--purple-700) !important; }
+.acko-lens, .login-lens { fill: #b59cf5 !important; }
+.acko-hex-light, .login-hex-light { fill: #926ff3 !important; }
+.acko-hex-dark, .login-hex-dark { fill: #4e29bb !important; }
 
 /* APP SHELL */
 .app { display: flex; height: 100vh; overflow: hidden; background: var(--bg); }
@@ -220,30 +221,19 @@ body.imagen-mode .btn-action:hover {
   background: rgba(124,58,237,.18);
 }
 body.imagen-mode .enhanced-wrap {
-  background: linear-gradient(180deg, #17171f 0%, #121218 100%);
-  border: 1px solid var(--vg-line);
-  border-radius: 18px;
-  box-shadow: 0 12px 36px rgba(0,0,0,.28);
-  overflow: hidden;
-  margin-bottom: 10px;
+  background: transparent;
+  border: none;
+  overflow: visible;
+  margin-bottom: 0;
 }
-body.imagen-mode .enhanced-head {
-  border-bottom: 1px solid var(--vg-line);
-  background: rgba(255,255,255,.02);
-}
-body.imagen-mode .enhanced-title,
-body.imagen-mode .editable-hint { color: var(--vg-text); }
 body.imagen-mode .enhanced-body {
   color: var(--vg-text);
   background: transparent;
-  min-height: 88px;
+  min-height: 120px;
+  max-height: 240px;
+  overflow-y: auto;
 }
 body.imagen-mode .enhanced-body:empty:before { color: #6d6d7c; }
-body.imagen-mode .btn-copy-sm {
-  background: var(--vg-elev);
-  border-color: var(--vg-line);
-  color: #cfcfd8;
-}
 body.imagen-mode .neg-accordion {
   background: linear-gradient(180deg, #17171f 0%, #121218 100%);
   border: 1px solid var(--vg-line);
@@ -262,11 +252,6 @@ body.imagen-mode .neg-body textarea {
   border: 1px solid var(--vg-line);
   color: var(--vg-text);
   border-radius: 12px;
-}
-body.imagen-mode .enhanced-body:hover { background: rgba(124,58,237,.08); }
-body.imagen-mode .enhanced-body:focus {
-  background: rgba(255,255,255,.02);
-  box-shadow: inset 0 0 0 2px rgba(139,92,246,.28);
 }
 
 /* Hard-guard: Imagen enhance / neg / advanced stay visible in imagen-mode only
@@ -394,8 +379,6 @@ body.studio-ui .prompt-wrap .vehicle-select-row select option {
   color: var(--color-text-primary); background: var(--color-surface-raised);
 }
 body.studio-ui .prompt-wrap .vehicle-select-row .sel-caret { color: var(--vg-muted); }
-body.imagen-mode .imagen-select-row #ratioGroup select { max-width: 210px; }
-body.imagen-mode .imagen-select-row #aiModelGroup select { max-width: 180px; }
 body.vehicle-mode .vg-year-ref-locked {
   opacity: .55;
   pointer-events: none;
@@ -699,6 +682,107 @@ body.imagen-mode #vgFilterYearWrap { display: none !important; }
   grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
   gap: 24px;
 }
+/* Imagen: side-by-side settings card + gallery card (Magnific-style layout).
+   Only kicks in above 1100px — below that there isn't room for 3 columns
+   (sidebar + settings + gallery) without the settings/gallery panels overlapping,
+   so we fall back to the default stacked layout (studio-ui's single-column rules). */
+@media (min-width: 1200px) {
+  body.imagen-mode .app {
+    grid-template-columns: var(--sidebar-w) minmax(300px, 380px) minmax(320px, 1fr);
+    grid-template-rows: 1fr;
+    column-gap: 24px;
+  }
+  body.imagen-mode .center {
+    grid-column: 2; grid-row: 1;
+    border: 1px solid var(--vg-line); border-radius: 16px;
+    background: var(--vg-surface); padding: 20px; margin: 22px 0;
+    overflow-y: auto; height: calc(100vh - 44px);
+    min-width: 0;
+  }
+  body.imagen-mode .right {
+    grid-column: 3; grid-row: 1;
+    padding: 22px 28px 22px 0; margin: 0;
+    display: flex; flex-direction: column; gap: 16px;
+    overflow-y: auto; height: 100vh;
+    min-width: 0;
+  }
+}
+body.imagen-mode #imagenConfigMeta { display: none; }
+body.imagen-mode .prompt-wrap .imagen-select-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+}
+body.imagen-mode .prompt-wrap .imagen-select-row .form-group { width: 100%; min-width: 0; }
+body.imagen-mode .prompt-wrap .imagen-select-row .form-label {
+  position: static; width: auto; height: auto; overflow: visible; clip: auto;
+  white-space: normal; display: block;
+  font: 600 12px/1 Outfit, Inter, sans-serif; color: var(--vg-muted);
+  margin-bottom: 6px; text-transform: none; letter-spacing: 0;
+}
+body.imagen-mode .prompt-wrap .imagen-select-row .sel-wrap {
+  height: 44px; border-radius: 10px; width: 100%;
+}
+body.imagen-mode .prompt-wrap .imagen-select-row select {
+  max-width: none; margin-right: 0; padding-right: 36px; width: 100%;
+}
+body.imagen-mode .vehicle-car-panel-label { font-size: 14px; font-weight: 700; }
+
+.gallery-card {
+  background: var(--vg-surface); border: 1px solid var(--vg-line); border-radius: 16px;
+  padding: 18px 20px;
+}
+.gallery-card-head { margin-bottom: 14px; }
+.gallery-card-title { font: 700 17px/1.2 Outfit, sans-serif; color: var(--vg-text); }
+.gallery-card-sub { font: 500 12px/1.4 Outfit, sans-serif; color: var(--vg-muted); margin-top: 2px; }
+
+.gen-batch { grid-column: 1 / -1; margin-bottom: 6px; }
+.gen-batch-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; margin-bottom: 12px; flex-wrap: wrap;
+}
+.gen-batch-prompt {
+  color: var(--vg-text, #f3f3f7); font: 500 13.5px/1.4 Outfit, Inter, sans-serif;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 60%;
+}
+.gen-batch-chips { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.gen-chip {
+  font: 600 11px/1 Outfit, Inter, sans-serif; color: var(--vg-muted, #b8b8c6);
+  background: rgba(255,255,255,.06); border: 1px solid var(--vg-line, rgba(255,255,255,.08));
+  border-radius: 999px; padding: 6px 12px; white-space: nowrap;
+}
+.gen-batch-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px; margin-bottom: 28px;
+}
+.gen-card {
+  position: relative; aspect-ratio: 16/9; background: #101014;
+  border-radius: 14px; overflow: hidden; cursor: zoom-in;
+  border: 1px solid var(--vg-line, rgba(255,255,255,.08));
+}
+.gen-card.ratio-4-3 { aspect-ratio: 4/3; }
+.gen-card.ratio-1-1 { aspect-ratio: 1/1; }
+.gen-card.ratio-9-16 { aspect-ratio: 9/16; }
+.gen-card.ratio-3-4 { aspect-ratio: 3/4; }
+.gen-card.ratio-4-5 { aspect-ratio: 4/5; }
+.gen-card.ratio-3-2 { aspect-ratio: 3/2; }
+.gen-card.ratio-2-1 { aspect-ratio: 2/1; }
+.gen-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.gen-card.has-alpha { background: repeating-conic-gradient(#1c1c22 0% 25%, #131317 0% 50%) 50% / 16px 16px; }
+.gen-card.has-alpha img { object-fit: contain; }
+.gen-card-overlay {
+  position: absolute; top: 8px; right: 8px; display: flex; gap: 6px;
+  opacity: 0; transition: opacity .15s;
+}
+.gen-card:hover .gen-card-overlay { opacity: 1; }
+.gen-icon-btn {
+  width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: rgba(10,10,12,.72); border: 1px solid rgba(255,255,255,.12); color: #f3f3f7;
+  backdrop-filter: blur(4px); cursor: pointer; font-size: 14px; flex-shrink: 0;
+}
+.gen-icon-btn svg { width: 15px; height: 15px; }
+.gen-icon-btn:hover { background: rgba(124,58,237,.35); }
+.gen-icon-btn.danger:hover { background: rgba(225,29,72,.45); }
+.gen-icon-btn.on { background: rgba(124,58,237,.55); border-color: rgba(196,181,253,.6); color: #fff; }
+.gen-icon-btn.on svg { fill: currentColor; }
 .vg-card {
   background: var(--vg-surface, #14141a);
   border: 1px solid var(--vg-line, rgba(255,255,255,.08));
@@ -750,6 +834,19 @@ body.imagen-mode #vgFilterYearWrap { display: none !important; }
 }
 .vg-pending-label { font: 600 16px/1 Outfit, sans-serif; color: #c4b5fd; }
 .vg-pending-time { font: 500 14px/1 Outfit, sans-serif; color: #6d6d7c; }
+.gen-card.is-pending { cursor: default; }
+.gen-pending-inner {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 10px; color: var(--vg-muted, #8b8b9a);
+  background: linear-gradient(180deg, #16161e, #101016);
+}
+.gen-pending-inner .ph-spinner {
+  width: 30px; height: 30px; border: 3px solid rgba(167,139,250,.25);
+  border-top-color: #a78bfa; border-radius: 50%; animation: spin .7s linear infinite;
+}
+.gen-pending-label { font: 600 13px/1 Outfit, sans-serif; color: #c4b5fd; }
+.gen-pending-time { font: 500 11.5px/1 Outfit, sans-serif; color: #6d6d7c; }
 .vg-card-body { padding: 20px 22px 22px; }
 .vg-card-title {
   font: 700 22px/1.25 Outfit, sans-serif;
@@ -923,6 +1020,12 @@ body.imagen-mode #vgFilterYearWrap { display: none !important; }
   font-size: 11px; color: var(--muted); overflow: hidden; text-overflow: ellipsis;
   white-space: nowrap; min-width: 0;
 }
+.sidebar-user-chip {
+  font-size: 11.5px; font-weight: 600; color: var(--sub);
+  border: 1px solid var(--border-s); border-radius: 999px; padding: 4px 12px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;
+  cursor: default; user-select: none;
+}
 .sidebar-signout {
   flex-shrink: 0; border: none; background: none; color: var(--muted);
   font: 600 11px/1 'Inter', sans-serif; cursor: pointer; padding: 4px 6px;
@@ -951,6 +1054,8 @@ body.imagen-mode #vgFilterYearWrap { display: none !important; }
 .btn-adv:hover { border-color: var(--purple); color: var(--purple); }
 .btn-adv svg { width: 14px; height: 14px; }
 .btn-adv i[class^="cil-"] { font-size: 14px; line-height: 1; }
+#imagenAdvBtn { width: 100%; justify-content: space-between; margin-top: 14px; padding: 10px 13px; }
+#imagenAdvBtn svg:last-child { width: 15px; height: 15px; }
 
 /* FORM ROW */
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
@@ -974,6 +1079,10 @@ body.imagen-mode #vgFilterYearWrap { display: none !important; }
 }
 .sel-icon svg { width: 15px; height: 15px; }
 .sel-icon i[class^="cil-"] { font-size: 15px; line-height: 1; }
+svg.sel-icon {
+  width: 16px; height: 16px; margin-right: 8px; color: var(--purple, #7a62f0);
+  flex-shrink: 0; pointer-events: none;
+}
 .sel-caret i[class^="cil-"] { font-size: 14px; line-height: 1; }
 .sel-wrap select {
   flex: 1; border: none; background: none; outline: none;
@@ -1011,6 +1120,14 @@ body.imagen-mode #vgFilterYearWrap { display: none !important; }
   gap: 10px; flex-wrap: wrap;
 }
 .char-count { font-size: 11px; color: var(--muted); }
+.btn-icon-sq {
+  width: 28px; height: 28px; border-radius: 8px; border: 1px solid var(--border-s);
+  background: none; color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all .15s; flex-shrink: 0;
+}
+.btn-icon-sq svg { width: 14px; height: 14px; }
+.btn-icon-sq:hover { border-color: var(--purple); color: var(--purple); }
+.imagen-enhance-row { padding: 0 16px 14px; display: flex; justify-content: flex-end; }
 /* Legacy non-studio layout only — studio-ui uses Vehiclegen-style footer */
 body:not(.studio-ui):not(.vehicle-mode) .prompt-footer {
   flex-direction: column;
@@ -1019,8 +1136,26 @@ body:not(.studio-ui):not(.vehicle-mode) .prompt-footer {
 body:not(.studio-ui):not(.vehicle-mode) .prompt-footer .char-count { align-self: flex-start; }
 body:not(.studio-ui):not(.vehicle-mode) .prompt-footer .btn-gen { width: 100%; margin-top: 2px; }
 
+/* Prompt / Enhanced Prompt tab toggle (segmented pill, list icon vs sparkle icon) */
+.prompt-tab-toggle {
+  display: inline-flex; align-items: center; gap: 2px;
+  padding: 3px; margin: 10px 12px 0;
+  background: rgba(255,255,255,.04); border: 1px solid var(--vg-line, var(--border-s));
+  border-radius: 999px; width: fit-content;
+}
+.ptab-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 34px; height: 30px; border: none; border-radius: 999px;
+  background: transparent; color: var(--vg-muted, var(--muted)); cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.ptab-btn svg { width: 16px; height: 16px; }
+.ptab-btn:hover { color: var(--vg-text, var(--text)); }
+.ptab-btn.active { background: var(--vg-elev, var(--white)); color: var(--vg-accent-2, var(--purple)); box-shadow: var(--shadow-xs); }
+
 /* ACTION BUTTONS */
 .action-row { display: flex; gap: 8px; margin-bottom: 14px; }
+body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
 .btn-action {
   display: flex; align-items: center; gap: 7px; padding: 8px 14px;
   border: 1px solid var(--border-s); border-radius: var(--r-sm); background: var(--white);
@@ -1031,31 +1166,9 @@ body:not(.studio-ui):not(.vehicle-mode) .prompt-footer .btn-gen { width: 100%; m
 .btn-action svg { width: 14px; height: 14px; }
 .btn-action i[class^="cil-"] { font-size: 14px; line-height: 1; }
 
-/* ENHANCED PROMPT */
-.enhanced-wrap {
-  background: var(--white); border: 1px solid var(--border-s); border-radius: var(--r-md);
-  overflow: hidden; margin-bottom: 14px; box-shadow: var(--shadow-xs);
-}
-.enhanced-head {
-  padding: 10px 14px; border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-}
-.enhanced-title {
-  font-size: 12px; font-weight: 600; color: var(--sub);
-  display: flex; align-items: center; gap: 7px;
-}
-.enhanced-title svg { width: 13px; height: 13px; color: var(--purple); }
-.enhanced-title i[class^="cil-"] { font-size: 13px; line-height: 1; color: var(--purple); }
-.info-icon {
-  width: 15px; height: 15px; border-radius: 50%; background: var(--bg);
-  display: inline-flex; align-items: center; justify-content: center;
-  font-size: 9px; font-weight: 700; color: var(--muted); cursor: default;
-}
-.enhanced-head-actions { display: flex; align-items: center; gap: 8px; }
-.editable-hint {
-  font-size: 10px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
-  color: var(--purple); background: var(--purple-l); padding: 3px 7px; border-radius: 100px;
-}
+/* ENHANCED PROMPT — deliberately unstyled beyond the shared prompt-wrap card,
+   so it reads as the same box as before enhancing, not a distinct "feature". */
+.enhanced-wrap { background: transparent; border: none; overflow: visible; margin-bottom: 0; }
 .btn-copy-sm {
   display: flex; align-items: center; gap: 5px; padding: 4px 9px;
   border: 1px solid var(--border); border-radius: 6px; background: none;
@@ -1065,11 +1178,9 @@ body:not(.studio-ui):not(.vehicle-mode) .prompt-footer .btn-gen { width: 100%; m
 .btn-copy-sm:hover { border-color: var(--purple); color: var(--purple); }
 .btn-copy-sm svg { width: 12px; height: 12px; }
 .enhanced-body {
-  padding: 12px 14px; font: 400 12.5px/1.6 'Inter', sans-serif; color: var(--sub);
-  min-height: 64px; outline: none; cursor: text; transition: background .15s;
+  padding: 12px 14px 8px; font: 400 13.5px/1.55 'Inter', sans-serif; color: var(--text);
+  min-height: 110px; max-height: 240px; overflow-y: auto; outline: none; cursor: text;
 }
-.enhanced-body:hover { background: var(--purple-pale); }
-.enhanced-body:focus { background: var(--white); box-shadow: inset 0 0 0 2px var(--purple-l); }
 .enhanced-body:empty::before {
   content: attr(data-placeholder); color: var(--muted); font-style: italic; font-size: 12px;
 }
@@ -1105,6 +1216,111 @@ body:not(.studio-ui):not(.vehicle-mode) .prompt-footer .btn-gen { width: 100%; m
 .neg-note { font-size: 10.5px; color: var(--muted); margin-top: 5px; font-style: italic; }
 
 /* DIVERSITY / ADVANCED (in advanced modal) */
+/* REFERENCES row (Style / Character / Add) */
+.ref-row { padding: 14px 16px 4px; }
+.ref-row-head {
+  display: flex; align-items: center; justify-content: space-between;
+  font: 700 11px/1 Outfit, sans-serif; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--vg-muted, var(--muted)); margin-bottom: 10px;
+}
+.ref-pills { display: flex; gap: 10px; }
+.ref-pill {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 12px 8px; border: 1.5px dashed var(--vg-line, var(--border-s)); border-radius: 12px;
+  background: rgba(255,255,255,.02); color: var(--vg-muted, var(--muted));
+  font: 600 11.5px/1 Outfit, sans-serif; cursor: pointer; transition: all .15s;
+}
+.ref-pill svg { width: 20px; height: 20px; }
+.ref-pill:hover { border-color: rgba(196,181,253,.6); color: var(--vg-text, var(--text)); background: rgba(124,58,237,.08); }
+.ref-pill.has-ref { border-style: solid; border-color: rgba(196,181,253,.7); color: var(--vg-text, var(--text)); }
+.ref-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.ref-chips:empty { margin-top: 0; }
+.ref-chip {
+  display: flex; align-items: center; gap: 6px; padding: 5px 6px 5px 5px;
+  border-radius: 999px; background: rgba(255,255,255,.05); border: 1px solid var(--vg-line, var(--border-s));
+  font: 600 11px/1 Outfit, sans-serif; color: var(--vg-text, var(--text));
+}
+.ref-chip img { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; }
+.ref-chip-avatar {
+  width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font: 700 10px/1 Outfit, sans-serif; color: #fff; flex-shrink: 0;
+}
+.ref-chip-clear {
+  width: 16px; height: 16px; border-radius: 50%; border: none; background: rgba(255,255,255,.12);
+  color: inherit; font-size: 12px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.ref-chip-clear:hover { background: rgba(248,113,113,.4); }
+
+/* CHARACTER LIBRARY modal */
+.char-overlay {
+  position: fixed; inset: 0; background: rgba(5,5,8,.7); backdrop-filter: blur(4px); z-index: 250;
+  display: none; align-items: center; justify-content: center; padding: 24px;
+}
+.char-overlay.open { display: flex; }
+.char-modal {
+  background: var(--vg-surface, #141418); border: 1px solid var(--vg-line, rgba(255,255,255,.08));
+  border-radius: 20px; width: 920px; max-width: 100%; max-height: 86vh;
+  display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--shadow-2xl, 0 8px 32px rgba(0,0,0,.55));
+}
+.char-modal-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  padding: 20px 22px 0;
+}
+.char-modal-title { font: 800 20px/1.2 Outfit, sans-serif; color: var(--vg-text, #f3f3f7); }
+.char-modal-sub { font: 500 12.5px/1.4 Outfit, sans-serif; color: var(--vg-muted, #b8b8c6); margin-top: 4px; }
+.char-modal-toolbar {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 16px 22px;
+}
+.char-tabs { display: flex; gap: 6px; background: rgba(255,255,255,.04); border-radius: 999px; padding: 3px; }
+.char-tab {
+  padding: 7px 14px; border: none; border-radius: 999px; background: none;
+  color: var(--vg-muted, #b8b8c6); font: 600 12.5px/1 Outfit, sans-serif; cursor: pointer;
+}
+.char-tab.active { background: var(--grad, linear-gradient(135deg,#7a62f0,#9b8ff6)); color: #fff; }
+.char-search-wrap {
+  flex: 1; max-width: 280px; display: flex; align-items: center; gap: 8px;
+  padding: 8px 14px; border-radius: 999px; background: rgba(255,255,255,.04);
+  border: 1px solid var(--vg-line, rgba(255,255,255,.08));
+}
+.char-search-wrap svg { width: 15px; height: 15px; color: var(--vg-muted, #b8b8c6); flex-shrink: 0; }
+.char-search-wrap input {
+  border: none; background: none; outline: none; color: var(--vg-text, #f3f3f7);
+  font: 500 12.5px/1 Outfit, sans-serif; width: 100%;
+}
+.char-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px;
+  padding: 0 22px 22px; overflow-y: auto;
+}
+.char-card {
+  position: relative; border: 1px solid var(--vg-line, rgba(255,255,255,.08)); border-radius: 14px;
+  background: rgba(255,255,255,.02); padding: 14px 12px; text-align: center; cursor: pointer;
+  transition: border-color .15s, transform .15s;
+}
+.char-card:hover { border-color: rgba(196,181,253,.5); transform: translateY(-2px); }
+.char-card.selected { border-color: #a78bfa; background: rgba(124,58,237,.12); }
+.char-avatar {
+  width: 56px; height: 56px; border-radius: 50%; margin: 0 auto 10px;
+  display: flex; align-items: center; justify-content: center;
+  font: 700 18px/1 Outfit, sans-serif; color: #fff;
+}
+.char-avatar-photo {
+  width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 10px;
+  overflow: hidden; background: var(--grey-650, #19191a);
+}
+.char-avatar-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.char-name { font: 700 13px/1.2 Outfit, sans-serif; color: var(--vg-text, #f3f3f7); }
+.char-meta { font: 500 11px/1.4 Outfit, sans-serif; color: var(--vg-muted, #b8b8c6); margin-top: 3px; }
+.char-fav-btn {
+  position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; border-radius: 50%;
+  border: none; background: rgba(0,0,0,.35); color: #b8b8c6; display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.char-fav-btn svg { width: 13px; height: 13px; }
+.char-fav-btn.on { color: #e11d48; }
+.char-fav-btn.on svg { fill: currentColor; }
+.char-grid-empty { grid-column: 1/-1; text-align: center; color: var(--vg-muted, #b8b8c6); padding: 40px 0; font-size: 13px; }
+
 .adv-overlay {
   position: fixed; inset: 0; background: rgba(15,10,40,.45); backdrop-filter: blur(3px); z-index: 200;
   display: none; align-items: center; justify-content: center;
@@ -1361,6 +1577,24 @@ body:not(.studio-ui):not(.vehicle-mode) .prompt-footer .btn-gen { width: 100%; m
 /* GALLERY VIEWS (History / Collections / Favourites) */
 .gallery-view { flex: 1; display: flex; flex-direction: column; padding: 26px 32px 40px; overflow-y: auto; background: var(--bg); }
 .gallery-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; }
+.gallery-search-wrap {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 18px;
+  padding: 10px 16px; border-radius: 999px;
+  background: var(--white); border: 1px solid var(--border-s); box-shadow: var(--shadow-xs);
+  max-width: 420px;
+}
+.gallery-search-wrap svg { width: 16px; height: 16px; color: var(--muted); flex-shrink: 0; }
+.gallery-search-wrap input {
+  border: none; background: none; outline: none; width: 100%;
+  font: 500 13px/1 'Inter', sans-serif; color: var(--text);
+}
+[data-theme="dark"] .gallery-search-wrap { background: var(--vg-elev, #19191a); border-color: var(--vg-line, rgba(255,255,255,.08)); }
+.gcard-tags { position: absolute; left: 8px; bottom: 8px; display: flex; gap: 4px; flex-wrap: wrap; max-width: calc(100% - 16px); }
+.gcard-tag {
+  font: 600 9.5px/1 Outfit, 'Inter', sans-serif; letter-spacing: .02em; color: #fff;
+  background: rgba(10,10,12,.6); backdrop-filter: blur(3px);
+  padding: 3px 7px; border-radius: 999px; white-space: nowrap;
+}
 .gallery-title { font-size: 21px; font-weight: 800; color: var(--text); letter-spacing: -.4px; }
 .gallery-sub { font-size: 13px; color: var(--muted); margin-top: 3px; }
 .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; align-content: start; }
@@ -1429,6 +1663,14 @@ body:not(.studio-ui):not(.vehicle-mode) .prompt-footer .btn-gen { width: 100%; m
 .admin-grant-btn:hover { transform: translateY(-1px); }
 .admin-grant-btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
 .admin-email-muted { color: var(--muted); font-size: 11.5px; }
+.admin-delete-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border-radius: 7px; border: 1px solid var(--border-s);
+  background: none; color: var(--muted); cursor: pointer; transition: all .15s;
+}
+.admin-delete-btn svg { width: 14px; height: 14px; }
+.admin-delete-btn:hover { border-color: var(--red); color: var(--red); background: rgba(220,38,38,.08); }
+.admin-delete-btn:disabled { opacity: .5; cursor: not-allowed; }
 
 /* LIGHTBOX */
 .lightbox {
@@ -1707,11 +1949,13 @@ body:not(.studio-ui):not(.vehicle-mode) .prompt-footer .btn-gen { width: 100%; m
   #editPreviewImg { width: 100%; flex-basis: auto; }
 }
 
-/* LOGIN GATE */
+/* LOGIN GATE — fallback literals alongside every var() so the gate still renders
+   correctly (dark, branded, legible) even if Skills/acko-tokens.css fails to load. */
 .login-overlay {
   position: fixed; inset: 0; z-index: 300;
-  background: var(--color-surface-overlay); backdrop-filter: blur(8px);
+  background: var(--color-surface-overlay, rgba(10,10,12,.82)); backdrop-filter: blur(8px);
   display: flex; align-items: center; justify-content: center; padding: 24px;
+  font-family: var(--font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
 }
 .login-overlay.hidden { display: none; }
 .hidden { display: none !important; }
@@ -1720,41 +1964,81 @@ body:not(.studio-ui):not(.vehicle-mode) .prompt-footer .btn-gen { width: 100%; m
 .vg-filter.hidden { display: none !important; }
 .login-card {
   width: 380px; max-width: 100%;
-  background: var(--color-surface-raised);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-4xl);
-  box-shadow: var(--shadow-modal); padding: 36px 32px 32px; display: flex; flex-direction: column;
+  background: var(--color-surface-raised, #19191a);
+  border: 1px solid var(--color-border, #333);
+  border-radius: var(--radius-4xl, 20px);
+  box-shadow: var(--shadow-modal, 0 4px 24px rgba(0,0,0,.45)); padding: 36px 32px 32px; display: flex; flex-direction: column;
   align-items: center; text-align: center; gap: 6px;
+  font-family: inherit;
 }
 .login-logo { width: 130px; height: auto; margin-bottom: 14px; }
 .login-title {
-  font-size: var(--font-18-size); line-height: var(--font-18-line);
-  font-weight: 700; color: var(--color-text-primary); letter-spacing: -.02em;
+  font-size: var(--font-18-size, 18px); line-height: var(--font-18-line, 24px);
+  font-weight: 700; color: var(--color-text-primary, #fbfbfb); letter-spacing: -.02em;
+  font-family: inherit;
 }
-.login-sub { font-size: var(--font-12-size); color: var(--color-text-secondary); margin-bottom: 18px; line-height: 1.5; }
+.login-title { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 22px; }
+.login-wave { font-size: 22px; }
+.login-sub { font-size: var(--font-14-size, 14px); color: var(--color-text-secondary, #8f8e92); margin-bottom: 22px; line-height: 1.5; font-family: inherit; }
+.login-field-label {
+  width: 100%; text-align: left; font-size: 12.5px; font-weight: 600;
+  color: var(--color-text-secondary, #8f8e92); margin-bottom: 7px; font-family: inherit;
+}
+.login-input-wrap {
+  width: 100%; position: relative; margin-bottom: 6px;
+  display: flex; align-items: center;
+}
+.login-input-icon {
+  position: absolute; left: 13px; width: 17px; height: 17px;
+  color: var(--color-text-secondary, #8f8e92); pointer-events: none;
+}
 .login-input {
-  width: 100%; padding: 11px 13px;
-  border: 1px solid var(--color-input-border); border-radius: var(--radius-full);
-  font: 400 var(--font-14-size)/1 var(--font-family);
-  color: var(--color-text-default); background: var(--color-input-bg); outline: none;
-  transition: border-color .15s, box-shadow .15s; margin-bottom: 6px;
+  width: 100%; padding: 11px 13px 11px 40px;
+  border: 1px solid var(--color-input-border, #242324); border-radius: var(--radius-lg, 10px);
+  font: 400 14px/1 inherit;
+  color: var(--color-text-default, #f5f5f5); background: var(--color-input-bg, #141414); outline: none;
+  transition: border-color .15s, box-shadow .15s;
 }
 .login-input:focus {
-  border-color: var(--color-primary);
-  box-shadow: var(--shadow-focus-ring);
+  border-color: var(--color-primary, #7a62f0);
+  box-shadow: var(--shadow-focus-ring, 0 0 0 3px rgba(122,98,240,.35));
 }
 .login-error {
-  min-height: 16px; font-size: var(--font-12-size); color: var(--color-text-error); margin-bottom: 8px; text-align: left;
-  width: 100%;
+  min-height: 16px; font-size: var(--font-12-size, 12px); color: var(--color-text-error, #f87171); margin-bottom: 8px; text-align: left;
+  width: 100%; font-family: inherit;
 }
 .login-btn {
-  width: 100%; padding: 12px; border-radius: var(--radius-full); border: none;
-  background: var(--grad); font: 600 var(--font-14-size)/1 var(--font-family); color: var(--color-on-primary);
-  cursor: pointer; transition: transform .15s var(--ease-out-cubic), box-shadow .15s;
-  box-shadow: var(--shadow-btn-inner), var(--shadow-subtle);
+  width: 100%; padding: 12px; border-radius: var(--radius-lg, 10px); border: none;
+  background: var(--grad, linear-gradient(135deg, #7a62f0 0%, #9b8ff6 100%)); font: 600 14px/1 inherit; color: var(--color-on-primary, #fff);
+  cursor: pointer; transition: transform .15s ease, box-shadow .15s;
+  box-shadow: var(--shadow-btn-inner, none), var(--shadow-subtle, 0 1px 4px rgba(0,0,0,.28));
+  display: flex; align-items: center; justify-content: center; gap: 8px;
 }
-.login-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: var(--shadow-btn-hover); }
+.login-btn svg { width: 17px; height: 17px; }
+.login-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: var(--shadow-btn-hover, 0 4px 8px rgba(0,0,0,.3)); }
 .login-btn:disabled { opacity: .6; cursor: not-allowed; }
+.login-divider {
+  width: 100%; display: flex; align-items: center; gap: 12px;
+  margin: 18px 0 16px; color: var(--color-text-secondary, #8f8e92);
+  font-size: 11px; font-weight: 600; letter-spacing: .06em;
+}
+.login-divider::before, .login-divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--color-border, #333);
+}
+.login-google-btn {
+  width: 100%; padding: 11px; border-radius: var(--radius-lg, 10px);
+  border: 1px solid var(--color-border, #333); background: transparent;
+  color: var(--color-text-default, #f5f5f5); font: 600 13.5px/1 inherit;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+  transition: background .15s, border-color .15s;
+}
+.login-google-btn:hover { background: rgba(255,255,255,.05); border-color: var(--color-border-strong, #555); }
+.login-google-btn svg { width: 18px; height: 18px; }
+.login-sso-line {
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  margin-top: 22px; font-size: 12px; color: var(--color-text-secondary, #8f8e92);
+}
+.login-sso-line svg { width: 14px; height: 14px; }
 
 /* Global dark app chrome (Imagen + galleries + admin) — Skills tokens */
 [data-theme="dark"] .app {
@@ -1890,10 +2174,27 @@ body:not(.studio-ui):not(.vehicle-mode) .prompt-footer .btn-gen { width: 100%; m
       </g>
     </svg>
     <div id="loginFormView">
-      <div class="login-title">Sign in to ACKO Gen</div>
-      <input class="login-input" id="loginEmail" type="email" placeholder="you@acko.tech" autocomplete="email" onkeydown="if(event.key==='Enter')submitLogin()">
+      <div class="login-title">Welcome back <span class="login-wave">👋</span></div>
+      <div class="login-sub">Sign in to continue to ACKO Gen</div>
+      <div class="login-field-label">Work email</div>
+      <div class="login-input-wrap">
+        <svg class="login-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        <input class="login-input" id="loginEmail" type="email" placeholder="you@acko.tech" autocomplete="email" onkeydown="if(event.key==='Enter')submitLogin()">
+      </div>
       <div class="login-error" id="loginError"></div>
-      <button class="login-btn" id="loginBtn" onclick="submitLogin()">Continue</button>
+      <button class="login-btn" id="loginBtn" onclick="submitLogin()">
+        <span>Continue</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+      <div class="login-divider"><span>OR</span></div>
+      <button type="button" class="login-google-btn" onclick="alert('Google sign-in isn\'t set up yet — please continue with your @acko.tech email above.')">
+        <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M23.52 12.27c0-.85-.08-1.67-.22-2.45H12v4.64h6.47a5.53 5.53 0 0 1-2.4 3.63v3h3.87c2.27-2.09 3.58-5.17 3.58-8.82Z"/><path fill="#34A853" d="M12 24c3.24 0 5.96-1.08 7.94-2.91l-3.87-3c-1.08.72-2.45 1.15-4.07 1.15-3.13 0-5.78-2.11-6.73-4.96H1.27v3.11A12 12 0 0 0 12 24Z"/><path fill="#FBBC05" d="M5.27 14.28A7.2 7.2 0 0 1 4.89 12c0-.79.14-1.56.38-2.28V6.61H1.27A12 12 0 0 0 0 12c0 1.94.46 3.77 1.27 5.39l4-3.11Z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.69 1.27 6.61l4 3.11C6.22 6.86 8.87 4.75 12 4.75Z"/></svg>
+        Continue with Google
+      </button>
+      <div class="login-sso-line">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Secure login with SSO
+      </div>
     </div>
   </div>
 </div>
@@ -1954,7 +2255,7 @@ body:not(.studio-ui):not(.vehicle-mode) .prompt-footer .btn-gen { width: 100%; m
 
     <div class="sidebar-spacer"></div>
     <div class="sidebar-user">
-      <div class="sidebar-user-email" id="sidebarUserEmail"></div>
+      <div class="sidebar-user-chip" id="sidebarUserEmail" title=""></div>
       <button class="sidebar-signout" onclick="signOut()">Sign out</button>
     </div>
   </aside>
@@ -1969,10 +2270,6 @@ body:not(.studio-ui):not(.vehicle-mode) .prompt-footer .btn-gen { width: 100%; m
         <div class="center-title" id="genTitle">Imagen</div>
         <div class="center-sub" id="genSub">Create brand-compliant images with AI</div>
       </div>
-      <button class="btn-adv" onclick="openAdv()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 1 0 4.93 19.07"/></svg>
-        Advanced Settings
-      </button>
     </div>
 
     <!-- Legacy external config stack — studio UI uses in-prompt dropdowns instead -->
@@ -1991,7 +2288,8 @@ body:not(.studio-ui):not(.vehicle-mode) .prompt-footer .btn-gen { width: 100%; m
           <div class="vehicle-select-row imagen-select-row" id="resRatioRow">
             <div class="form-group" id="aiModelGroup">
               <label class="form-label">Model</label>
-              <div class="sel-wrap">
+              <div class="sel-wrap has-icon">
+                <svg class="sel-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
                 <select id="modelSelect" onchange="onModelChange()">
                   <optgroup label="Google">
                     <option value="nano-banana" selected>Nano Banana 2</option>
@@ -2043,6 +2341,35 @@ body:not(.studio-ui):not(.vehicle-mode) .prompt-footer .btn-gen { width: 100%; m
               </div>
             </div>
           </div>
+
+          <div class="ref-row">
+            <div class="ref-row-head">
+              <span>References</span>
+              <span id="refCount">0/16</span>
+            </div>
+            <div class="ref-pills">
+              <button type="button" class="ref-pill" id="refStyleBtn" onclick="openReferencePicker('style')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l2.6 6.6L22 9.3l-5.5 4.6L18 21l-6-3.9L6 21l1.5-7.1L2 9.3l7.4-.7L12 2z"/></svg>
+                <span>Style</span>
+              </button>
+              <button type="button" class="ref-pill" id="refCharacterBtn" onclick="openCharacterLibrary()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+                <span>Character</span>
+              </button>
+              <button type="button" class="ref-pill" id="refAddBtn" onclick="document.getElementById('refFileInput').click()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <span>Add</span>
+              </button>
+              <input type="file" id="refFileInput" accept="image/png,image/jpeg,image/webp" hidden onchange="onRefFileSelected(event)">
+            </div>
+            <div class="ref-chips" id="refChips"></div>
+          </div>
+
+          <button class="btn-adv" id="imagenAdvBtn" onclick="openAdv()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 1 0 4.93 19.07"/></svg>
+            <span style="flex:1;text-align:left">Advanced Settings</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 6 15 12 9 18"/></svg>
+          </button>
         </div>
         <div id="vehicleCarPanel" class="vehicle-car-panel">
           <div class="vehicle-car-panel-head">
@@ -2158,42 +2485,54 @@ body:not(.studio-ui):not(.vehicle-mode) .prompt-footer .btn-gen { width: 100%; m
             </div>
           </div>
         </div>
-        <textarea id="sceneInput" placeholder="Describe the image you want to generate…" oninput="onSceneInput()" maxlength="3000"></textarea>
-        <div class="prompt-footer">
-          <span class="char-count" id="charCount">0 / 3000</span>
-          <button class="btn-gen" id="genBtn" onclick="generate()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            <span id="genBtnLabel">Generate</span>
+        <!-- Prompt / Enhanced Prompt tab toggle -->
+        <div class="prompt-tab-toggle" role="tablist" aria-label="Prompt view">
+          <button type="button" class="ptab-btn active" id="ptabPromptBtn" onclick="setPromptTab('prompt')" title="Prompt" aria-selected="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
           </button>
+          <button type="button" class="ptab-btn" id="ptabEnhancedBtn" onclick="setPromptTab('enhanced')" title="Enhanced Prompt" aria-selected="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </button>
+        </div>
+
+        <div class="prompt-tab-panel" id="promptTabPrompt">
+          <textarea id="sceneInput" placeholder="Describe the image you want to generate…" oninput="onSceneInput()" maxlength="3000"></textarea>
+          <div class="prompt-footer">
+            <span class="char-count" id="charCount">0 / 3000</span>
+            <button class="btn-icon-sq" onclick="document.getElementById('sceneInput').focus()" title="Edit prompt">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="imagen-enhance-row">
+          <button class="btn-action" onclick="enhancePrompt()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Enhance Prompt
+          </button>
+        </div>
+
+        <!-- Enhanced Prompt (same plain look as the Prompt tab — no separate header/badge) -->
+        <div class="prompt-tab-panel" id="promptTabEnhanced" style="display:none">
+          <div class="enhanced-wrap">
+            <div class="enhanced-body" id="enhancedBody" contenteditable="true" data-placeholder="Your enhanced prompt will appear here… (you can also type your own)" oninput="onEnhancedEdit()"></div>
+            <div class="prompt-footer" style="justify-content:flex-end">
+              <button class="btn-action" onclick="copyEnhanced()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Copy
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Action buttons -->
     <div class="action-row">
-      <button class="btn-action" onclick="enhancePrompt()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-        Enhance Prompt
+      <button class="btn-gen" id="genBtn" onclick="generate()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        <span id="genBtnLabel">Generate</span>
       </button>
-    </div>
-
-    <!-- Enhanced Prompt -->
-    <div class="enhanced-wrap">
-      <div class="enhanced-head">
-        <div class="enhanced-title">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-          Enhanced Prompt
-          <span class="info-icon" title="ACKO brand-compliant prompt built from your scene description — click the text to edit it directly">i</span>
-        </div>
-        <div class="enhanced-head-actions">
-          <span class="editable-hint">Editable</span>
-          <button class="btn-copy-sm" onclick="copyEnhanced()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            Copy
-          </button>
-        </div>
-      </div>
-      <div class="enhanced-body" id="enhancedBody" contenteditable="true" data-placeholder="Your enhanced prompt will appear here… (you can also type your own)" oninput="onEnhancedEdit()"></div>
     </div>
 
     <!-- Negative Prompt -->
@@ -2260,7 +2599,7 @@ body:not(.studio-ui):not(.vehicle-mode) .prompt-footer .btn-gen { width: 100%; m
     </div>
 
     <!-- Vehicle gallery (Vehicle Image Gen) -->
-    <div class="vehicle-gallery-section" id="vehicleGallerySection" hidden>
+    <div class="vehicle-gallery-section gallery-card" id="vehicleGallerySection" hidden>
       <div class="vg-gallery-head">
         <div>
           <div class="results-head" id="vgGalleryTitle">Gallery</div>
@@ -2328,6 +2667,10 @@ body:not(.studio-ui):not(.vehicle-mode) .prompt-footer .btn-gen { width: 100%; m
         Clear all
       </button>
     </div>
+    <div class="gallery-search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="search" id="historySearch" placeholder="Search by prompt, tag, model, ratio…" oninput="renderGallery('history')">
+    </div>
     <div class="gallery-grid" id="historyGrid"></div>
   </div>
 
@@ -2374,14 +2717,14 @@ body:not(.studio-ui):not(.vehicle-mode) .prompt-footer .btn-gen { width: 100%; m
     <div id="adminPanel-pending">
       <div class="admin-empty hidden" id="adminPendingEmpty">No pending requests right now.</div>
       <table class="admin-table hidden" id="adminPendingTable">
-        <thead><tr><th>Email</th><th>Requested</th><th>Grant access as</th><th></th></tr></thead>
+        <thead><tr><th>Email</th><th>Requested</th><th>Grant access as</th><th></th><th></th></tr></thead>
         <tbody id="adminPendingBody"></tbody>
       </table>
     </div>
 
     <div id="adminPanel-users" class="hidden">
       <table class="admin-table" id="adminUsersTable">
-        <thead><tr><th>Email</th><th>Permission</th><th>Requested</th><th>Granted</th><th>Granted by</th></tr></thead>
+        <thead><tr><th>Email</th><th>Permission</th><th>Requested</th><th>Granted</th><th>Granted by</th><th></th></tr></thead>
         <tbody id="adminUsersBody"></tbody>
       </table>
     </div>
@@ -2484,6 +2827,31 @@ body:not(.studio-ui):not(.vehicle-mode) .prompt-footer .btn-gen { width: 100%; m
 </div>
 
 <!-- ADVANCED SETTINGS MODAL -->
+<div class="char-overlay" id="charOverlay" onclick="if(event.target===this)closeCharacterLibrary()">
+  <div class="char-modal">
+    <div class="char-modal-head">
+      <div>
+        <div class="char-modal-title">Characters</div>
+        <div class="char-modal-sub">Pick a recurring character to keep the same person consistent across generations</div>
+      </div>
+      <button class="btn-close" onclick="closeCharacterLibrary()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="char-modal-toolbar">
+      <div class="char-tabs">
+        <button type="button" class="char-tab active" id="charTabAll" onclick="setCharacterTab('all')">All Characters</button>
+        <button type="button" class="char-tab" id="charTabFav" onclick="setCharacterTab('favourites')">Favourites</button>
+      </div>
+      <div class="char-search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="search" id="charSearch" placeholder="Search characters…" oninput="renderCharacterGrid()">
+      </div>
+    </div>
+    <div class="char-grid" id="charGrid"></div>
+  </div>
+</div>
+
 <div class="adv-overlay" id="advOverlay" onclick="if(event.target===this)closeAdv()">
   <div class="adv-modal">
     <div class="adv-modal-head">
@@ -3250,6 +3618,131 @@ function buildVehiclePendingCard(pending) {
   return wrap;
 }
 
+function relativeTimeLabel(ts) {
+  if (!ts) return '';
+  const diff = Math.max(0, Date.now() - ts);
+  const min = Math.floor(diff / 60000);
+  if (min < 1) return 'just now';
+  if (min < 60) return `${min}m ago`;
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return `${hr}h ago`;
+  const day = Math.floor(hr / 24);
+  if (day < 7) return `${day}d ago`;
+  return day < 30 ? 'last week' : `${Math.floor(day / 30)}mo ago`;
+}
+
+function buildImagenGridCard(item) {
+  const src = resolveItemImageSrc(item);
+  if (!src) return null;
+  const isCutout = !!(item.isCutout || item.badge === 'No BG');
+  const card = document.createElement('div');
+  card.className = `gen-card${galleryThumbRatioClass(item.ratio)}${isCutout ? ' has-alpha' : ''}`;
+  card.dataset.itemId = item.id;
+  card.onclick = () => openLightbox(item.id, 'history');
+
+  const img = document.createElement('img');
+  img.src = src;
+  img.alt = item.prompt || 'Generated image';
+  img.onerror = () => { removeHistoryItemById(item.id); if (card.parentNode) card.remove(); renderVehicleGallery(); };
+  card.appendChild(img);
+
+  const overlay = document.createElement('div');
+  overlay.className = 'gen-card-overlay';
+  overlay.onclick = (e) => e.stopPropagation();
+
+  const dl = document.createElement('button');
+  dl.className = 'gen-icon-btn';
+  dl.title = 'Download';
+  dl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
+  dl.onclick = async () => { try { await downloadHistoryItem(item); } catch (err) { alert('Download failed: ' + (err.message || err)); } };
+  overlay.appendChild(dl);
+
+  const coll = document.createElement('button');
+  const isInCollection = inStore('collections', item.id);
+  coll.className = `gen-icon-btn${isInCollection ? ' on' : ''}`;
+  coll.title = isInCollection ? 'Remove from Collection' : 'Add to Collection';
+  coll.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21 12 16l-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16Z"/></svg>';
+  coll.onclick = () => {
+    const on = toggleStore('collections', item);
+    coll.classList.toggle('on', on);
+    coll.title = on ? 'Remove from Collection' : 'Add to Collection';
+  };
+  overlay.appendChild(coll);
+
+  const del = document.createElement('button');
+  del.className = 'gen-icon-btn danger';
+  del.title = 'Delete';
+  del.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
+  del.onclick = () => {
+    if (!confirm('Delete this image?')) return;
+    removeHistoryItemById(item.id);
+    renderVehicleGallery();
+  };
+  overlay.appendChild(del);
+
+  card.appendChild(overlay);
+  return card;
+}
+
+function buildImagenPendingCard(pending) {
+  const v = pending.meta || {};
+  const card = document.createElement('div');
+  card.className = `gen-card is-pending${galleryThumbRatioClass(v.aspect)}`;
+  card.dataset.pendingId = pending.id;
+  card.innerHTML = `
+    <div class="gen-pending-inner">
+      <div class="ph-spinner"></div>
+      <div class="gen-pending-label">Generating…</div>
+      <div class="gen-pending-time" data-pending-timer="${pending.id}">0s</div>
+    </div>`;
+  return card;
+}
+
+function buildImagenBatchGroups(items) {
+  const frag = document.createDocumentFragment();
+  let i = 0;
+  while (i < items.length) {
+    const head = items[i];
+    const key = head.batchId || head.id;
+    const group = [head];
+    let j = i + 1;
+    while (j < items.length && (items[j].batchId || items[j].id) === key) { group.push(items[j]); j++; }
+    i = j;
+
+    const batch = document.createElement('div');
+    batch.className = 'gen-batch';
+
+    const headRow = document.createElement('div');
+    headRow.className = 'gen-batch-head';
+    const promptEl = document.createElement('div');
+    promptEl.className = 'gen-batch-prompt';
+    promptEl.textContent = head.prompt || '';
+    promptEl.title = head.fullPrompt || head.prompt || '';
+    headRow.appendChild(promptEl);
+
+    const chips = document.createElement('div');
+    chips.className = 'gen-batch-chips';
+    [head.ratio, head.model, head.res, relativeTimeLabel(head.ts)].filter(Boolean).forEach(text => {
+      const chip = document.createElement('span');
+      chip.className = 'gen-chip';
+      chip.textContent = text;
+      chips.appendChild(chip);
+    });
+    headRow.appendChild(chips);
+    batch.appendChild(headRow);
+
+    const grid = document.createElement('div');
+    grid.className = 'gen-batch-grid';
+    group.forEach(item => {
+      const card = buildImagenGridCard(item);
+      if (card) grid.appendChild(card);
+    });
+    batch.appendChild(grid);
+    frag.appendChild(batch);
+  }
+  return frag;
+}
+
 function renderVehicleGallery() {
   const section = document.getElementById('vehicleGallerySection');
   const grid = document.getElementById('vehicleGalleryGrid');
@@ -3337,11 +3830,22 @@ function renderVehicleGallery() {
     const make = (p.meta && p.meta.make) || 'Unknown make';
     return make === vehicleCollectionOpenMake;
   });
-  pendingForView.forEach(p => grid.appendChild(buildVehiclePendingCard(p)));
-  list.forEach(item => {
-    const card = buildVehicleGalleryCard(item);
-    if (card) grid.appendChild(card);
-  });
+  if (imagen && pendingForView.length) {
+    const pendingGrid = document.createElement('div');
+    pendingGrid.className = 'gen-batch-grid gen-pending-grid';
+    pendingForView.forEach(p => pendingGrid.appendChild(buildImagenPendingCard(p)));
+    grid.appendChild(pendingGrid);
+  } else {
+    pendingForView.forEach(p => grid.appendChild(buildVehiclePendingCard(p)));
+  }
+  if (imagen) {
+    grid.appendChild(buildImagenBatchGroups(list));
+  } else {
+    list.forEach(item => {
+      const card = buildVehicleGalleryCard(item);
+      if (card) grid.appendChild(card);
+    });
+  }
 
   if (!pendingForView.length && !list.length) {
     const empty = document.createElement('div');
@@ -3560,6 +4064,279 @@ function clearVehicleModelRef() {
   if (input) input.value = '';
   renderVehicleModelRefUI();
   syncVehiclePrompt(); // drop MODEL REFERENCE postfix from locked prompt
+}
+
+// ─── IMAGEN REFERENCES (Style / Character / Add) ───────────────────────────
+const CHARACTER_LIBRARY = [
+  { id: 'aanya-nair', name: 'Aanya Nair', location: 'Bengaluru, Karnataka', role: 'Researcher' },
+  { id: 'rohan-malhotra', name: 'Rohan Malhotra', location: 'Delhi', role: 'New Car Owner' },
+  { id: 'meena-subramanian', name: 'Meena Subramanian', location: 'Chennai, Tamil Nadu', role: 'Caregiver' },
+  { id: 'arjun-deshmukh', name: 'Arjun Deshmukh', location: 'Pune, Maharashtra', role: 'College Student' },
+  { id: 'fatima-khan', name: 'Fatima Khan', location: 'Hyderabad, Telangana', role: 'Small Business Owner' },
+  { id: 'david-varghese', name: 'David Varghese', location: 'Kochi, Kerala', role: 'Retiree' },
+  { id: 'simran-kaur', name: 'Simran Kaur', location: 'Chandigarh, Punjab', role: 'Marketing Executive' },
+  { id: 'bikram-doley', name: 'Bikram Doley', location: 'Guwahati, Assam', role: 'Travel Blogger' },
+  { id: 'lakshmi-reddy', name: 'Lakshmi Reddy', location: 'Vijayawada, Andhra Pradesh', role: 'New Mother' },
+  { id: 'imran-ansari', name: 'Imran Ansari', location: 'Lucknow, Uttar Pradesh', role: 'Mechanic' },
+  { id: 'priya-fernandes', name: 'Priya Fernandes', location: 'Goa', role: 'Content Creator' },
+  { id: 'manoj-yadav', name: 'Manoj Yadav', location: 'Jaipur, Rajasthan', role: 'Shop Owner' },
+  { id: 'neha-verma', name: 'Neha Verma', location: 'Patna, Bihar', role: 'Teacher' },
+  { id: 'sanjay-singh', name: 'Sanjay Singh', location: 'Haryana', role: 'Farmer' },
+  { id: 'pema-angmo', name: 'Pema Angmo', location: 'Leh, Ladakh', role: 'Homestay Owner' },
+  { id: 'joseph-thomas', name: 'Joseph Thomas', location: 'Kottayam, Kerala', role: 'Bank Manager' },
+  { id: 'sunita-devi', name: 'Sunita Devi', location: 'Ranchi, Jharkhand', role: 'ASHA Worker' },
+  { id: 'vikram-shetty', name: 'Vikram Shetty', location: 'Mumbai, Maharashtra', role: 'Marine Engineer' },
+  { id: 'tsering-dolma', name: 'Tsering Dolma', location: 'Sikkim', role: 'Hotel Manager' },
+  { id: 'mahesh-kumar', name: 'Mahesh Kumar', location: 'Bhopal, Madhya Pradesh', role: 'Electrician' },
+  { id: 'anjali-iyer', name: 'Anjali Iyer', location: 'Mysuru, Karnataka', role: 'Architect' },
+  { id: 'sahil-shaikh', name: 'Sahil Shaikh', location: 'Surat, Gujarat', role: 'Textile Trader' },
+  { id: 'parul-chatterjee', name: 'Parul Chatterjee', location: 'Kolkata, West Bengal', role: 'Journalist' },
+  { id: 'harpreet-sandhu', name: 'Harpreet Sandhu', location: 'Amritsar, Punjab', role: 'Delivery Partner' },
+];
+const CHAR_AVATAR_COLORS = ['#7a62f0', '#e0759a', '#4aa8d8', '#e0954a', '#5cb85c', '#c0563f', '#9b59b6', '#2e9e8f'];
+function charInitials(name) {
+  return String(name || '').trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
+}
+function charHash(id) {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+  return h;
+}
+function charColor(id) {
+  return CHAR_AVATAR_COLORS[charHash(id) % CHAR_AVATAR_COLORS.length];
+}
+// Real Indian-looking headshots, generated once through this tool's own Nano Banana
+// pipeline (same engine as regular generations) and persisted under ./generated —
+// one consistent photo per character id. Falls back to a generic placeholder photo
+// if a character is ever added without a generated portrait yet.
+const CHAR_PHOTOS = {
+  'aanya-nair': '/generated/20260729_143205_character_3ddd84d467.png',
+  'rohan-malhotra': '/generated/20260729_143155_character_e9bf59964e.png',
+  'meena-subramanian': '/generated/20260729_143159_character_ec41b7f59d.png',
+  'arjun-deshmukh': '/generated/20260729_143202_character_c427b4d910.png',
+  'fatima-khan': '/generated/20260729_143233_character_59e2a171c5.png',
+  'david-varghese': '/generated/20260729_143237_character_d00af232a5.png',
+  'simran-kaur': '/generated/20260729_143240_character_4431a299d5.png',
+  'bikram-doley': '/generated/20260729_143244_character_240348d5b8.png',
+  'lakshmi-reddy': '/generated/20260729_143340_character_3bce44baeb.png',
+  'imran-ansari': '/generated/20260729_143344_character_170a3905fa.png',
+  'priya-fernandes': '/generated/20260729_143347_character_4c9a6618ef.png',
+  'manoj-yadav': '/generated/20260729_143351_character_906b00da29.png',
+  'neha-verma': '/generated/20260729_143429_character_d2e4a89cd4.png',
+  'pema-angmo': '/generated/20260729_143433_character_f0db2b3446.png',
+  'joseph-thomas': '/generated/20260729_143436_character_a2a34212a3.png',
+  'sanjay-singh': '/generated/20260729_143440_character_bc57189902.png',
+  'vikram-shetty': '/generated/20260729_143517_character_b0c6b769f2.png',
+  'tsering-dolma': '/generated/20260729_143521_character_c9caf25309.png',
+  'mahesh-kumar': '/generated/20260729_143525_character_562c6bfaa1.png',
+  'sunita-devi': '/generated/20260729_143532_character_bb3d6909db.png',
+  'parul-chatterjee': '/generated/20260729_143603_character_916c91a371.png',
+  'harpreet-sandhu': '/generated/20260729_143608_character_9c39f93e4c.png',
+  'anjali-iyer': '/generated/20260729_143612_character_9de6a4f4c7.png',
+  'sahil-shaikh': '/generated/20260729_143616_character_df460dbdf4.png',
+};
+function charPhotoUrl(id) {
+  if (CHAR_PHOTOS[id]) return CHAR_PHOTOS[id];
+  const num = (charHash(id) % 70) + 1;
+  return `https://i.pravatar.cc/300?img=${num}`;
+}
+
+let imagenReferences = { style: null, character: null, custom: null };
+let refPickingKind = null; // 'style' | 'custom' — which slot the hidden file input targets
+let characterTab = 'all';
+let characterFavourites = new Set(JSON.parse(localStorage.getItem('acko_char_favs') || '[]'));
+
+function openReferencePicker(kind) {
+  refPickingKind = kind;
+  document.getElementById('refFileInput').click();
+}
+
+async function onRefFileSelected(ev) {
+  const file = ev && ev.target && ev.target.files && ev.target.files[0];
+  const kind = refPickingKind;
+  refPickingKind = null;
+  if (!file || !kind) return;
+  if (!/^image\//i.test(file.type || '')) {
+    alert('Please choose an image file (PNG, JPEG, or WebP).');
+    ev.target.value = '';
+    return;
+  }
+  if (file.size > 12 * 1024 * 1024) {
+    alert('Reference image is too large (max 12 MB). Try a smaller photo.');
+    ev.target.value = '';
+    return;
+  }
+  try {
+    const rawUri = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ''));
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+    const compressed = await compressDataUriForReference(rawUri, 350 * 1024);
+    const mime = normalizeMagnificRefMime(mimeFromDataUri(compressed) || file.type);
+    if (!mime) throw new Error('Unsupported image format after processing. Please upload a PNG, JPEG, or WebP.');
+    imagenReferences[kind] = { dataUri: compressed, mime, label: file.name || 'Reference' };
+    renderRefUI();
+  } catch (e) {
+    alert('Could not load reference image: ' + (e && e.message ? e.message : e));
+  }
+  ev.target.value = '';
+}
+
+function clearReference(kind) {
+  imagenReferences[kind] = null;
+  renderRefUI();
+}
+
+function renderRefUI() {
+  const count = ['style', 'character', 'custom'].filter(k => imagenReferences[k]).length;
+  const countEl = document.getElementById('refCount');
+  if (countEl) countEl.textContent = `${count}/16`;
+
+  const styleBtn = document.getElementById('refStyleBtn');
+  const charBtn = document.getElementById('refCharacterBtn');
+  const addBtn = document.getElementById('refAddBtn');
+  if (styleBtn) styleBtn.classList.toggle('has-ref', !!imagenReferences.style);
+  if (charBtn) charBtn.classList.toggle('has-ref', !!imagenReferences.character);
+  if (addBtn) addBtn.classList.toggle('has-ref', !!imagenReferences.custom);
+
+  const chips = document.getElementById('refChips');
+  if (!chips) return;
+  chips.innerHTML = '';
+  if (imagenReferences.style) chips.appendChild(buildRefChip('style', imagenReferences.style.label, imagenReferences.style.dataUri));
+  if (imagenReferences.character) {
+    const c = imagenReferences.character;
+    chips.appendChild(buildRefChip('character', `${c.name} · ${c.role}`, charPhotoUrl(c.id), c));
+  }
+  if (imagenReferences.custom) chips.appendChild(buildRefChip('custom', imagenReferences.custom.label, imagenReferences.custom.dataUri));
+}
+
+function buildRefChip(kind, label, thumbSrc, character) {
+  const chip = document.createElement('div');
+  chip.className = 'ref-chip';
+  if (thumbSrc) {
+    const img = document.createElement('img');
+    img.src = thumbSrc;
+    chip.appendChild(img);
+  } else if (character) {
+    const av = document.createElement('div');
+    av.className = 'ref-chip-avatar';
+    av.style.background = charColor(character.id);
+    av.textContent = charInitials(character.name);
+    chip.appendChild(av);
+  }
+  const text = document.createElement('span');
+  text.textContent = label.length > 22 ? label.slice(0, 20) + '…' : label;
+  chip.appendChild(text);
+  const clear = document.createElement('button');
+  clear.className = 'ref-chip-clear';
+  clear.type = 'button';
+  clear.textContent = '×';
+  clear.onclick = () => clearReference(kind);
+  chip.appendChild(clear);
+  return chip;
+}
+
+function openCharacterLibrary() {
+  document.getElementById('charOverlay').classList.add('open');
+  renderCharacterGrid();
+}
+function closeCharacterLibrary() {
+  document.getElementById('charOverlay').classList.remove('open');
+}
+function setCharacterTab(tab) {
+  characterTab = tab;
+  document.getElementById('charTabAll').classList.toggle('active', tab === 'all');
+  document.getElementById('charTabFav').classList.toggle('active', tab === 'favourites');
+  renderCharacterGrid();
+}
+function toggleCharacterFav(id, ev) {
+  ev.stopPropagation();
+  if (characterFavourites.has(id)) characterFavourites.delete(id);
+  else characterFavourites.add(id);
+  localStorage.setItem('acko_char_favs', JSON.stringify([...characterFavourites]));
+  renderCharacterGrid();
+}
+function selectCharacter(id) {
+  const c = CHARACTER_LIBRARY.find(x => x.id === id);
+  if (!c) return;
+  imagenReferences.character = c;
+  renderRefUI();
+  closeCharacterLibrary();
+}
+function renderCharacterGrid() {
+  const grid = document.getElementById('charGrid');
+  if (!grid) return;
+  const q = (document.getElementById('charSearch').value || '').trim().toLowerCase();
+  let list = CHARACTER_LIBRARY;
+  if (characterTab === 'favourites') list = list.filter(c => characterFavourites.has(c.id));
+  if (q) list = list.filter(c => (c.name + ' ' + c.location + ' ' + c.role).toLowerCase().includes(q));
+  if (!list.length) {
+    grid.innerHTML = `<div class="char-grid-empty">${characterTab === 'favourites' ? 'No favourites yet — star a character to save it here.' : 'No characters match your search.'}</div>`;
+    return;
+  }
+  grid.innerHTML = list.map(c => {
+    const isFav = characterFavourites.has(c.id);
+    const isSelected = imagenReferences.character && imagenReferences.character.id === c.id;
+    return `
+      <div class="char-card${isSelected ? ' selected' : ''}" onclick="selectCharacter('${c.id}')">
+        <button class="char-fav-btn${isFav ? ' on' : ''}" onclick="toggleCharacterFav('${c.id}', event)" title="Favourite">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+        <div class="char-avatar-photo"><img src="${charPhotoUrl(c.id)}" alt="${esc(c.name)}" loading="lazy" onerror="this.parentElement.outerHTML='<div class=\'char-avatar\' style=\'background:${charColor(c.id)}\'>${esc(charInitials(c.name))}</div>'"></div>
+        <div class="char-name">${esc(c.name)}</div>
+        <div class="char-meta">${esc(c.location)}</div>
+        <div class="char-meta">${esc(c.role)}</div>
+      </div>`;
+  }).join('');
+}
+
+async function urlToDataUri(url) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error('Could not load reference image (' + r.status + ').');
+  const blob = await r.blob();
+  return await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ''));
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+let characterRefCache = {}; // character id -> {dataUri, mime}, so repeat generations don't refetch/recompress
+async function getCharacterReferenceImage(character) {
+  if (characterRefCache[character.id]) return characterRefCache[character.id];
+  const rawUri = await urlToDataUri(charPhotoUrl(character.id));
+  const compressed = await compressDataUriForReference(rawUri, 350 * 1024);
+  const mime = normalizeMagnificRefMime(mimeFromDataUri(compressed) || 'image/png');
+  const ref = { dataUri: compressed, mime };
+  characterRefCache[character.id] = ref;
+  return ref;
+}
+
+async function getImagenReferenceImages() {
+  const refs = [];
+  if (imagenReferences.style) {
+    refs.push({ image: imagenReferences.style.dataUri, mime_type: imagenReferences.style.mime, text: 'STYLE REFERENCE: match the lighting, color grading and overall visual mood of this photo.' });
+  }
+  if (imagenReferences.character) {
+    const c = imagenReferences.character;
+    try {
+      const charRef = await getCharacterReferenceImage(c);
+      refs.push({
+        image: charRef.dataUri,
+        mime_type: charRef.mime,
+        text: `RECURRING CHARACTER REFERENCE (PRIMARY identity — not camera): study this photo of ${c.name} and reproduce the same person's face, skin tone, hair and build accurately so they look like the same recurring character across generations.`,
+      });
+    } catch (e) {
+      console.warn('Character reference image failed to load, falling back to text-only consistency:', e);
+    }
+  }
+  if (imagenReferences.custom) {
+    refs.push({ image: imagenReferences.custom.dataUri, mime_type: imagenReferences.custom.mime, text: 'ADDITIONAL REFERENCE: use this photo as guidance for the requested scene.' });
+  }
+  return refs;
 }
 
 async function getVehicleModelReferenceImages() {
@@ -4174,7 +4951,21 @@ function applyVehicleLocks(enabled) {
   }
 }
 
+let imagenPromptBackup = null;
 function applyGenMode(mode) {
+  const prevMode = genMode;
+  const sceneElPrev = document.getElementById('sceneInput');
+  const enhancedElPrev = document.getElementById('enhancedBody');
+  // Imagen and Vehiclegen share the same prompt textarea/enhanced box — save
+  // Imagen's own prompt before leaving it, so switching tabs doesn't leak one
+  // mode's text into the other.
+  if (prevMode === 'generate' && mode !== 'generate' && sceneElPrev) {
+    imagenPromptBackup = {
+      scene: sceneElPrev.value,
+      enhanced: enhancedElPrev ? enhancedElPrev.textContent : '',
+      userEdited: enhancedUserEdited,
+    };
+  }
   genMode = mode;
   const cfg = GEN_MODES[mode] || GEN_MODES.generate;
   const titleEl = document.getElementById('genTitle');
@@ -4201,7 +4992,19 @@ function applyGenMode(mode) {
   if (imagenPanel) imagenPanel.classList.toggle('visible', mode === 'generate');
   renderVehicleModelRefUI();
   applyVehicleLocks(mode === 'vehicle');
-  if (mode === 'generate') syncImagenConfigMeta();
+  if (mode === 'generate') {
+    syncImagenConfigMeta();
+    if (prevMode !== 'generate') {
+      // Restore Imagen's own prompt/enhanced text instead of leaving whatever
+      // Vehiclegen last wrote into the shared textarea.
+      const enhancedEl = document.getElementById('enhancedBody');
+      if (sceneEl) sceneEl.value = imagenPromptBackup ? imagenPromptBackup.scene : '';
+      if (enhancedEl) enhancedEl.textContent = imagenPromptBackup ? imagenPromptBackup.enhanced : '';
+      enhancedUserEdited = imagenPromptBackup ? imagenPromptBackup.userEdited : false;
+      setPromptTab('prompt');
+      onSceneInput();
+    }
+  }
   const genLabel = document.getElementById('genBtnLabel');
   if (genLabel && !isGenerating) {
     genLabel.textContent = 'Generate';
@@ -4354,16 +5157,44 @@ function saveToHistory(item) {
 }
 
 // ─── GALLERY RENDER ───────────────────────────────────────────────────────────
+const TAG_STOPWORDS = new Set(['the','a','an','and','or','with','for','of','in','on','at','to','from','by','is','are','their','his','her','she','he','they','it','its','this','that','image','generate','photo','picture']);
+function deriveTags(item) {
+  const tags = [];
+  if (item.model) tags.push(item.model);
+  if (item.ratio) tags.push(item.ratio);
+  if (item.kind === 'vehicle') tags.push('Vehicle');
+  if (item.vehicle && item.vehicle.make) tags.push(item.vehicle.make);
+  if (item.vehicle && item.vehicle.model) tags.push(item.vehicle.model);
+  const words = String(item.prompt || '').toLowerCase().match(/[a-z]{4,}/g) || [];
+  const seen = new Set(tags.map(t => t.toLowerCase()));
+  for (const w of words) {
+    if (TAG_STOPWORDS.has(w) || seen.has(w)) continue;
+    seen.add(w);
+    tags.push(w.charAt(0).toUpperCase() + w.slice(1));
+    if (tags.length >= 8) break;
+  }
+  return tags;
+}
+function itemMatchesQuery(item, q) {
+  if (!q) return true;
+  const tags = deriveTags(item);
+  const haystack = (tags.join(' ') + ' ' + (item.prompt || '')).toLowerCase();
+  return haystack.includes(q);
+}
+
 function renderGallery(kind) {
   const grid = document.getElementById(kind + 'Grid');
   const countEl = document.getElementById(kind + 'Count');
   const clearBtn = document.getElementById(kind + 'ClearBtn');
-  const items = storeGet(kind);
+  const searchEl = document.getElementById(kind + 'Search');
+  const query = (searchEl && searchEl.value || '').trim().toLowerCase();
+  const allItems = storeGet(kind);
+  const items = query ? allItems.filter(it => itemMatchesQuery(it, query)) : allItems;
 
-  countEl.textContent = items.length ? `${items.length} image${items.length !== 1 ? 's' : ''}` : '';
-  clearBtn.style.display = items.length ? '' : 'none';
+  countEl.textContent = allItems.length ? `${items.length} of ${allItems.length} image${allItems.length !== 1 ? 's' : ''}` : '';
+  clearBtn.style.display = allItems.length ? '' : 'none';
 
-  if (!items.length) {
+  if (!allItems.length) {
     const e = EMPTY_STATES[kind];
     grid.innerHTML = `<div class="gallery-empty"><div class="empty-view-content">
       <div class="empty-icon">${e.icon}</div>
@@ -4373,15 +5204,24 @@ function renderGallery(kind) {
     </div></div>`;
     return;
   }
+  if (!items.length) {
+    grid.innerHTML = `<div class="gallery-empty"><div class="empty-view-content">
+      <div class="empty-title">No matches</div>
+      <div class="empty-desc">No images match “${esc(query)}” — try a different prompt keyword, model or ratio.</div>
+    </div></div>`;
+    return;
+  }
 
   grid.innerHTML = items.map(it => {
     const fav = inStore('favourites', it.id);
     const coll = inStore('collections', it.id);
+    const tags = deriveTags(it).slice(0, 3);
     return `<div class="gcard" onclick="openLightbox('${it.id}','${kind}')">
       <img src="${it.src}" alt="Generated image" loading="lazy">
       <div class="img-zoom-hint">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
       </div>
+      ${tags.length ? `<div class="gcard-tags">${tags.map(t => `<span class="gcard-tag">${esc(t)}</span>`).join('')}</div>` : ''}
       <div class="gcard-actions" onclick="event.stopPropagation()">
         <button class="gact${fav ? ' on' : ''}" title="Favourite" onclick="cardToggle('favourites','${it.id}','${kind}',this)">
           <svg viewBox="0 0 24 24" fill="${fav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -4465,6 +5305,7 @@ function renderAdminPending(pending) {
       <td>
         <button class="admin-grant-btn" onclick="grantFromPending('${esc(u.email)}', this)">Grant</button>
       </td>
+      <td>${adminDeleteBtnHtml(u.email)}</td>
     </tr>
   `).join('');
 }
@@ -4482,8 +5323,33 @@ function renderAdminUsers(users) {
       <td class="admin-email-muted">${fmtDate(u.requestedAt)}</td>
       <td class="admin-email-muted">${fmtDate(u.grantedAt)}</td>
       <td class="admin-email-muted">${u.grantedBy ? esc(u.grantedBy) : '—'}</td>
+      <td>${adminDeleteBtnHtml(u.email)}</td>
     </tr>
   `).join('');
+}
+
+function adminDeleteBtnHtml(email) {
+  return `<button class="admin-delete-btn" title="Delete ${esc(email)}" onclick="deleteAdminUser('${esc(email)}', this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+  </button>`;
+}
+
+async function deleteAdminUser(email, btn) {
+  if (!confirm(`Delete ${email}? This permanently removes their access record — they'd need to sign in again and be re-approved from scratch. This cannot be undone.`)) {
+    return;
+  }
+  btn.disabled = true;
+  try {
+    await adminFetch('/admin/users/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    loadAdminData();
+  } catch (e) {
+    alert('Could not delete user: ' + e.message);
+    btn.disabled = false;
+  }
 }
 
 async function grantFromPending(email, btn) {
@@ -5604,9 +6470,17 @@ function clearSession() {
 function showLoginGate() {
   document.getElementById('loginOverlay').classList.remove('hidden');
 }
+function displayNameFromEmail(email) {
+  const local = String(email || '').split('@')[0];
+  const first = local.split(/[._-]/)[0] || local;
+  return first ? first.charAt(0).toUpperCase() + first.slice(1).toLowerCase() : '';
+}
 function hideLoginGate(email) {
   document.getElementById('loginOverlay').classList.add('hidden');
-  document.getElementById('sidebarUserEmail').textContent = email || getSessionEmail();
+  const resolvedEmail = email || getSessionEmail();
+  const chip = document.getElementById('sidebarUserEmail');
+  chip.textContent = displayNameFromEmail(resolvedEmail);
+  chip.title = resolvedEmail;
 }
 function showLoginForm() {
   document.getElementById('loginFormView').classList.remove('hidden');
@@ -5827,6 +6701,10 @@ function buildPrompt(scene) {
 
   const subjectParts = [skinTone, region, 'person', age, stage].filter(Boolean);
   const subject = subjectParts.join(', ');
+  const character = imagenReferences.character;
+  const characterClause = character
+    ? ` RECURRING CHARACTER — ${character.name}, a ${character.role} based in ${character.location}: keep this same person's face, build, age and styling consistent with how they've appeared in earlier generations in this session.`
+    : '';
 
   return [
     `Cinematic photorealistic lifestyle photograph, ${FRAME}, ${cam}, shot on 50mm lens at f/2.8, shallow depth of field.`,
@@ -5835,7 +6713,7 @@ function buildPrompt(scene) {
     BACKGROUND_RULE,
     PROPS_RULE + (s.propsHint ? ` (${s.propsHint}.)` : ''),
     `${s.light}. Clean neutral whites, natural honest skin tones with slight imperfections — bright modern Indian commercial photography, never dark, moody or oversaturated.`,
-    `Expression: ${mood}. One clear subject with room to breathe.`,
+    `Expression: ${mood}. One clear subject with room to breathe.` + characterClause,
     'Candid documentary feel, not posed. Realistic skin texture, no heavy makeup. Middle-class Indian aesthetic, modern but understated.',
     'Soft diffused natural light, mostly neutral true-to-life color, only a subtle 20-30% touch of warmth — not golden hour, not amber or orange, no heavy color cast, gentle film grain.',
     MASTER_SUFFIX,
@@ -5848,6 +6726,21 @@ function buildPrompt(scene) {
 // pill/dropdown changes (which call updatePrompt) don't clobber a manual edit.
 let enhancedUserEdited = false;
 
+function setPromptTab(tab) {
+  const promptPanel = document.getElementById('promptTabPrompt');
+  const enhancedPanel = document.getElementById('promptTabEnhanced');
+  const promptBtn = document.getElementById('ptabPromptBtn');
+  const enhancedBtn = document.getElementById('ptabEnhancedBtn');
+  const enhanceRow = document.querySelector('.imagen-enhance-row');
+  if (!promptPanel || !enhancedPanel) return;
+  const isEnhanced = tab === 'enhanced';
+  promptPanel.style.display = isEnhanced ? 'none' : '';
+  enhancedPanel.style.display = isEnhanced ? '' : 'none';
+  if (enhanceRow) enhanceRow.style.display = isEnhanced ? 'none' : '';
+  if (promptBtn) { promptBtn.classList.toggle('active', !isEnhanced); promptBtn.setAttribute('aria-selected', String(!isEnhanced)); }
+  if (enhancedBtn) { enhancedBtn.classList.toggle('active', isEnhanced); enhancedBtn.setAttribute('aria-selected', String(isEnhanced)); }
+}
+
 function enhancePrompt() {
   if (genMode === 'vehicle') return; // Vehicle Image Gen uses the scene prompt as-is
   const scene = document.getElementById('sceneInput').value.trim();
@@ -5858,6 +6751,7 @@ function enhancePrompt() {
   const body = document.getElementById('enhancedBody');
   body.textContent = buildPrompt(scene);
   enhancedUserEdited = false;
+  setPromptTab('enhanced');
 }
 
 function updatePrompt() {
@@ -5878,7 +6772,7 @@ function copyEnhanced() {
   const text = body.textContent.trim();
   if (!text) return;
   navigator.clipboard.writeText(text).then(() => {
-    const btn = document.querySelector('.btn-copy-sm');
+    const btn = document.querySelector('#promptTabEnhanced .btn-action');
     const orig = btn.innerHTML;
     btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Copied';
     setTimeout(() => btn.innerHTML = orig, 1500);
@@ -6069,6 +6963,8 @@ async function generate() {
       ? vehicleAspect.aspectColon
       : (ratioOpt ? (ratioOpt.dataset.label || ratioOpt.textContent.trim()) : '');
     const vehicleMeta = genMode === 'vehicle' ? snapshotVehicleConfig() : null;
+    const resOpt = document.getElementById('resSelect').selectedOptions[0];
+    const resLabel = resOpt ? resOpt.textContent.trim() : '';
     lastGenMeta = {
       prompt: displayPrompt || prompt,
       fullPrompt: prompt,
@@ -6076,8 +6972,10 @@ async function generate() {
       modelId,
       provider: model.provider,
       ratio: ratioLabel,
+      res: resLabel,
       kind: genMode === 'vehicle' ? 'vehicle' : 'generate',
       vehicle: vehicleMeta,
+      batchId: Date.now(),
     };
 
     state.cancelRequested = false;
@@ -6141,6 +7039,9 @@ async function runGeneration(model, prompt, negPrompt, ratio, res, guidance, see
     if (genMode === 'vehicle') {
       const modelRefs = await getVehicleModelReferenceImages();
       if (modelRefs.length) options.referenceImages = modelRefs;
+    } else {
+      const imagenRefs = await getImagenReferenceImages();
+      if (imagenRefs.length) options.referenceImages = imagenRefs;
     }
     const imageData = model.async
       ? await doAsync(model, prompt, negPrompt, ratio, res, guidance, seed, idx, options)
@@ -6423,8 +7324,10 @@ async function showImage(idx, imageData, pendingId) {
     prompt: lastGenMeta.prompt, fullPrompt: lastGenMeta.fullPrompt,
     model: lastGenMeta.model, modelId: lastGenMeta.modelId,
     provider: lastGenMeta.provider, ratio: lastGenMeta.ratio,
+    res: lastGenMeta.res || '',
     kind: lastGenMeta.kind || 'generate',
     vehicle: lastGenMeta.vehicle || null,
+    batchId: lastGenMeta.batchId || null,
     ts: Date.now(),
     bgRemoved: false,
     badge: 'Original',
