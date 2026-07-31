@@ -111,10 +111,9 @@ body {
 body.vehicle-mode #numImagesGroup,
 body.vehicle-mode #resRatioRow,
 body.vehicle-mode #modelNumRow,
-body.vehicle-mode .action-row,
+body.vehicle-mode .imagen-enhance-row,
 body.vehicle-mode .enhanced-wrap,
-body.vehicle-mode .center-head .btn-adv,
-body.vehicle-mode .neg-accordion { display: none !important; }
+body.vehicle-mode .center-head .btn-adv { display: none !important; }
 .center-form-stack { display: flex; flex-direction: column; }
 
 /* ═══ Vehiclegen / Imagen shared dark studio tokens (Skills) ═══ */
@@ -194,7 +193,6 @@ body.studio-ui .center-form-stack { display: none !important; }
 body.studio-ui .prompt-block { order: 1; margin-bottom: 8px !important; }
 body.studio-ui .action-row { order: 2; }
 body.studio-ui .enhanced-wrap { order: 3; }
-body.studio-ui .neg-accordion { order: 4; }
 
 /* Imagen enhance / negative / advanced — Vehiclegen studio chrome */
 body.imagen-mode .center-head .btn-adv {
@@ -234,31 +232,11 @@ body.imagen-mode .enhanced-body {
   overflow-y: auto;
 }
 body.imagen-mode .enhanced-body:empty:before { color: #6d6d7c; }
-body.imagen-mode .neg-accordion {
-  background: linear-gradient(180deg, #17171f 0%, #121218 100%);
-  border: 1px solid var(--vg-line);
-  border-radius: 18px;
-  overflow: hidden;
-  margin-bottom: 8px;
-}
-body.imagen-mode .neg-toggle {
-  color: var(--vg-text);
-  background: transparent;
-}
-body.imagen-mode .neg-optional,
-body.imagen-mode .neg-note { color: var(--vg-muted); }
-body.imagen-mode .neg-body textarea {
-  background: var(--vg-elev);
-  border: 1px solid var(--vg-line);
-  color: var(--vg-text);
-  border-radius: 12px;
-}
 
-/* Hard-guard: Imagen enhance / neg / advanced stay visible in imagen-mode only
+/* Hard-guard: Imagen enhance / advanced stay visible in imagen-mode only
    (:not(.vehicle-mode) so vehicle locks still win if both classes ever collide) */
 body.imagen-mode:not(.vehicle-mode) .action-row { display: flex !important; }
-body.imagen-mode:not(.vehicle-mode) .enhanced-wrap,
-body.imagen-mode:not(.vehicle-mode) .neg-accordion { display: block !important; }
+body.imagen-mode:not(.vehicle-mode) .enhanced-wrap { display: block !important; }
 body.imagen-mode:not(.vehicle-mode) .center-head .btn-adv { display: flex !important; }
 body.imagen-mode:not(.vehicle-mode) #imagenConfigPanel.visible { display: block !important; }
 body.vehicle-mode #imagenConfigPanel { display: none !important; }
@@ -687,19 +665,22 @@ body.imagen-mode #vgFilterYearWrap { display: none !important; }
    (sidebar + settings + gallery) without the settings/gallery panels overlapping,
    so we fall back to the default stacked layout (studio-ui's single-column rules). */
 @media (min-width: 1200px) {
-  body.imagen-mode .app {
+  body.imagen-mode .app,
+  body.vehicle-mode .app {
     grid-template-columns: var(--sidebar-w) minmax(300px, 380px) minmax(320px, 1fr);
     grid-template-rows: 1fr;
     column-gap: 24px;
   }
-  body.imagen-mode .center {
+  body.imagen-mode .center,
+  body.vehicle-mode .center {
     grid-column: 2; grid-row: 1;
     border: 1px solid var(--vg-line); border-radius: 16px;
     background: var(--vg-surface); padding: 20px; margin: 22px 0;
     overflow-y: auto; height: calc(100vh - 44px);
     min-width: 0;
   }
-  body.imagen-mode .right {
+  body.imagen-mode .right,
+  body.vehicle-mode .right {
     grid-column: 3; grid-row: 1;
     padding: 22px 28px 22px 0; margin: 0;
     display: flex; flex-direction: column; gap: 16px;
@@ -708,23 +689,38 @@ body.imagen-mode #vgFilterYearWrap { display: none !important; }
   }
 }
 body.imagen-mode #imagenConfigMeta { display: none; }
-body.imagen-mode .prompt-wrap .imagen-select-row {
+body.imagen-mode .prompt-wrap .imagen-select-row,
+body.vehicle-mode .prompt-wrap .vehicle-select-row {
   display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
 }
-body.imagen-mode .prompt-wrap .imagen-select-row .form-group { width: 100%; min-width: 0; }
-body.imagen-mode .prompt-wrap .imagen-select-row .form-label {
+body.imagen-mode .prompt-wrap .imagen-select-row .form-group,
+body.vehicle-mode .prompt-wrap .vehicle-select-row .form-group {
+  width: 100%; min-width: 0; flex: none;
+}
+body.imagen-mode .prompt-wrap .imagen-select-row .form-label,
+body.vehicle-mode .prompt-wrap .vehicle-select-row .form-label {
   position: static; width: auto; height: auto; overflow: visible; clip: auto;
   white-space: normal; display: block;
   font: 600 12px/1 Outfit, Inter, sans-serif; color: var(--vg-muted);
   margin-bottom: 6px; text-transform: none; letter-spacing: 0;
 }
-body.imagen-mode .prompt-wrap .imagen-select-row .sel-wrap {
+body.imagen-mode .prompt-wrap .imagen-select-row .sel-wrap,
+body.vehicle-mode .prompt-wrap .vehicle-select-row .sel-wrap {
   height: 44px; border-radius: 10px; width: 100%;
 }
-body.imagen-mode .prompt-wrap .imagen-select-row select {
+body.imagen-mode .prompt-wrap .imagen-select-row select,
+body.vehicle-mode .prompt-wrap .vehicle-select-row select {
   max-width: none; margin-right: 0; padding-right: 36px; width: 100%;
 }
-body.imagen-mode .vehicle-car-panel-label { font-size: 14px; font-weight: 700; }
+body.vehicle-mode .prompt-wrap .vehicle-select-row .vg-combo-trigger {
+  height: 44px; border-radius: 10px; width: 100%;
+  font: 500 13px/1 Outfit, sans-serif;
+}
+body.imagen-mode .vehicle-car-panel-label,
+body.vehicle-mode .vehicle-car-panel-label { font-size: 14px; font-weight: 700; }
+body.vehicle-mode .vehicle-car-panel-head {
+  flex-direction: column; align-items: flex-start; gap: 3px;
+}
 
 .gallery-card {
   background: var(--vg-surface); border: 1px solid var(--vg-line); border-radius: 16px;
@@ -1185,36 +1181,6 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
   content: attr(data-placeholder); color: var(--muted); font-style: italic; font-size: 12px;
 }
 
-/* NEGATIVE PROMPT ACCORDION */
-.neg-accordion {
-  background: var(--white); border: 1px solid var(--border-s); border-radius: var(--r-md);
-  overflow: hidden; margin-bottom: 18px; box-shadow: var(--shadow-xs);
-}
-.neg-toggle {
-  width: 100%; padding: 11px 14px; background: none; border: none; cursor: pointer;
-  display: flex; align-items: center; justify-content: space-between;
-  font: 500 12.5px/1 'Inter', sans-serif; color: var(--sub); transition: color .15s;
-}
-.neg-toggle:hover { color: var(--text); }
-.neg-toggle-left { display: flex; align-items: center; gap: 7px; }
-.neg-toggle-left svg { width: 14px; height: 14px; color: var(--muted); }
-.neg-toggle-left i[class^="cil-"] { font-size: 14px; line-height: 1; color: var(--muted); }
-.neg-caret.cil-caret-bottom,
-.neg-caret.cil-caret-top { font-size: 14px; transition: transform .15s; }
-.neg-optional { font-size: 11px; font-weight: 400; color: var(--muted); margin-left: 4px; }
-.neg-caret { width: 14px; height: 14px; transition: transform .2s; color: var(--muted); }
-.neg-caret.open { transform: rotate(180deg); }
-.neg-body { display: none; border-top: 1px solid var(--border); padding: 10px 14px 12px; }
-.neg-body.open { display: block; }
-.neg-body textarea {
-  width: 100%; border: 1px solid var(--border-s); border-radius: 7px; outline: none;
-  padding: 9px 11px; font: 400 11.5px/1.55 'Inter', sans-serif; color: var(--text);
-  background: var(--bg); min-height: 72px; resize: vertical;
-  transition: border-color .15s;
-}
-.neg-body textarea:focus { border-color: var(--purple); background: var(--white); }
-.neg-note { font-size: 10.5px; color: var(--muted); margin-top: 5px; font-style: italic; }
-
 /* DIVERSITY / ADVANCED (in advanced modal) */
 /* REFERENCES row (Style / Character / Add) */
 .ref-row { padding: 14px 16px 4px; }
@@ -1577,6 +1543,16 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
 /* GALLERY VIEWS (History / Collections / Favourites) */
 .gallery-view { flex: 1; display: flex; flex-direction: column; padding: 26px 32px 40px; overflow-y: auto; background: var(--bg); }
 .gallery-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; }
+.history-tabs {
+  display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 1px solid var(--border-s);
+}
+.history-tab {
+  padding: 10px 16px; background: none; border: none; border-bottom: 2px solid transparent;
+  font: 500 13px/1 'Inter', sans-serif; color: var(--muted); cursor: pointer;
+  transition: color .15s, border-color .15s;
+}
+.history-tab:hover { color: var(--text); }
+.history-tab.active { color: var(--purple); border-bottom-color: var(--purple); }
 .gallery-search-wrap {
   display: flex; align-items: center; gap: 10px; margin-bottom: 18px;
   padding: 10px 16px; border-radius: 999px;
@@ -2146,6 +2122,22 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+/* GEN TABS (Create / History within Imagen and Vehiclegen) */
+.gen-tabs { display: flex; gap: 8px; margin-bottom: 14px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+.gen-tab-btn {
+  border: none; background: transparent; cursor: pointer;
+  padding: 6px 12px; border-radius: 4px;
+  font: 600 13px/1 Outfit, Inter, sans-serif;
+  color: var(--muted);
+  transition: color .15s, background .15s;
+}
+.gen-tab-btn:hover { color: var(--text); }
+.gen-tab-btn.active { color: var(--purple); background: rgba(122, 98, 240, .1); }
+.gen-panels { display: flex; flex-direction: column; }
+.gen-panel { display: none; }
+.gen-panel.active { display: block; }
+.gen-panel-create { flex: 1; }
+.gen-panel-history { width: 100%; }
 }
 </style>
 </head>
@@ -2273,6 +2265,19 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
     </div>
 
     <!-- Legacy external config stack — studio UI uses in-prompt dropdowns instead -->
+
+    <!-- GEN TABS: Create / History -->
+    <div class="gen-tabs" id="genTabs">
+      <button class="gen-tab-btn active" data-tab="create" onclick="switchGenTab('create')">Create</button>
+      <button class="gen-tab-btn" data-tab="history" onclick="switchGenTab('history')">
+        <svg style="display: inline; width: 14px; height: 14px; vertical-align: -2px; margin-right: 4px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        History
+      </button>
+    </div>
+
+    <div class="gen-panels">
+      <!-- CREATE PANEL -->
+      <div class="gen-panel gen-panel-create active" id="genPanelCreate">
     <div class="center-form-stack" id="modelNumRow" hidden aria-hidden="true"></div>
 
     <!-- Prompt (Imagen + Vehicle: settings / selectors live inside this box) -->
@@ -2296,6 +2301,9 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
                   </optgroup>
                   <optgroup label="Magnific">
                     <option value="gpt-2">Magnific (classic)</option>
+                  </optgroup>
+                  <optgroup label="OpenAI">
+                    <option value="gpt-image-1">GPT Image 1</option>
                   </optgroup>
                 </select>
                 <div class="sel-caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
@@ -2534,22 +2542,6 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
         <span id="genBtnLabel">Generate</span>
       </button>
     </div>
-
-    <!-- Negative Prompt -->
-    <div class="neg-accordion">
-      <button class="neg-toggle" onclick="toggleNeg()">
-        <div class="neg-toggle-left">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-          Negative Prompt
-          <span class="neg-optional">(Optional)</span>
-        </div>
-        <svg class="neg-caret" id="negCaret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
-      <div class="neg-body" id="negBody">
-        <textarea id="negPrompt" placeholder="Describe what you don't want in the image…"></textarea>
-        <div class="neg-note">Prefilled from ACKO guidelines. Edit to override.</div>
-      </div>
-    </div>
   </main>
 
   <!-- RIGHT PANEL -->
@@ -2666,6 +2658,11 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
         Clear all
       </button>
+    </div>
+    <!-- History Filter Tabs -->
+    <div class="history-tabs">
+      <button class="history-tab active" data-filter="all" onclick="setHistoryFilter('all')">Imagen</button>
+      <button class="history-tab" data-filter="motor" onclick="setHistoryFilter('motor')">Vechilegen</button>
     </div>
     <div class="gallery-search-wrap">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -3761,6 +3758,10 @@ function renderVehicleGallery() {
 
   syncStudioGalleryChrome();
   if (!imagen) syncVehicleGalleryFilterOptions();
+  // Only show pending placeholders started in the mode currently being viewed —
+  // an in-flight Imagen generation should never surface in the Vehiclegen gallery
+  // (or vice versa) if the user switches tabs while it's still running.
+  const modePendingGens = vehiclePendingGens.filter(p => (p.kind === 'vehicle') === !imagen);
   const items = filteredVehicleGalleryItems();
   grid.innerHTML = '';
   grid.classList.toggle('is-folders', !imagen && vehicleGalleryMode === 'collections' && !vehicleCollectionOpenMake);
@@ -3784,7 +3785,7 @@ function renderVehicleGallery() {
   // Collections: folder grid by make (Vehiclegen only)
   if (!imagen && vehicleGalleryMode === 'collections' && !vehicleCollectionOpenMake) {
     // Pending gens still surface at top as cards spanning pipeline feel
-    vehiclePendingGens.forEach(p => grid.appendChild(buildVehiclePendingCard(p)));
+    modePendingGens.forEach(p => grid.appendChild(buildVehiclePendingCard(p)));
 
     let groups = groupVehicleItemsByMake(items);
     const q = (vehicleGalleryFilters.q || '').trim().toLowerCase();
@@ -3799,7 +3800,7 @@ function renderVehicleGallery() {
     }
     groups.forEach(g => grid.appendChild(buildVehicleMakeFolderCard(g)));
 
-    if (!vehiclePendingGens.length && !groups.length) {
+    if (!modePendingGens.length && !groups.length) {
       const empty = document.createElement('div');
       empty.className = 'vg-empty';
       empty.textContent = items.length
@@ -3810,7 +3811,7 @@ function renderVehicleGallery() {
 
     if (meta) {
       const bits = [`${groups.length} make folder${groups.length === 1 ? '' : 's'}`];
-      if (vehiclePendingGens.length) bits.push(`${vehiclePendingGens.length} generating`);
+      if (modePendingGens.length) bits.push(`${modePendingGens.length} generating`);
       meta.textContent = bits.join(' · ') + ' · Collections by make';
     }
     return;
@@ -3825,7 +3826,7 @@ function renderVehicleGallery() {
     });
   }
 
-  const pendingForView = vehiclePendingGens.filter(p => {
+  const pendingForView = modePendingGens.filter(p => {
     if (imagen || vehicleGalleryMode !== 'collections' || !vehicleCollectionOpenMake) return true;
     const make = (p.meta && p.meta.make) || 'Unknown make';
     return make === vehicleCollectionOpenMake;
@@ -3881,7 +3882,10 @@ function renderVehicleGallery() {
 
 function startVehicleGalleryPending(meta) {
   const id = 'pending_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
-  vehiclePendingGens.unshift({ id, meta: { ...meta }, startedAt: Date.now() });
+  // Tag with the mode it was started in so Imagen's in-flight placeholders never
+  // leak into the Vehiclegen gallery (and vice versa) if the user switches tabs
+  // mid-generation.
+  vehiclePendingGens.unshift({ id, meta: { ...meta }, startedAt: Date.now(), kind: genMode === 'vehicle' ? 'vehicle' : 'generate' });
   renderVehicleGallery();
   return id;
 }
@@ -5182,13 +5186,27 @@ function itemMatchesQuery(item, q) {
   return haystack.includes(q);
 }
 
+function setHistoryFilter(filter) {
+  historyFilter = filter;
+  document.querySelectorAll('.history-tab').forEach(el => {
+    el.classList.toggle('active', el.dataset.filter === filter);
+  });
+  renderGallery('history');
+}
+
 function renderGallery(kind) {
   const grid = document.getElementById(kind + 'Grid');
   const countEl = document.getElementById(kind + 'Count');
   const clearBtn = document.getElementById(kind + 'ClearBtn');
   const searchEl = document.getElementById(kind + 'Search');
   const query = (searchEl && searchEl.value || '').trim().toLowerCase();
-  const allItems = storeGet(kind);
+  let allItems = storeGet(kind);
+
+  // Apply history filter (Imagen = all, Vechilegen = motor only)
+  if (kind === 'history' && historyFilter === 'motor') {
+    allItems = allItems.filter(it => it.product === 'motor');
+  }
+
   const items = query ? allItems.filter(it => itemMatchesQuery(it, query)) : allItems;
 
   countEl.textContent = allItems.length ? `${items.length} of ${allItems.length} image${allItems.length !== 1 ? 's' : ''}` : '';
@@ -6071,6 +6089,7 @@ async function lbMirrorImage() {
       ratio: root.ratio,
       kind: root.kind || (root.vehicle ? 'vehicle' : 'generate'),
       vehicle: root.vehicle ? { ...root.vehicle } : null,
+      product: root.product || 'general',
       ts: Date.now(),
       badge: 'Mirrored',
       isMirror: true,
@@ -6228,6 +6247,7 @@ async function lbRegenerate() {
       provider: item.provider, ratio: item.ratio,
       kind: item.kind || (item.vehicle ? 'vehicle' : 'generate'),
       vehicle: item.vehicle ? { ...item.vehicle } : null,
+      product: item.product || 'general',
       ts: Date.now(), regeneratedFrom: item.id,
       badge: 'Original',
     };
@@ -6571,6 +6591,15 @@ const MODELS = {
   'gpt-2':       { provider: 'magnific', path: '/v1/ai/text-to-image', async: false, supportsRes: false, supportsSubModel: false, colRatio: false },
   // Google Nano Banana 2 via Magnific (async, colon aspect ratios; supports reference_images)
   'nano-banana': { provider: 'magnific', path: '/v1/ai/text-to-image/nano-banana-pro-flash', async: true, supportsRes: true, supportsSubModel: false, colRatio: true },
+  // OpenAI GPT Image 1, called directly (not via Magnific) — key stays server-side in .env
+  'gpt-image-1': { provider: 'openai', path: '/v1/images/generations', async: false, supportsRes: false, supportsSubModel: false, colRatio: false },
+};
+
+// GPT Image 1 only accepts these three sizes — map our aspect ratios to the closest one.
+const OPENAI_SIZE = {
+  'square_1_1': '1024x1024',
+  'widescreen_16_9': '1536x1024', 'horizontal_2_1': '1536x1024', 'standard_3_2': '1536x1024', 'classic_4_3': '1536x1024',
+  'social_story_9_16': '1024x1536', 'social_post_4_5': '1024x1536', 'traditional_3_4': '1024x1536',
 };
 
 // Nano Banana expects colon format; all other models use underscore format
@@ -6594,6 +6623,9 @@ let state = {
   noCharacters: false,
   cancelRequested: false,
 };
+
+// History filter state (Imagen = all, Vechilegen = motor only)
+let historyFilter = 'all';
 
 // ─── CAMERA ANGLES ────────────────────────────────────────────────────────────
 const CAMERA_ANGLES = {
@@ -6822,12 +6854,6 @@ function toggleNoCharacters() {
   updatePrompt();
 }
 
-// ─── NEG PROMPT ──────────────────────────────────────────────────────────────
-function toggleNeg() {
-  document.getElementById('negBody').classList.toggle('open');
-  document.getElementById('negCaret').classList.toggle('open');
-}
-
 // ─── MODALS ──────────────────────────────────────────────────────────────────
 function openAdv()  { document.getElementById('advOverlay').classList.add('open'); }
 function closeAdv() { document.getElementById('advOverlay').classList.remove('open'); }
@@ -7043,9 +7069,11 @@ async function runGeneration(model, prompt, negPrompt, ratio, res, guidance, see
       const imagenRefs = await getImagenReferenceImages();
       if (imagenRefs.length) options.referenceImages = imagenRefs;
     }
-    const imageData = model.async
-      ? await doAsync(model, prompt, negPrompt, ratio, res, guidance, seed, idx, options)
-      : await doSync(model, prompt, negPrompt, ratio, guidance, seed);
+    const imageData = model.provider === 'openai'
+      ? await doOpenAI(model, prompt, ratio)
+      : model.async
+        ? await doAsync(model, prompt, negPrompt, ratio, res, guidance, seed, idx, options)
+        : await doSync(model, prompt, negPrompt, ratio, guidance, seed);
     if (!state.cancelRequested) await showImage(idx, imageData, pendingId);
   } catch(e) {
     if (!state.cancelRequested) {
@@ -7084,8 +7112,12 @@ function parseApiError(status, errText) {
   let message = `API ${status}: ${raw.slice(0, 160)}`;
   try {
     const errData = JSON.parse(raw);
-    if (errData.error) message = errData.error;
-    else if (errData.message) {
+    if (errData.error && typeof errData.error === 'object') {
+      // OpenAI shape: { error: { message, type, code } }
+      message = `API ${status}: ${errData.error.message || errData.error.code || JSON.stringify(errData.error)}`;
+    } else if (errData.error) {
+      message = errData.error;
+    } else if (errData.message) {
       message = `API ${status}: ${errData.message}`;
       const invalid = errData.invalid_params;
       if (Array.isArray(invalid) && invalid.length) {
@@ -7120,6 +7152,22 @@ async function doSync(model, prompt, negPrompt, ratio, guidance, seed) {
   const images = data.data || [];
   if (!images.length || !images[0].base64) throw new Error('No image returned from Magnific.');
   return { b64: images[0].base64, mime: 'image/png' };
+}
+
+async function doOpenAI(model, prompt, ratio) {
+  const size = OPENAI_SIZE[ratio] || '1024x1024';
+  const body = { model: 'gpt-image-1', prompt, n: 1, size, quality: 'high' };
+
+  const res = await fetch(apiUrl('openai', model.path), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-session-token': getSessionToken() },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(parseApiError(res.status, await res.text()));
+  const data = await res.json();
+  const images = data.data || [];
+  if (!images.length || !images[0].b64_json) throw new Error('No image returned from OpenAI.');
+  return { b64: images[0].b64_json, mime: 'image/png' };
 }
 
 async function doAsync(model, prompt, negPrompt, ratio, res, guidance, seed, idx, options = {}) {
@@ -7327,6 +7375,7 @@ async function showImage(idx, imageData, pendingId) {
     res: lastGenMeta.res || '',
     kind: lastGenMeta.kind || 'generate',
     vehicle: lastGenMeta.vehicle || null,
+    product: state.product || 'general',
     batchId: lastGenMeta.batchId || null,
     ts: Date.now(),
     bgRemoved: false,
@@ -7517,6 +7566,7 @@ async function removeBackgroundForItem(item, opts = {}) {
     ratio: item.ratio || root.ratio,
     kind: root.kind || item.kind || (root.vehicle ? 'vehicle' : 'generate'),
     vehicle: root.vehicle ? { ...root.vehicle } : (item.vehicle || null),
+    product: root.product || item.product || 'general',
     ts: Date.now(),
     badge: 'No BG',
     isCutout: true,
@@ -7598,6 +7648,19 @@ async function convertDataUriFormat(dataUri, format = 'png', quality = 0.92) {
  * Uses in-memory cache / data URI so Original vs Mirrored vs No BG match the strip.
  * format: 'png' | 'jpeg' | 'webp' (optional; defaults to png for cutouts, else source-ish png).
  */
+/** Turn a prompt into a short, filesystem-safe filename slug, e.g.
+ * "A person at a laptop, in a bright office…" -> "a-person-at-a-laptop-in-bright". */
+function slugifyPrompt(text, maxWords = 8) {
+  const words = String(text || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, ' ')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, maxWords);
+  return words.join('-');
+}
+
 async function downloadHistoryItem(item, opts = {}) {
   if (!item) throw new Error('No image selected.');
   const isCutout = !!(item.isCutout || item.badge === 'No BG');
@@ -7613,6 +7676,10 @@ async function downloadHistoryItem(item, opts = {}) {
   } else if (item.imageData && item.imageData.b64) {
     const mime = item.imageData.mime || 'image/png';
     href = `data:${mime};base64,${item.imageData.b64}`;
+  } else if (resolved.startsWith('/')) {
+    // Durable same-origin copy under /generated/ — fetch directly rather than
+    // falling through to the (possibly-expired) original Magnific source URL.
+    href = await urlToDataUri(resolved);
   } else {
     href = await getItemAsDataUri(item);
   }
@@ -7621,9 +7688,13 @@ async function downloadHistoryItem(item, opts = {}) {
   href = await convertDataUriFormat(href, format);
   const ext = format === 'jpeg' ? 'jpg' : format;
   const mime = format === 'jpeg' ? 'image/jpeg' : (format === 'webp' ? 'image/webp' : 'image/png');
-  const label = String(item.badge || 'image').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'image';
+  const promptSlug = slugifyPrompt(item.prompt || item.fullPrompt);
+  const badgeSlug = (isCutout || (item.badge && item.badge !== 'Original'))
+    ? String(item.badge || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+    : '';
+  const namePart = [promptSlug, badgeSlug].filter(Boolean).join('-') || 'image';
   const a = document.createElement('a');
-  a.download = `acko-${label}-${Date.now()}.${ext}`;
+  a.download = `acko-${namePart}-${Date.now()}.${ext}`;
   a.href = href;
   document.body.appendChild(a);
   a.click();
@@ -7700,7 +7771,6 @@ document.addEventListener('DOMContentLoaded', () => {
     wipeAllLibraryStores();
     localStorage.setItem(FRESH_START_KEY, '1');
   }
-  document.getElementById('negPrompt').value = DEFAULT_NEG;
   onModelChange();
   wireSelectWraps();
   wireVehicleCombos();
