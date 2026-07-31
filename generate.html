@@ -2122,22 +2122,10 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-/* GEN TABS (Create / History within Imagen and Vehiclegen) */
-.gen-tabs { display: flex; gap: 8px; margin-bottom: 14px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
-.gen-tab-btn {
-  border: none; background: transparent; cursor: pointer;
-  padding: 6px 12px; border-radius: 4px;
-  font: 600 13px/1 Outfit, Inter, sans-serif;
-  color: var(--muted);
-  transition: color .15s, background .15s;
-}
-.gen-tab-btn:hover { color: var(--text); }
-.gen-tab-btn.active { color: var(--purple); background: rgba(122, 98, 240, .1); }
 .gen-panels { display: flex; flex-direction: column; }
 .gen-panel { display: none; }
 .gen-panel.active { display: block; }
 .gen-panel-create { flex: 1; }
-.gen-panel-history { width: 100%; }
 }
 </style>
 </head>
@@ -2265,15 +2253,6 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
     </div>
 
     <!-- Legacy external config stack — studio UI uses in-prompt dropdowns instead -->
-
-    <!-- GEN TABS: Create / History -->
-    <div class="gen-tabs" id="genTabs">
-      <button class="gen-tab-btn active" data-tab="create" onclick="switchGenTab('create')">Create</button>
-      <button class="gen-tab-btn" data-tab="history" onclick="switchGenTab('history')">
-        <svg style="display: inline; width: 14px; height: 14px; vertical-align: -2px; margin-right: 4px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        History
-      </button>
-    </div>
 
     <div class="gen-panels">
       <!-- CREATE PANEL -->
