@@ -20,9 +20,13 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 import os
 
 import user_store
+import catalogue_db
+import catalogue_validation
+import catalogue_prompt_builder
 
 PORT = int(os.environ.get("PORT", 3458))
 MAGNIFIC_BASE = "https://api.magnific.com"
+OPENAI_BASE = "https://api.openai.com"
 REMOVE_BG_API = "https://api.remove.bg/v1.0/removebg"
 HTML_DIR = os.path.dirname(os.path.abspath(__file__))
 ENV_FILE = os.path.join(HTML_DIR, ".env")
@@ -107,6 +111,9 @@ def load_env_file(path):
 
 load_env_file(ENV_FILE)
 MAGNIFIC_KEY = os.environ.get("MAGNIFIC_KEY", "")
+# GPT Image 1, called directly against OpenAI (not via Magnific) — same
+# server-side-only key pattern as MAGNIFIC_KEY: the browser never sees it.
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
 # Same API the https://github.com/remove-bg/remove-bg-cli tool uses.
 REMOVE_BG_API_KEY = os.environ.get("REMOVE_BG_API_KEY", "")
 
@@ -371,6 +378,8 @@ _bootstrap_admin_emails = [e for e in os.environ.get("ADMIN_EMAILS", "").split("
 if _bootstrap_admin_emails:
     user_store.bootstrap_admins(_bootstrap_admin_emails)
 
+catalogue_db.init_db()
+
 
 def get_session_secret():
     """Load a persistent random secret for signing sessions, creating it on first run."""
@@ -448,6 +457,8 @@ def route(path):
     """Map /api/<provider>/... to (upstream_url, provider)."""
     if path.startswith("/api/magnific/"):
         return MAGNIFIC_BASE + path[len("/api/magnific"):], "magnific"
+    if path.startswith("/api/openai/"):
+        return OPENAI_BASE + path[len("/api/openai"):], "openai"
     return None, None
 
 
@@ -459,6 +470,8 @@ def upstream_headers(provider, incoming_headers):
         # The real key lives only here, loaded from .env — the browser never sees it and
         # any client-supplied x-magnific-api-key header is ignored, not trusted.
         return {"Content-Type": content_type, "x-magnific-api-key": MAGNIFIC_KEY}
+    if provider == "openai":
+        return {"Content-Type": content_type, "Authorization": f"Bearer {OPENAI_API_KEY}"}
     return {"Content-Type": "application/json"}
 
 
@@ -481,6 +494,122 @@ class ProxyHandler(BaseHTTPRequestHandler):
         self.send_cors()
         self.end_headers()
         self.wfile.write(body)
+
+    # ── Vehicle catalogue routes ────────────────────────────────────────────
+    def handle_catalogue_get(self, path_no_query):
+        """Routes for GET /api/catalogue/*. Only surfaces production-ready
+        (approved / confidence>=0.80) rows outside the admin endpoints — see
+        catalogue_models.MarketPhase.is_production_ready."""
+        parts = [p for p in path_no_query.split("/") if p]  # ['api','catalogue', ...]
+        rest = parts[2:]  # after 'api','catalogue'
+
+        if rest == ["makes"]:
+            rows = catalogue_db.query("SELECT * FROM makes WHERE active_in_india = 1 ORDER BY name")
+            self.send_json(200, {"makes": rows})
+            return
+
+        if len(rest) == 3 and rest[0] == "makes" and rest[2] == "models":
+            rows = catalogue_db.query(
+                "SELECT * FROM model_families WHERE make_id = ? AND active = 1 ORDER BY name", (rest[1],)
+            )
+            self.send_json(200, {"models": rows})
+            return
+
+        if len(rest) == 3 and rest[0] == "models" and rest[2] == "generations":
+            rows = catalogue_db.query(
+                "SELECT * FROM generations WHERE model_family_id = ? ORDER BY india_start_date", (rest[1],)
+            )
+            self.send_json(200, {"generations": rows})
+            return
+
+        if len(rest) == 3 and rest[0] == "generations" and rest[2] == "phases":
+            rows = catalogue_db.query(
+                """SELECT * FROM market_phases WHERE generation_id = ?
+                   AND (review_status = 'approved' OR confidence_score >= 0.80)
+                   ORDER BY india_start_date""",
+                (rest[1],),
+            )
+            self.send_json(200, {"phases": rows})
+            return
+
+        if len(rest) == 3 and rest[0] == "phases" and rest[2] == "variants":
+            rows = catalogue_db.query("SELECT * FROM variants WHERE market_phase_id = ? ORDER BY name", (rest[1],))
+            self.send_json(200, {"variants": rows})
+            return
+
+        if len(rest) == 3 and rest[0] == "variants" and rest[2] == "colours":
+            variant = catalogue_db.query_one("SELECT * FROM variants WHERE id = ?", (rest[1],))
+            if not variant:
+                self.send_json(404, {"error": "Unknown variant_id."})
+                return
+            rows = catalogue_db.query(
+                """SELECT c.* FROM colours c
+                   JOIN colour_availability ca ON ca.colour_id = c.id
+                   WHERE ca.market_phase_id = ? AND (ca.variant_id = ? OR ca.variant_id IS NULL)
+                   ORDER BY c.official_name""",
+                (variant["market_phase_id"], rest[1]),
+            )
+            self.send_json(200, {"colours": rows})
+            return
+
+        if len(rest) == 2 and rest[0] == "configurations":
+            # A "configuration" id here is just "<phase_id>:<variant_id-or-_>:<colour_id-or-_>"
+            # — there's no separate configurations table; this endpoint exists for API-shape
+            # parity with the spec and resolves + validates on the fly.
+            try:
+                phase_id, variant_id, colour_id = (rest[1].split(":") + ["_", "_"])[:3]
+            except ValueError:
+                self.send_json(400, {"error": "Malformed configuration id."})
+                return
+            phase = catalogue_db.query_one("SELECT * FROM market_phases WHERE id = ?", (phase_id,))
+            if not phase:
+                self.send_json(404, {"error": "Unknown configuration."})
+                return
+            self.send_json(200, {
+                "market_phase": phase,
+                "variant_id": None if variant_id == "_" else variant_id,
+                "colour_id": None if colour_id == "_" else colour_id,
+            })
+            return
+
+        if rest == ["search"]:
+            qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+            q = (qs.get("q") or [""])[0].strip().lower()
+            if not q:
+                self.send_json(200, {"results": []})
+                return
+            makes = catalogue_db.query(
+                "SELECT id, name, 'make' as entity_type FROM makes WHERE lower(name) LIKE ?", (f"%{q}%",)
+            )
+            models = catalogue_db.query(
+                "SELECT id, name, 'model_family' as entity_type FROM model_families WHERE lower(name) LIKE ?",
+                (f"%{q}%",),
+            )
+            alias_hits = catalogue_db.query(
+                "SELECT entity_type, entity_id, alias FROM aliases WHERE lower(alias) LIKE ?", (f"%{q}%",)
+            )
+            self.send_json(200, {"results": makes + models, "alias_matches": alias_hits})
+            return
+
+        if len(rest) == 3 and rest[0] == "sources":
+            entity_type, entity_id = rest[1], rest[2]
+            evidence = catalogue_db.query(
+                "SELECT * FROM catalogue_evidence WHERE entity_type = ? AND entity_id = ?",
+                (entity_type, entity_id),
+            )
+            source_ids = list({e["source_id"] for e in evidence})
+            sources = []
+            if source_ids:
+                placeholders = ",".join("?" * len(source_ids))
+                sources = catalogue_db.query(f"SELECT * FROM source_records WHERE id IN ({placeholders})", source_ids)
+            self.send_json(200, {"evidence": evidence, "sources": sources})
+            return
+
+        if rest == ["validate"]:
+            self.send_json(200, {"findings": catalogue_validation.run_all_validations()})
+            return
+
+        self.send_json(404, {"error": f"Unknown catalogue route: /{'/'.join(parts)}"})
 
     def do_OPTIONS(self):
         self.send_response(204)
@@ -672,6 +801,21 @@ class ProxyHandler(BaseHTTPRequestHandler):
             self.send_json(200, {"users": user_store.list_all_users()})
             return
 
+        # ── Vehicle catalogue (new, sourced relational data — separate from the
+        # legacy vehicle_catalog.json flat file the current selector still uses).
+        # Gated the same way as the rest of Vehiclegen: signed-in + image-gen access.
+        if path_no_query.startswith("/api/catalogue/") or path_no_query == "/api/catalogue":
+            ok, email = verify_session(self.headers.get("x-session-token", ""))
+            if not ok:
+                self.send_json(401, {"error": "Not signed in. Please sign in with your acko.tech email."})
+                return
+            perm_ok, perm_err = require_permission(email, user_store.IMAGE_GEN_ALLOWED)
+            if not perm_ok:
+                self.send_json(403, perm_err)
+                return
+            self.handle_catalogue_get(path_no_query)
+            return
+
         # Fetch a remote generation URL server-side (avoids browser CORS) so the
         # UI can persist Magnific temp image links as durable data URLs.
         if path_no_query == "/api/fetch-image":
@@ -795,6 +939,44 @@ class ProxyHandler(BaseHTTPRequestHandler):
                 pass
 
     def _do_POST_inner(self):
+        # Vehicle catalogue prompt builder — resolves + validates every ID
+        # server-side (never trusts the client's selection) then returns the
+        # structured positive/negative prompt. See catalogue_prompt_builder.py.
+        if self.path == "/api/prompts/build":
+            ok, email = verify_session(self.headers.get("x-session-token", ""))
+            if not ok:
+                self.send_json(401, {"error": "Not signed in. Please sign in with your acko.tech email."})
+                return
+            perm_ok, perm_err = require_permission(email, user_store.IMAGE_GEN_ALLOWED)
+            if not perm_ok:
+                self.send_json(403, perm_err)
+                return
+            length = int(self.headers.get("Content-Length", 0))
+            try:
+                data = json.loads(self.rfile.read(length) or b"{}")
+            except Exception:
+                self.send_json(400, {"error": "Invalid request body."})
+                return
+            try:
+                result = catalogue_prompt_builder.build_prompt(
+                    make_id=data.get("make_id"),
+                    model_family_id=data.get("model_family_id"),
+                    generation_id=data.get("generation_id"),
+                    market_phase_id=data.get("market_phase_id"),
+                    variant_id=data.get("variant_id"),
+                    colour_id=data.get("colour_id"),
+                    camera_preset=data.get("camera_preset", "front_driver_three_quarter"),
+                    output=data.get("output") or {},
+                )
+            except catalogue_prompt_builder.ConfigurationError as e:
+                self.send_json(400, {"error": str(e)})
+                return
+            except Exception as e:
+                self.send_json(500, {"error": f"Prompt build failed: {e}"})
+                return
+            self.send_json(200, result)
+            return
+
         # Login — validates the email domain and issues a signed session token.
         # Login only proves identity now; it always succeeds for a valid acko.tech
         # address (creating a 'No access' user record on first sight). Whether that
@@ -1172,6 +1354,8 @@ if __name__ == "__main__":
     print(f"  Local image store → {GENERATED_DIR}\n")
     if not MAGNIFIC_KEY:
         print("  WARNING: MAGNIFIC_KEY is not set in .env — image generation will fail with a 401/403 until it is.\n")
+    if not OPENAI_API_KEY:
+        print("  WARNING: OPENAI_API_KEY is not set in .env — the GPT Image 1 model will fail with a 401 until it is.\n")
     if not REMOVE_BG_API_KEY:
         print("  WARNING: REMOVE_BG_API_KEY is not set in .env — Vehicle Remove BG will fail until it is.\n")
     else:

@@ -1,6 +1,7 @@
 .env
 .session_secret
 acko_gen.db
+vehicle_catalogue.db
 node_modules/
 .DS_Store
 gen_debug.log
