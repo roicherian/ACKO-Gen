@@ -4020,30 +4020,41 @@ function clearVehicleModelRef() {
 
 // ─── IMAGEN REFERENCES (Style / Character / Add) ───────────────────────────
 const CHARACTER_LIBRARY = [
-  { id: 'aanya-nair', name: 'Aanya Nair', location: 'Bengaluru, Karnataka', role: 'Researcher' },
-  { id: 'rohan-malhotra', name: 'Rohan Malhotra', location: 'Delhi', role: 'New Car Owner' },
-  { id: 'meena-subramanian', name: 'Meena Subramanian', location: 'Chennai, Tamil Nadu', role: 'Caregiver' },
-  { id: 'arjun-deshmukh', name: 'Arjun Deshmukh', location: 'Pune, Maharashtra', role: 'College Student' },
-  { id: 'fatima-khan', name: 'Fatima Khan', location: 'Hyderabad, Telangana', role: 'Small Business Owner' },
-  { id: 'david-varghese', name: 'David Varghese', location: 'Kochi, Kerala', role: 'Retiree' },
-  { id: 'simran-kaur', name: 'Simran Kaur', location: 'Chandigarh, Punjab', role: 'Marketing Executive' },
-  { id: 'bikram-doley', name: 'Bikram Doley', location: 'Guwahati, Assam', role: 'Travel Blogger' },
-  { id: 'lakshmi-reddy', name: 'Lakshmi Reddy', location: 'Vijayawada, Andhra Pradesh', role: 'New Mother' },
-  { id: 'imran-ansari', name: 'Imran Ansari', location: 'Lucknow, Uttar Pradesh', role: 'Mechanic' },
-  { id: 'priya-fernandes', name: 'Priya Fernandes', location: 'Goa', role: 'Content Creator' },
-  { id: 'manoj-yadav', name: 'Manoj Yadav', location: 'Jaipur, Rajasthan', role: 'Shop Owner' },
-  { id: 'neha-verma', name: 'Neha Verma', location: 'Patna, Bihar', role: 'Teacher' },
-  { id: 'sanjay-singh', name: 'Sanjay Singh', location: 'Haryana', role: 'Farmer' },
-  { id: 'pema-angmo', name: 'Pema Angmo', location: 'Leh, Ladakh', role: 'Homestay Owner' },
-  { id: 'joseph-thomas', name: 'Joseph Thomas', location: 'Kottayam, Kerala', role: 'Bank Manager' },
-  { id: 'sunita-devi', name: 'Sunita Devi', location: 'Ranchi, Jharkhand', role: 'ASHA Worker' },
-  { id: 'vikram-shetty', name: 'Vikram Shetty', location: 'Mumbai, Maharashtra', role: 'Marine Engineer' },
-  { id: 'tsering-dolma', name: 'Tsering Dolma', location: 'Sikkim', role: 'Hotel Manager' },
-  { id: 'mahesh-kumar', name: 'Mahesh Kumar', location: 'Bhopal, Madhya Pradesh', role: 'Electrician' },
-  { id: 'anjali-iyer', name: 'Anjali Iyer', location: 'Mysuru, Karnataka', role: 'Architect' },
-  { id: 'sahil-shaikh', name: 'Sahil Shaikh', location: 'Surat, Gujarat', role: 'Textile Trader' },
-  { id: 'parul-chatterjee', name: 'Parul Chatterjee', location: 'Kolkata, West Bengal', role: 'Journalist' },
-  { id: 'harpreet-sandhu', name: 'Harpreet Sandhu', location: 'Amritsar, Punjab', role: 'Delivery Partner' },
+  // Age 0-10
+  { id: 'arjun-deshmukh', name: 'Arjun Deshmukh', location: 'Pune, Maharashtra', role: 'Student', age: '0-10', gender: 'male' },
+  { id: 'imran-ansari', name: 'Imran Ansari', location: 'Lucknow, Uttar Pradesh', role: 'Student', age: '0-10', gender: 'male' },
+  { id: 'pema-angmo', name: 'Pema Angmo', location: 'Leh, Ladakh', role: 'Student', age: '0-10', gender: 'female' },
+  { id: 'meena-subramanian', name: 'Meena Subramanian', location: 'Chennai, Tamil Nadu', role: 'Student', age: '0-10', gender: 'female' },
+
+  // Age 10-20
+  { id: 'rohan-malhotra', name: 'Rohan Malhotra', location: 'Delhi', role: 'College Student', age: '10-20', gender: 'male' },
+  { id: 'bikram-doley', name: 'Bikram Doley', location: 'Guwahati, Assam', role: 'Student', age: '10-20', gender: 'male' },
+  { id: 'simran-kaur', name: 'Simran Kaur', location: 'Chandigarh, Punjab', role: 'Student', age: '10-20', gender: 'female' },
+  { id: 'neha-verma', name: 'Neha Verma', location: 'Patna, Bihar', role: 'Student', age: '10-20', gender: 'female' },
+
+  // Age 20-30
+  { id: 'manoj-yadav', name: 'Manoj Yadav', location: 'Jaipur, Rajasthan', role: 'Shop Owner', age: '20-30', gender: 'male' },
+  { id: 'sahil-shaikh', name: 'Sahil Shaikh', location: 'Surat, Gujarat', role: 'Textile Trader', age: '20-30', gender: 'male' },
+  { id: 'aanya-nair', name: 'Aanya Nair', location: 'Bengaluru, Karnataka', role: 'Researcher', age: '20-30', gender: 'female' },
+  { id: 'priya-fernandes', name: 'Priya Fernandes', location: 'Goa', role: 'Content Creator', age: '20-30', gender: 'female' },
+
+  // Age 30-40
+  { id: 'vikram-shetty', name: 'Vikram Shetty', location: 'Mumbai, Maharashtra', role: 'Marine Engineer', age: '30-40', gender: 'male' },
+  { id: 'imran-ansari', name: 'Imran Ansari', location: 'Lucknow, Uttar Pradesh', role: 'Mechanic', age: '30-40', gender: 'male' },
+  { id: 'fatima-khan', name: 'Fatima Khan', location: 'Hyderabad, Telangana', role: 'Small Business Owner', age: '30-40', gender: 'female' },
+  { id: 'lakshmi-reddy', name: 'Lakshmi Reddy', location: 'Vijayawada, Andhra Pradesh', role: 'Entrepreneur', age: '30-40', gender: 'female' },
+
+  // Age 40-50
+  { id: 'sanjay-singh', name: 'Sanjay Singh', location: 'Haryana', role: 'Farmer', age: '40-50', gender: 'male' },
+  { id: 'mahesh-kumar', name: 'Mahesh Kumar', location: 'Bhopal, Madhya Pradesh', role: 'Electrician', age: '40-50', gender: 'male' },
+  { id: 'tsering-dolma', name: 'Tsering Dolma', location: 'Sikkim', role: 'Hotel Manager', age: '40-50', gender: 'female' },
+  { id: 'anjali-iyer', name: 'Anjali Iyer', location: 'Mysuru, Karnataka', role: 'Architect', age: '40-50', gender: 'female' },
+
+  // Age 50-60
+  { id: 'joseph-thomas', name: 'Joseph Thomas', location: 'Kottayam, Kerala', role: 'Bank Manager', age: '50-60', gender: 'male' },
+  { id: 'harpreet-sandhu', name: 'Harpreet Sandhu', location: 'Amritsar, Punjab', role: 'Business Owner', age: '50-60', gender: 'male' },
+  { id: 'sunita-devi', name: 'Sunita Devi', location: 'Ranchi, Jharkhand', role: 'ASHA Worker', age: '50-60', gender: 'female' },
+  { id: 'parul-chatterjee', name: 'Parul Chatterjee', location: 'Kolkata, West Bengal', role: 'Journalist', age: '50-60', gender: 'female' },
 ];
 const CHAR_AVATAR_COLORS = ['#7a62f0', '#e0759a', '#4aa8d8', '#e0954a', '#5cb85c', '#c0563f', '#9b59b6', '#2e9e8f'];
 function charInitials(name) {
@@ -4228,20 +4239,36 @@ function renderCharacterGrid() {
     grid.innerHTML = `<div class="char-grid-empty">${characterTab === 'favourites' ? 'No favourites yet — star a character to save it here.' : 'No characters match your search.'}</div>`;
     return;
   }
-  grid.innerHTML = list.map(c => {
-    const isFav = characterFavourites.has(c.id);
-    const isSelected = imagenReferences.character && imagenReferences.character.id === c.id;
-    return `
-      <div class="char-card${isSelected ? ' selected' : ''}" onclick="selectCharacter('${c.id}')">
-        <button class="char-fav-btn${isFav ? ' on' : ''}" onclick="toggleCharacterFav('${c.id}', event)" title="Favourite">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-        </button>
-        <div class="char-avatar-photo"><img src="${charPhotoUrl(c.id)}" alt="${esc(c.name)}" loading="lazy" onerror="this.parentElement.outerHTML='<div class=\'char-avatar\' style=\'background:${charColor(c.id)}\'>${esc(charInitials(c.name))}</div>'"></div>
-        <div class="char-name">${esc(c.name)}</div>
-        <div class="char-meta">${esc(c.location)}</div>
-        <div class="char-meta">${esc(c.role)}</div>
-      </div>`;
-  }).join('');
+
+  const ageGroups = ['0-10', '10-20', '20-30', '30-40', '40-50', '50-60'];
+  const groupedByAge = {};
+  ageGroups.forEach(age => groupedByAge[age] = []);
+  list.forEach(c => {
+    if (c.age && groupedByAge[c.age]) groupedByAge[c.age].push(c);
+  });
+
+  let html = '';
+  ageGroups.forEach(age => {
+    const chars = groupedByAge[age];
+    if (chars.length) {
+      html += `<div style="grid-column: 1/-1; margin-top: 16px; font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px;">Age ${age}</div>`;
+      html += chars.map(c => {
+        const isFav = characterFavourites.has(c.id);
+        const isSelected = imagenReferences.character && imagenReferences.character.id === c.id;
+        return `
+          <div class="char-card${isSelected ? ' selected' : ''}" onclick="selectCharacter('${c.id}')">
+            <button class="char-fav-btn${isFav ? ' on' : ''}" onclick="toggleCharacterFav('${c.id}', event)" title="Favourite">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </button>
+            <div class="char-avatar-photo"><img src="${charPhotoUrl(c.id)}" alt="${esc(c.name)}" loading="lazy" onerror="this.parentElement.outerHTML='<div class=\'char-avatar\' style=\'background:${charColor(c.id)}\'>${esc(charInitials(c.name))}</div>'"></div>
+            <div class="char-name">${esc(c.name)}</div>
+            <div class="char-meta">${esc(c.location)}</div>
+            <div class="char-meta">${esc(c.role)}</div>
+          </div>`;
+      }).join('');
+    }
+  });
+  grid.innerHTML = html;
 }
 
 async function urlToDataUri(url) {
