@@ -1,0 +1,13 @@
+[tool.vercel]
+builders = [
+  { src = "proxy.py", use = "@vercel/python" }
+]
+env = { PYTHONUNBUFFERED = "1" }
+
+[build-system]
+requires = ["setuptools>=40.8.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "acko-gen"
+version = "1.0.0"
