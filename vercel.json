@@ -1,7 +1,6 @@
 {
-  "buildCommand": "pip install -r requirements.txt",
+  "buildCommand": "pip install -r requirements.txt || echo 'No dependencies to install'",
   "outputDirectory": ".",
-  "framework": "python",
   "env": {
     "PYTHONUNBUFFERED": "1"
   }
