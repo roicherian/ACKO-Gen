@@ -4,7 +4,7 @@
     {
       "name": "acko-image-generator",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["/Users/roy.cherian/Documents/ACKO Gen/proxy.py"],
+      "runtimeArgs": ["/Users/roy.cherian/Documents/ACKO-Gen-main/main.py"],
       "port": 3458
     }
   ]
