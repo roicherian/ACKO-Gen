@@ -5,6 +5,6 @@
     "buildCommand": "echo 'Building Python app'"
   },
   "deploy": {
-    "startCommand": "python3 proxy.py"
+    "startCommand": "python3 main.py"
   }
 }
