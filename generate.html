@@ -1633,6 +1633,15 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
   outline: none; cursor: pointer;
 }
 .admin-select:focus { border-color: var(--purple); }
+.admin-add-row {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 14px;
+}
+.admin-text-input {
+  flex: 1; max-width: 280px; padding: 6px 10px; border: 1px solid var(--border-s); border-radius: 7px;
+  font: 500 12.5px/1 'Inter', sans-serif; color: var(--text); background: var(--white);
+  outline: none;
+}
+.admin-text-input:focus { border-color: var(--purple); }
 .admin-grant-btn {
   padding: 6px 14px; border-radius: 7px; border: none; background: var(--grad);
   font: 600 12px/1 'Inter', sans-serif; color: #fff; cursor: pointer; transition: transform .15s;
@@ -2023,7 +2032,8 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
 [data-theme="dark"] .btn-adv,
 [data-theme="dark"] .btn-action,
 [data-theme="dark"] .admin-tab,
-[data-theme="dark"] .admin-select {
+[data-theme="dark"] .admin-select,
+[data-theme="dark"] .admin-text-input {
   background: var(--color-input-bg);
   border-color: var(--color-input-border);
   color: var(--color-text-default);
@@ -2031,7 +2041,8 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
 }
 [data-theme="dark"] .sel-wrap:focus-within,
 [data-theme="dark"] .prompt-wrap:focus-within,
-[data-theme="dark"] .admin-select:focus {
+[data-theme="dark"] .admin-select:focus,
+[data-theme="dark"] .admin-text-input:focus {
   border-color: var(--color-primary);
   box-shadow: var(--shadow-focus-ring);
 }
@@ -2245,15 +2256,8 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
               <div class="sel-wrap has-icon">
                 <svg class="sel-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
                 <select id="modelSelect" onchange="onModelChange()">
-                  <optgroup label="Google">
-                    <option value="nano-banana" selected>Nano Banana 2</option>
-                  </optgroup>
-                  <optgroup label="Magnific">
-                    <option value="gpt-2">Magnific (classic)</option>
-                  </optgroup>
-                  <optgroup label="OpenAI">
-                    <option value="gpt-image-1">GPT Image 1</option>
-                  </optgroup>
+                  <option value="nano-banana" selected>Nano Banana 2</option>
+                  <option value="gpt-2">GPT 2</option>
                 </select>
                 <div class="sel-caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
               </div>
@@ -2669,6 +2673,11 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
     </div>
 
     <div id="adminPanel-users" class="hidden">
+      <div class="admin-add-row">
+        <input class="admin-text-input" id="addUserEmail" type="email" placeholder="name@acko.tech" autocomplete="off" onkeydown="if(event.key==='Enter')addAdminUser()">
+        <select class="admin-select" id="addUserPermission"></select>
+        <button class="admin-grant-btn" id="addUserBtn" onclick="addAdminUser()">Add user</button>
+      </div>
       <table class="admin-table" id="adminUsersTable">
         <thead><tr><th>Email</th><th>Permission</th><th>Requested</th><th>Granted</th><th>Granted by</th><th></th></tr></thead>
         <tbody id="adminUsersBody"></tbody>
@@ -5252,6 +5261,10 @@ async function adminFetch(path, options) {
 }
 
 async function loadAdminData() {
+  const addPermSelect = document.getElementById('addUserPermission');
+  if (!addPermSelect.options.length) {
+    addPermSelect.innerHTML = permissionOptions('Full access');
+  }
   try {
     const [{ pending }, { users }] = await Promise.all([
       adminFetch('/admin/pending'),
@@ -5359,6 +5372,31 @@ async function grantFromPending(email, btn) {
     loadAdminData();
   } catch (e) {
     alert('Could not update permission: ' + e.message);
+    btn.disabled = false;
+  }
+}
+
+async function addAdminUser() {
+  const emailInput = document.getElementById('addUserEmail');
+  const permission = document.getElementById('addUserPermission').value;
+  const email = emailInput.value.trim().toLowerCase();
+  if (!email || !email.endsWith('@' + ALLOWED_EMAIL_DOMAIN)) {
+    alert(`Please enter a valid @${ALLOWED_EMAIL_DOMAIN} email address.`);
+    return;
+  }
+  const btn = document.getElementById('addUserBtn');
+  btn.disabled = true;
+  try {
+    await adminFetch('/admin/users/update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, permission }),
+    });
+    emailInput.value = '';
+    loadAdminData();
+  } catch (e) {
+    alert('Could not add user: ' + e.message);
+  } finally {
     btn.disabled = false;
   }
 }
@@ -6567,15 +6605,6 @@ const MODELS = {
   'gpt-2':       { provider: 'magnific', path: '/v1/ai/text-to-image', async: false, supportsRes: false, supportsSubModel: false, colRatio: false },
   // Google Nano Banana 2 via Magnific (async, colon aspect ratios; supports reference_images)
   'nano-banana': { provider: 'magnific', path: '/v1/ai/text-to-image/nano-banana-pro-flash', async: true, supportsRes: true, supportsSubModel: false, colRatio: true },
-  // OpenAI GPT Image 1, called directly (not via Magnific) — key stays server-side in .env
-  'gpt-image-1': { provider: 'openai', path: '/v1/images/generations', async: false, supportsRes: false, supportsSubModel: false, colRatio: false },
-};
-
-// GPT Image 1 only accepts these three sizes — map our aspect ratios to the closest one.
-const OPENAI_SIZE = {
-  'square_1_1': '1024x1024',
-  'widescreen_16_9': '1536x1024', 'horizontal_2_1': '1536x1024', 'standard_3_2': '1536x1024', 'classic_4_3': '1536x1024',
-  'social_story_9_16': '1024x1536', 'social_post_4_5': '1024x1536', 'traditional_3_4': '1024x1536',
 };
 
 // Nano Banana expects colon format; all other models use underscore format
@@ -7045,11 +7074,9 @@ async function runGeneration(model, prompt, negPrompt, ratio, res, guidance, see
       const imagenRefs = await getImagenReferenceImages();
       if (imagenRefs.length) options.referenceImages = imagenRefs;
     }
-    const imageData = model.provider === 'openai'
-      ? await doOpenAI(model, prompt, ratio)
-      : model.async
-        ? await doAsync(model, prompt, negPrompt, ratio, res, guidance, seed, idx, options)
-        : await doSync(model, prompt, negPrompt, ratio, guidance, seed);
+    const imageData = model.async
+      ? await doAsync(model, prompt, negPrompt, ratio, res, guidance, seed, idx, options)
+      : await doSync(model, prompt, negPrompt, ratio, guidance, seed);
     if (!state.cancelRequested) await showImage(idx, imageData, pendingId);
   } catch(e) {
     if (!state.cancelRequested) {
@@ -7128,22 +7155,6 @@ async function doSync(model, prompt, negPrompt, ratio, guidance, seed) {
   const images = data.data || [];
   if (!images.length || !images[0].base64) throw new Error('No image returned from Magnific.');
   return { b64: images[0].base64, mime: 'image/png' };
-}
-
-async function doOpenAI(model, prompt, ratio) {
-  const size = OPENAI_SIZE[ratio] || '1024x1024';
-  const body = { model: 'gpt-image-1', prompt, n: 1, size, quality: 'high' };
-
-  const res = await fetch(apiUrl('openai', model.path), {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-session-token': getSessionToken() },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) throw new Error(parseApiError(res.status, await res.text()));
-  const data = await res.json();
-  const images = data.data || [];
-  if (!images.length || !images[0].b64_json) throw new Error('No image returned from OpenAI.');
-  return { b64: images[0].b64_json, mime: 'image/png' };
 }
 
 async function doAsync(model, prompt, negPrompt, ratio, res, guidance, seed, idx, options = {}) {

@@ -1,4 +1,5 @@
 .env
+*.env
 .session_secret
 acko_gen.db
 vehicle_catalogue.db

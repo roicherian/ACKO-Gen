@@ -1014,6 +1014,10 @@ class ProxyHandler(BaseHTTPRequestHandler):
                 return
             target_email = str(data.get("email", "")).strip().lower()
             new_permission = str(data.get("permission", "")).strip()
+            if "@" not in target_email or not target_email.endswith("@" + ALLOWED_EMAIL_DOMAIN):
+                self.send_json(400, {"error": f"Access is limited to @{ALLOWED_EMAIL_DOMAIN} email addresses."})
+                return
+            user_store.get_or_create_user(target_email)
             try:
                 updated = user_store.set_permission(target_email, new_permission, granted_by=admin_email)
             except ValueError as e:
