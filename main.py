@@ -13,16 +13,19 @@ import base64
 import hashlib
 import secrets
 import uuid
+import threading
 import urllib.request
 import urllib.error
 import urllib.parse
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 import os
 
 import user_store
 import catalogue_db
 import catalogue_validation
 import catalogue_prompt_builder
+import acko_mcp_server
+import character_store
 
 PORT = int(os.environ.get("PORT", 3458))
 MAGNIFIC_BASE = "https://api.magnific.com"
@@ -373,12 +376,33 @@ ALLOWED_EMAIL_DOMAIN = "acko.tech"
 SESSION_TTL_SECONDS = 12 * 60 * 60  # 12 hours
 SESSION_SECRET_FILE = os.path.join(DATA_DIR, ".session_secret")
 
+# /mcp cost guardrail — a lightweight in-memory sliding-window limit, not an audit
+# record (last_used_at on the token already covers that). Deliberately not
+# persisted to SQLite: resets on restart, which is fine for a rate limit, and
+# assumes a single Railway instance (see MCP_RATE_LIMIT_PER_HOUR usage below).
+_mcp_rate_lock = threading.Lock()
+_mcp_rate_log = {}  # email -> [timestamps]
+MCP_RATE_LIMIT_PER_HOUR = int(os.environ.get("MCP_RATE_LIMIT_PER_HOUR", "20"))
+
+
+def check_mcp_rate_limit(email):
+    now = time.time()
+    with _mcp_rate_lock:
+        log = _mcp_rate_log.setdefault(email, [])
+        log[:] = [t for t in log if now - t < 3600]
+        if len(log) >= MCP_RATE_LIMIT_PER_HOUR:
+            return False
+        log.append(now)
+        return True
+
+
 user_store.init_db()
 _bootstrap_admin_emails = [e for e in os.environ.get("ADMIN_EMAILS", "").split(",") if e.strip()]
 if _bootstrap_admin_emails:
     user_store.bootstrap_admins(_bootstrap_admin_emails)
 
 catalogue_db.init_db()
+character_store.init_db()
 
 
 def get_session_secret():
@@ -484,7 +508,7 @@ class ProxyHandler(BaseHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         self.send_header(
             "Access-Control-Allow-Headers",
-            "Content-Type, x-session-token, x-acko-vehicle-ref, x-acko-vehicle-view",
+            "Content-Type, Authorization, x-session-token, x-acko-vehicle-ref, x-acko-vehicle-view",
         )
 
     def send_json(self, status, obj):
@@ -494,6 +518,118 @@ class ProxyHandler(BaseHTTPRequestHandler):
         self.send_cors()
         self.end_headers()
         self.wfile.write(body)
+
+    # ── MCP (Model Context Protocol) ─────────────────────────────────────────
+    # Lets a teammate generate an image by typing a request into their own
+    # Claude, authenticated with a personal access token instead of the 12h
+    # browser session. JSON-only Streamable HTTP transport — no SSE, since every
+    # call here is a single request/response, nothing needs a server push.
+    def handle_mcp_request(self):
+        length = int(self.headers.get("Content-Length", 0))
+        try:
+            req = json.loads(self.rfile.read(length) or b"{}")
+        except Exception:
+            self.send_json(400, {"jsonrpc": "2.0", "id": None,
+                                  "error": {"code": -32700, "message": "Parse error"}})
+            return
+
+        method = req.get("method", "")
+        id_ = req.get("id")
+        params = req.get("params") or {}
+
+        if id_ is None:
+            # Notifications (e.g. notifications/initialized) get no JSON-RPC response.
+            self.send_response(202)
+            self.send_cors()
+            self.end_headers()
+            return
+
+        if method == "initialize":
+            self.send_json(200, {"jsonrpc": "2.0", "id": id_, "result": {
+                "protocolVersion": params.get("protocolVersion", "2024-11-05"),
+                "capabilities": {"tools": {}},
+                "serverInfo": {"name": "acko-image-generator", "version": "1.0"},
+            }})
+            return
+
+        if method == "tools/list":
+            # Harmless to expose without auth — same spirit as showing UI to any
+            # signed-in user before gating the actual (billable) action below.
+            self.send_json(200, {"jsonrpc": "2.0", "id": id_, "result": {"tools": [acko_mcp_server.TOOL]}})
+            return
+
+        if method == "tools/call":
+            auth = self.headers.get("Authorization", "")
+            token = auth[7:].strip() if auth.lower().startswith("bearer ") else ""
+            ok, email = user_store.verify_pat(token)
+            if not ok:
+                self.send_json(401, {"jsonrpc": "2.0", "id": id_, "error": {
+                    "code": -32001,
+                    "message": "Invalid or missing bearer token. Generate a personal access "
+                               "token from the ACKO Image Generator web app's API Tokens panel.",
+                }})
+                return
+
+            name = params.get("name")
+            args = params.get("arguments") or {}
+            if name != "generate_acko_image":
+                self.send_json(200, {"jsonrpc": "2.0", "id": id_,
+                                      "error": {"code": -32601, "message": f"Unknown tool: {name}"}})
+                return
+
+            # Same permission gate as the web UI — a valid token proves identity
+            # only; this call is what actually costs money.
+            perm_ok, perm_err = require_permission(email, user_store.IMAGE_GEN_ALLOWED)
+            if not perm_ok:
+                self.send_json(200, {"jsonrpc": "2.0", "id": id_, "result": {
+                    "content": [{"type": "text", "text": perm_err["error"]}],
+                    "isError": True,
+                }})
+                return
+
+            if not check_mcp_rate_limit(email):
+                self.send_json(200, {"jsonrpc": "2.0", "id": id_, "result": {
+                    "content": [{"type": "text", "text":
+                        f"Rate limit reached (max {MCP_RATE_LIMIT_PER_HOUR} images/hour). Try again later."}],
+                    "isError": True,
+                }})
+                return
+
+            scene = str(args.get("scene", ""))
+            prompt = acko_mcp_server.build_prompt(
+                scene, args.get("moment", "care"), args.get("product", "general"),
+                args.get("skin_tone", ""), args.get("region", ""), args.get("age", ""),
+                args.get("life_stage", ""),
+            )
+            try:
+                b64, _meta = acko_mcp_server.generate_magnific(
+                    prompt, args.get("ratio", "16:9"), float(args.get("guidance", 1.2)),
+                    args.get("seed"), api_key=MAGNIFIC_KEY,
+                )
+            except Exception as e:
+                self.send_json(200, {"jsonrpc": "2.0", "id": id_, "result": {
+                    "content": [{"type": "text", "text": f"Generation failed: {e}"}],
+                    "isError": True,
+                }})
+                return
+
+            # Best-effort — an MCP-originated image should be as visible/auditable
+            # to admins as a web-app one, but a save hiccup shouldn't fail the call.
+            try:
+                save_generated_bytes(base64.b64decode(b64), mime="image/png", kind="mcp-generate", email=email)
+            except Exception as ex:
+                print(f"  MCP save-to-gallery failed (non-fatal): {ex}")
+
+            self.send_json(200, {"jsonrpc": "2.0", "id": id_, "result": {
+                "content": [
+                    {"type": "text", "text": f"ACKO image generated for {email} · scene: {scene}"},
+                    {"type": "image", "data": b64, "mimeType": "image/png"},
+                ],
+            }})
+            return
+
+        self.send_json(200, {"jsonrpc": "2.0", "id": id_,
+                              "error": {"code": -32601, "message": f"Method not found: {method}"}})
 
     # ── Vehicle catalogue routes ────────────────────────────────────────────
     def handle_catalogue_get(self, path_no_query):
@@ -801,6 +937,69 @@ class ProxyHandler(BaseHTTPRequestHandler):
             self.send_json(200, {"users": user_store.list_all_users()})
             return
 
+        # Self-service: a signed-in user's own API tokens (for the /mcp endpoint).
+        # Not admin-gated — a token only proves identity, require_permission still
+        # gates actual generation, same split the rest of the app already uses.
+        if self.path == "/account/tokens":
+            ok, email = verify_session(self.headers.get("x-session-token", ""))
+            if not ok:
+                self.send_json(401, {"error": "Not signed in. Please sign in with your acko.tech email."})
+                return
+            self.send_json(200, {"tokens": user_store.list_api_tokens(email)})
+            return
+
+        # Admin-only: every API token across every user, for spotting stale/leaked PATs.
+        if self.path == "/admin/tokens":
+            ok, _email = require_admin(self.headers.get("x-session-token", ""))
+            if not ok:
+                self.send_json(403, {"error": "Admin access required."})
+                return
+            self.send_json(200, {"tokens": user_store.list_all_api_tokens()})
+            return
+
+        # Character reference library — list (metadata only, no image bytes).
+        if path_no_query == "/api/characters":
+            ok, email = verify_session(self.headers.get("x-session-token", ""))
+            if not ok:
+                self.send_json(401, {"error": "Not signed in. Please sign in with your acko.tech email."})
+                return
+            perm_ok, perm_err = require_permission(email, user_store.IMAGE_GEN_ALLOWED)
+            if not perm_ok:
+                self.send_json(403, perm_err)
+                return
+            self.send_json(200, {"characters": character_store.list_characters()})
+            return
+
+        # Character reference library — the actual portrait bytes, used directly
+        # as an <img src>, same role /generated/<file> plays for other images.
+        if path_no_query.startswith("/api/characters/") and path_no_query.endswith("/image"):
+            qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+            # <img src> cannot send custom headers — allow token via query too.
+            token = self.headers.get("x-session-token", "") or (qs.get("token") or [""])[0]
+            ok, email = verify_session(token)
+            if not ok:
+                self.send_json(401, {"error": "Not signed in. Please sign in with your acko.tech email."})
+                return
+            perm_ok, perm_err = require_permission(email, user_store.IMAGE_GEN_ALLOWED)
+            if not perm_ok:
+                self.send_json(403, perm_err)
+                return
+            char_id = path_no_query[len("/api/characters/"):-len("/image")]
+            img_bytes, mime = character_store.get_character_image(char_id)
+            if img_bytes is None:
+                self.send_response(404)
+                self.send_cors()
+                self.end_headers()
+                return
+            self.send_response(200)
+            self.send_header("Content-Type", mime or "image/jpeg")
+            self.send_header("Content-Length", str(len(img_bytes)))
+            self.send_header("Cache-Control", "private, max-age=86400")
+            self.send_cors()
+            self.end_headers()
+            self.wfile.write(img_bytes)
+            return
+
         # ── Vehicle catalogue (new, sourced relational data — separate from the
         # legacy vehicle_catalog.json flat file the current selector still uses).
         # Gated the same way as the rest of Vehiclegen: signed-in + image-gen access.
@@ -939,6 +1138,13 @@ class ProxyHandler(BaseHTTPRequestHandler):
                 pass
 
     def _do_POST_inner(self):
+        # MCP endpoint — its own JSON-RPC error envelopes must always be well-
+        # formed, so it's handled entirely inside handle_mcp_request() rather
+        # than relying on the outer do_POST's generic bare-500 exception handler.
+        if self.path == "/mcp":
+            self.handle_mcp_request()
+            return
+
         # Vehicle catalogue prompt builder — resolves + validates every ID
         # server-side (never trusts the client's selection) then returns the
         # structured positive/negative prompt. See catalogue_prompt_builder.py.
@@ -1044,6 +1250,136 @@ class ProxyHandler(BaseHTTPRequestHandler):
                 return
             try:
                 user_store.delete_user(target_email)
+            except ValueError as e:
+                self.send_json(400, {"error": str(e)})
+                return
+            self.send_json(200, {"ok": True})
+            return
+
+        # Self-service: generate a personal access token for the /mcp endpoint.
+        # Any signed-in user may create one for themselves — see /account/tokens (GET).
+        if self.path == "/account/tokens/create":
+            ok, email = verify_session(self.headers.get("x-session-token", ""))
+            if not ok:
+                self.send_json(401, {"error": "Not signed in. Please sign in with your acko.tech email."})
+                return
+            length = int(self.headers.get("Content-Length", 0))
+            try:
+                data = json.loads(self.rfile.read(length) or b"{}")
+            except Exception:
+                self.send_json(400, {"error": "Invalid request body."})
+                return
+            label = str(data.get("label", "")).strip()[:80]
+            raw_token, record = user_store.create_api_token(email, label=label)
+            self.send_json(200, {"token": raw_token, "record": record})
+            return
+
+        # Self-service: revoke one of your own tokens.
+        if self.path == "/account/tokens/revoke":
+            ok, email = verify_session(self.headers.get("x-session-token", ""))
+            if not ok:
+                self.send_json(401, {"error": "Not signed in. Please sign in with your acko.tech email."})
+                return
+            length = int(self.headers.get("Content-Length", 0))
+            try:
+                data = json.loads(self.rfile.read(length) or b"{}")
+                token_id = int(data.get("id"))
+            except Exception:
+                self.send_json(400, {"error": "Invalid request body."})
+                return
+            try:
+                user_store.revoke_api_token(token_id, requester_email=email)
+            except ValueError as e:
+                self.send_json(400, {"error": str(e)})
+                return
+            self.send_json(200, {"ok": True})
+            return
+
+        # Admin-only: force-revoke any user's token (offboarding, suspected leak).
+        if self.path == "/admin/tokens/revoke":
+            ok, admin_email = require_admin(self.headers.get("x-session-token", ""))
+            if not ok:
+                self.send_json(403, {"error": "Admin access required."})
+                return
+            length = int(self.headers.get("Content-Length", 0))
+            try:
+                data = json.loads(self.rfile.read(length) or b"{}")
+                token_id = int(data.get("id"))
+            except Exception:
+                self.send_json(400, {"error": "Invalid request body."})
+                return
+            try:
+                user_store.revoke_api_token(token_id, requester_email=admin_email, allow_any=True)
+            except ValueError as e:
+                self.send_json(400, {"error": str(e)})
+                return
+            self.send_json(200, {"ok": True})
+            return
+
+        # Character reference library — add a new character (any signed-in
+        # generation-capable user; additive/low-blast-radius, unlike delete below).
+        if self.path == "/api/characters/create":
+            ok, email = verify_session(self.headers.get("x-session-token", ""))
+            if not ok:
+                self.send_json(401, {"error": "Not signed in. Please sign in with your acko.tech email."})
+                return
+            perm_ok, perm_err = require_permission(email, user_store.IMAGE_GEN_ALLOWED)
+            if not perm_ok:
+                self.send_json(403, perm_err)
+                return
+            length = int(self.headers.get("Content-Length", 0))
+            try:
+                data = json.loads(self.rfile.read(length) or b"{}")
+            except Exception:
+                self.send_json(400, {"error": "Invalid request body."})
+                return
+            name = str(data.get("name", "")).strip()[:80]
+            image_b64 = str(data.get("image_b64", "")).strip()
+            if not name or not image_b64.startswith("data:"):
+                self.send_json(400, {"error": "name and image_b64 (data URI) are required."})
+                return
+            mime = "image/jpeg"
+            try:
+                header, image_b64 = image_b64.split(",", 1)
+                if ";base64" in header and ":" in header:
+                    maybe_mime = header.split(":", 1)[1].split(";", 1)[0]
+                    if maybe_mime.startswith("image/"):
+                        mime = maybe_mime
+                raw = base64.b64decode(image_b64, validate=False)
+            except Exception:
+                self.send_json(400, {"error": "Invalid image_b64."})
+                return
+            try:
+                record = character_store.create_character(
+                    name, raw, mime,
+                    role=str(data.get("role", ""))[:80],
+                    location=str(data.get("location", ""))[:80],
+                    age=str(data.get("age", ""))[:20],
+                    created_by=email,
+                )
+            except ValueError as e:
+                self.send_json(400, {"error": str(e)})
+                return
+            self.send_json(200, {"character": record})
+            return
+
+        # Character reference library — admin-only delete: this removes a shared
+        # resource other people's generations may depend on for consistency, so
+        # it gets the higher bar (matches /admin/tokens/revoke vs /account/tokens/revoke).
+        if self.path == "/admin/characters/delete":
+            ok, admin_email = require_admin(self.headers.get("x-session-token", ""))
+            if not ok:
+                self.send_json(403, {"error": "Admin access required."})
+                return
+            length = int(self.headers.get("Content-Length", 0))
+            try:
+                data = json.loads(self.rfile.read(length) or b"{}")
+            except Exception:
+                self.send_json(400, {"error": "Invalid request body."})
+                return
+            char_id = str(data.get("id", "")).strip()
+            try:
+                character_store.delete_character(char_id)
             except ValueError as e:
                 self.send_json(400, {"error": str(e)})
                 return
@@ -1352,7 +1688,7 @@ class ProxyHandler(BaseHTTPRequestHandler):
 if __name__ == "__main__":
     # 0.0.0.0 so this works both locally and on a real host (Render etc. route
     # external traffic to whatever port the process binds, not just localhost).
-    server = HTTPServer(("0.0.0.0", PORT), ProxyHandler)
+    server = ThreadingHTTPServer(("0.0.0.0", PORT), ProxyHandler)
     print(f"\n  ACKO Image Generator proxy running on port {PORT}")
     print(f"  Open in browser → http://localhost:{PORT}/generate.html")
     print(f"  Local image store → {GENERATED_DIR}\n")

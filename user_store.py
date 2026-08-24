@@ -12,6 +12,8 @@ import os
 import sqlite3
 import threading
 import datetime
+import hashlib
+import secrets
 
 HTML_DIR = os.path.dirname(os.path.abspath(__file__))
 # On a real host, point DATA_DIR at a persistent volume/disk so this DB survives
@@ -23,6 +25,12 @@ PERMISSION_LEVELS = ["No access", "Full access", "Imagen access", "Icongen acces
 
 # Levels allowed to use the image generator (the one gated feature that exists today).
 IMAGE_GEN_ALLOWED = {"Full access", "Imagen access", "Admin"}
+
+# Kept in sync with main.py's ALLOWED_EMAIL_DOMAIN — a personal access token is
+# only ever valid for the same email domain the interactive login enforces.
+ALLOWED_EMAIL_DOMAIN = "acko.tech"
+
+API_TOKEN_PREFIX = "acko_pat_"
 
 _lock = threading.Lock()
 _local = threading.local()
@@ -59,6 +67,18 @@ def init_db():
                 granted_at      TEXT,
                 granted_by      TEXT,
                 created_at      TEXT NOT NULL
+            )
+        """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS api_tokens (
+                id              INTEGER PRIMARY KEY AUTOINCREMENT,
+                email           TEXT NOT NULL,
+                token_hash      TEXT UNIQUE NOT NULL,
+                preview         TEXT NOT NULL,
+                label           TEXT,
+                created_at      TEXT NOT NULL,
+                last_used_at    TEXT,
+                revoked_at      TEXT
             )
         """)
         conn.commit()
@@ -196,3 +216,100 @@ def bootstrap_admins(emails):
         get_or_create_user(email)
         set_permission(email, "Admin", granted_by="system:bootstrap")
         _log(f"bootstrapped {email} as Admin")
+
+
+# ── Personal access tokens (for the /mcp endpoint — non-interactive, no expiry) ──
+
+def _hash_token(token):
+    return hashlib.sha256(token.encode("utf-8")).hexdigest()
+
+
+def _token_row_to_dict(row):
+    if row is None:
+        return None
+    return {
+        "id": row["id"],
+        "email": row["email"],
+        "preview": row["preview"],
+        "label": row["label"],
+        "createdAt": row["created_at"],
+        "lastUsedAt": row["last_used_at"],
+        "revokedAt": row["revoked_at"],
+    }
+
+
+def create_api_token(email, label=""):
+    """Self-service: any signed-in user can generate their own token — identity
+    only, not authorization (require_permission still gates actual generation).
+    Returns (raw_token, record_dict). The raw token is never stored or
+    retrievable again after this call — only its hash is persisted."""
+    email = email.strip().lower()
+    raw = API_TOKEN_PREFIX + secrets.token_urlsafe(32)
+    token_hash = _hash_token(raw)
+    preview = raw[:len(API_TOKEN_PREFIX) + 4] + "…" + raw[-4:]
+    with _lock:
+        conn = _connect()
+        conn.execute(
+            "INSERT INTO api_tokens (email, token_hash, preview, label, created_at) VALUES (?, ?, ?, ?, ?)",
+            (email, token_hash, preview, (label or "").strip()[:80], now_iso()),
+        )
+        conn.commit()
+        row = conn.execute("SELECT * FROM api_tokens WHERE token_hash = ?", (token_hash,)).fetchone()
+    return raw, _token_row_to_dict(row)
+
+
+def list_api_tokens(email):
+    """Self-service: a user's own tokens only. Never returns token_hash."""
+    email = email.strip().lower()
+    with _lock:
+        conn = _connect()
+        rows = conn.execute(
+            "SELECT * FROM api_tokens WHERE email = ? ORDER BY created_at DESC", (email,)
+        ).fetchall()
+    return [_token_row_to_dict(r) for r in rows]
+
+
+def list_all_api_tokens():
+    """Admin oversight: every token across every user, for spotting stale/unused
+    or unexpected PATs. Never returns token_hash."""
+    with _lock:
+        conn = _connect()
+        rows = conn.execute("SELECT * FROM api_tokens ORDER BY email ASC, created_at DESC").fetchall()
+    return [_token_row_to_dict(r) for r in rows]
+
+
+def revoke_api_token(token_id, requester_email, allow_any=False):
+    """Revokes (soft-delete) a token by id. Non-admin callers may only revoke
+    their own tokens — ownership is enforced here, not just by the caller.
+    allow_any=True is for the admin force-revoke path (offboarding, suspected
+    leak). Raises ValueError for an unknown/not-owned token — callers turn
+    that into a 400, same convention as set_permission/delete_user."""
+    requester_email = requester_email.strip().lower()
+    with _lock:
+        conn = _connect()
+        row = conn.execute("SELECT * FROM api_tokens WHERE id = ?", (token_id,)).fetchone()
+        if row is None or (not allow_any and row["email"] != requester_email):
+            raise ValueError("No such token.")
+        conn.execute("UPDATE api_tokens SET revoked_at = ? WHERE id = ?", (now_iso(), token_id))
+        conn.commit()
+
+
+def verify_pat(token):
+    """Returns (True, email) for a live, unrevoked token belonging to a still-
+    valid @acko.tech address, else (False, None) — same shape as verify_session,
+    so it composes identically with require_permission(). Bumps last_used_at on
+    every successful check (best-effort, for spotting stale tokens later)."""
+    if not token or not token.startswith(API_TOKEN_PREFIX):
+        return False, None
+    token_hash = _hash_token(token)
+    with _lock:
+        conn = _connect()
+        row = conn.execute("SELECT * FROM api_tokens WHERE token_hash = ?", (token_hash,)).fetchone()
+        if row is None or row["revoked_at"] is not None:
+            return False, None
+        email = row["email"]
+        conn.execute("UPDATE api_tokens SET last_used_at = ? WHERE id = ?", (now_iso(), row["id"]))
+        conn.commit()
+    if not email.endswith("@" + ALLOWED_EMAIL_DOMAIN):
+        return False, None
+    return True, email

@@ -7,6 +7,7 @@ Pure stdlib, Python 3.9+. No external packages required.
 Protocol: JSON-RPC 2.0 over stdin/stdout (MCP spec 2024-11-05)
 """
 import sys
+import os
 import json
 import urllib.request
 import urllib.error
@@ -14,7 +15,10 @@ import time
 import base64
 
 # ── CONFIG ────────────────────────────────────────────────────────────────────
-MAGNIFIC_KEY      = "MS37c8268acced4d76966a212c97d658de"
+# Only used when this file is run standalone (see ACKO_MCP_TOKEN relay mode at
+# the bottom) — the deployed /mcp endpoint in main.py always passes its own
+# already-.env-loaded key explicitly instead of relying on this module-level read.
+MAGNIFIC_KEY      = os.environ.get("MAGNIFIC_KEY", "")
 MAGNIFIC_URL      = "https://api.magnific.com/v1/ai/text-to-image"
 NANO_BANANA_URL   = "https://api.magnific.com/v1/ai/text-to-image/nano-banana-pro-flash"
 POLL_INTERVAL     = 2        # seconds between polls for Nano Banana
@@ -119,7 +123,7 @@ def fetch_image_as_base64(url):
 
 
 # ── MAGNIFIC (sync, returns base64) ───────────────────────────────────────────
-def generate_magnific(prompt, ratio, guidance=1.2, seed=None):
+def generate_magnific(prompt, ratio, guidance=1.2, seed=None, api_key=None):
     body = {
         "prompt":          prompt,
         "negative_prompt": NEGATIVE_PROMPT,
@@ -133,7 +137,7 @@ def generate_magnific(prompt, ratio, guidance=1.2, seed=None):
 
     headers = {
         "Content-Type":        "application/json",
-        "x-magnific-api-key":  MAGNIFIC_KEY,
+        "x-magnific-api-key":  api_key or MAGNIFIC_KEY,
     }
     data = http_post(MAGNIFIC_URL, body, headers)
     images = data.get("data") or []
@@ -174,12 +178,18 @@ def generate_nano_banana(prompt, ratio, resolution="2K"):
             raise RuntimeError("Nano Banana generation failed.")
     raise RuntimeError("Timed out waiting for Nano Banana 2.")
 
+# NOTE: generate_nano_banana() above is deliberately NOT exposed via TOOL below.
+# Its blocking ~2-minute poll loop is unsafe to run inline inside a single /mcp
+# request — a future phase would wrap it in a job-id/poll-tool pair instead of
+# calling it directly from a synchronous tool call. Kept here, unused for now,
+# as the starting point for that work.
+
 
 # ── TOOL DEFINITION ───────────────────────────────────────────────────────────
 TOOL = {
     "name":        "generate_acko_image",
     "description": (
-        "Generate an ACKO brand-compliant image using Magnific or Google Nano Banana 2. "
+        "Generate an ACKO brand-compliant image via Magnific. "
         "Automatically builds the correct ACKO prompt style (Indian commercial photography, "
         "warm light, candid, real settings) from a plain-language scene description. "
         "Use this whenever a user asks to generate, create, or produce an image for ACKO."
@@ -192,12 +202,6 @@ TOOL = {
                 "type":        "string",
                 "description": "Plain-language description of the scene to generate. "
                                "E.g. 'A woman photographing the dent on her car on a residential street'",
-            },
-            "model": {
-                "type":        "string",
-                "enum":        ["magnific", "nano_banana_2"],
-                "default":     "magnific",
-                "description": "magnific = high-fidelity, slower. nano_banana_2 = Google Gemini Flash, faster.",
             },
             "moment": {
                 "type":        "string",
@@ -238,67 +242,25 @@ TOOL = {
             "guidance": {
                 "type":        "number",
                 "default":     1.2,
-                "description": "Magnific only: guidance scale 0.8–1.5",
-            },
-            "resolution": {
-                "type":        "string",
-                "enum":        ["1K", "2K", "4K"],
-                "default":     "2K",
-                "description": "Nano Banana only: output resolution",
+                "description": "Guidance scale 0.8–1.5",
             },
         },
     },
 }
 
 
-# ── TOOL HANDLER ──────────────────────────────────────────────────────────────
-def call_tool(args):
-    scene      = args.get("scene", "")
-    model      = args.get("model", "magnific")
-    moment     = args.get("moment", "care")
-    product    = args.get("product", "general")
-    ratio      = args.get("ratio", "16:9")
-    skin_tone  = args.get("skin_tone", "")
-    region     = args.get("region", "")
-    age        = args.get("age", "")
-    life_stage = args.get("life_stage", "")
-    guidance   = float(args.get("guidance", 1.2))
-    resolution = args.get("resolution", "2K")
-
-    prompt = build_prompt(scene, moment, product, skin_tone, region, age, life_stage)
-
-    try:
-        if model == "nano_banana_2":
-            b64, meta = generate_nano_banana(prompt, ratio, resolution)
-            model_label = "Google Nano Banana 2"
-        else:
-            seed = args.get("seed")
-            b64, meta = generate_magnific(prompt, ratio, guidance, seed)
-            model_label = "Magnific"
-    except Exception as e:
-        return {
-            "content": [{"type": "text", "text": f"Generation failed: {e}"}],
-            "isError": True,
-        }
-
-    info_lines = [
-        f"**ACKO Image Generated** · {model_label}",
-        f"Scene: {scene}",
-        f"Moment: {moment} | Product: {product} | Format: {ratio}",
-        f"Prompt used: {prompt[:200]}…" if len(prompt) > 200 else f"Prompt: {prompt}",
-    ]
-    if meta.get("seed"):
-        info_lines.append(f"Seed: {meta['seed']}")
-
-    return {
-        "content": [
-            {"type": "text",  "text": "\n".join(info_lines)},
-            {"type": "image", "data": b64, "mimeType": "image/png"},
-        ],
-    }
+# ── LOCAL RELAY MODE ──────────────────────────────────────────────────────────
+# Running this file directly no longer talks to Magnific in-process and holds no
+# API key. It forwards every JSON-RPC request byte-for-byte to the real, deployed
+# /mcp endpoint, authenticated with your own personal access token (generate one
+# from the ACKO Image Generator web app's "API Tokens" panel). This exists purely
+# as a fallback for Claude clients that can't register a remote HTTP MCP server
+# with a custom bearer header — it cannot bypass permissions or the rate limit,
+# unlike the old (pre-fix) version of this file.
+ACKO_MCP_URL   = os.environ.get("ACKO_MCP_URL", "https://web-production-af07c.up.railway.app/mcp")
+ACKO_MCP_TOKEN = os.environ.get("ACKO_MCP_TOKEN", "")
 
 
-# ── MCP JSON-RPC LOOP ─────────────────────────────────────────────────────────
 def respond(id_, result):
     msg = json.dumps({"jsonrpc": "2.0", "id": id_, "result": result})
     sys.stdout.write(msg + "\n")
@@ -311,7 +273,30 @@ def error(id_, code, message):
     sys.stdout.flush()
 
 
+def relay_to_remote(raw_line):
+    req = urllib.request.Request(
+        ACKO_MCP_URL,
+        data=raw_line.encode(),
+        method="POST",
+        headers={
+            "Content-Type":  "application/json",
+            "Authorization": f"Bearer {ACKO_MCP_TOKEN}",
+        },
+    )
+    with urllib.request.urlopen(req, timeout=60) as r:
+        return r.read()
+
+
 def main():
+    if not ACKO_MCP_TOKEN:
+        sys.stderr.write(
+            "ACKO_MCP_TOKEN is not set. Generate a personal access token from the "
+            "ACKO Image Generator web app's API Tokens panel and set it as an env "
+            "var before running this relay — every request will otherwise be "
+            "rejected by the remote server as unauthenticated.\n"
+        )
+        sys.stderr.flush()
+
     for raw in sys.stdin:
         raw = raw.strip()
         if not raw:
@@ -321,34 +306,26 @@ def main():
         except json.JSONDecodeError:
             continue
 
-        method = req.get("method", "")
-        id_    = req.get("id")
-        params = req.get("params", {})
+        id_ = req.get("id")
 
-        # Notifications have no id and need no response
+        # Notifications have no id and need no response — still forward them
+        # (fire-and-forget) so the remote server's own state stays in sync.
         if id_ is None:
+            try:
+                relay_to_remote(raw)
+            except Exception:
+                pass
             continue
 
-        if method == "initialize":
-            respond(id_, {
-                "protocolVersion": "2024-11-05",
-                "capabilities":    {"tools": {}},
-                "serverInfo":      {"name": "acko-image-generator", "version": "1.0"},
-            })
-
-        elif method == "tools/list":
-            respond(id_, {"tools": [TOOL]})
-
-        elif method == "tools/call":
-            name = params.get("name")
-            if name != "generate_acko_image":
-                error(id_, -32601, f"Unknown tool: {name}")
-                continue
-            result = call_tool(params.get("arguments", {}))
-            respond(id_, result)
-
-        else:
-            error(id_, -32601, f"Method not found: {method}")
+        try:
+            body = relay_to_remote(raw)
+            sys.stdout.write(body.decode() + "\n")
+            sys.stdout.flush()
+        except urllib.error.HTTPError as e:
+            detail = e.read().decode(errors="replace")[:200]
+            error(id_, -32000, f"Remote /mcp request failed: HTTP {e.code} {detail}")
+        except Exception as e:
+            error(id_, -32000, f"Could not reach remote /mcp endpoint at {ACKO_MCP_URL}: {e}")
 
 
 if __name__ == "__main__":

@@ -160,6 +160,7 @@ body.studio-ui .sidebar-signout:hover { background: rgba(255,255,255,.06); }
 
 body.studio-ui #view-generate { display: contents; }
 #view-admin { display: none; }
+#view-tokens { display: none; }
 body.studio-ui .center {
   grid-column: 2;
   grid-row: 1;
@@ -623,6 +624,12 @@ body.imagen-mode .vg-view-toggle,
 body.imagen-mode #vgBreadcrumb,
 body.imagen-mode #vgFilterMakeWrap,
 body.imagen-mode #vgFilterYearWrap { display: none !important; }
+/* Vehiclegen: hide the Imagen-only quick filters (ratio/model/res/time) */
+body.vehicle-mode #vgFilterImgRatioWrap,
+body.vehicle-mode #vgFilterImgModelWrap,
+body.vehicle-mode #vgFilterImgResWrap,
+body.vehicle-mode #vgFilterImgTimeWrap { display: none !important; }
+.gen-chip-filter { min-width: 64px; max-width: 110px; }
 
 .vehicle-gallery-section { display: none; }
 .vg-gallery-head { margin-bottom: 12px; }
@@ -719,6 +726,9 @@ body.vehicle-mode .prompt-wrap .vehicle-select-row .vg-combo-trigger {
 }
 body.imagen-mode .vehicle-car-panel-label,
 body.vehicle-mode .vehicle-car-panel-label { font-size: 14px; font-weight: 700; }
+body.imagen-mode #imagenConfigPanel .vehicle-car-panel-label {
+  text-transform: none; letter-spacing: normal; color: var(--text);
+}
 body.vehicle-mode .vehicle-car-panel-head {
   flex-direction: column; align-items: flex-start; gap: 3px;
 }
@@ -1017,18 +1027,32 @@ body.vehicle-mode .vehicle-car-panel-head {
   font-size: 11px; color: var(--muted); overflow: hidden; text-overflow: ellipsis;
   white-space: nowrap; min-width: 0;
 }
-.sidebar-user-chip {
-  font-size: 11.5px; font-weight: 600; color: var(--sub);
-  border: 1px solid var(--border-s); border-radius: 999px; padding: 4px 12px;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;
-  cursor: default; user-select: none;
-}
 .sidebar-signout {
   flex-shrink: 0; border: none; background: none; color: var(--muted);
   font: 600 11px/1 'Inter', sans-serif; cursor: pointer; padding: 4px 6px;
   border-radius: 6px; transition: all .15s;
 }
 .sidebar-signout:hover { background: var(--bg); color: var(--red); }
+.sidebar-user { position: relative; }
+.sidebar-user-btn {
+  width: 100%; background: none; border: none; padding: 4px 6px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  cursor: pointer; text-align: left;
+}
+.sidebar-user-btn:hover { background: var(--bg); }
+.sidebar-user-info { min-width: 0; overflow: hidden; }
+.sidebar-user-name {
+  font-size: 12.5px; font-weight: 700; color: var(--text);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.sidebar-user-chevron { width: 14px; height: 14px; color: var(--muted); flex-shrink: 0; }
+.sidebar-user-menu {
+  position: absolute; bottom: calc(100% + 6px); left: 16px; right: 16px;
+  background: var(--white); border: 1px solid var(--border-s); border-radius: var(--r-sm);
+  box-shadow: var(--shadow-sm); padding: 6px; z-index: 50;
+}
+.sidebar-user-menu.hidden { display: none; }
+.sidebar-user-menu .sidebar-signout { width: 100%; text-align: left; padding: 6px 8px; }
 /* CENTER */
 .center {
   flex: 1; overflow-y: auto; padding: 28px 24px;
@@ -1200,6 +1224,9 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
 .ref-pill svg { width: 20px; height: 20px; }
 .ref-pill:hover { border-color: rgba(196,181,253,.6); color: var(--vg-text, var(--text)); background: rgba(124,58,237,.08); }
 .ref-pill.has-ref { border-style: solid; border-color: rgba(196,181,253,.7); color: var(--vg-text, var(--text)); }
+.ref-pill:disabled, .ref-pill.disabled {
+  opacity: .4; cursor: not-allowed; pointer-events: none;
+}
 .ref-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .ref-chips:empty { margin-top: 0; }
 .ref-chip {
@@ -1284,6 +1311,37 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
   cursor: pointer;
 }
 .char-fav-btn svg { width: 13px; height: 13px; }
+.char-delete-btn {
+  position: absolute; top: 8px; left: 8px; width: 24px; height: 24px; border-radius: 50%;
+  border: none; background: rgba(0,0,0,.35); color: #b8b8c6; display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.char-delete-btn svg { width: 12px; height: 12px; }
+.char-delete-btn:hover { background: rgba(220,38,38,.5); color: #fff; }
+.char-add-form {
+  margin: 0 22px 16px; padding: 14px; border-radius: 14px;
+  background: rgba(255,255,255,.03); border: 1px solid var(--vg-line, rgba(255,255,255,.08));
+  display: flex; flex-direction: column; gap: 10px;
+}
+.char-add-form.hidden { display: none; }
+.char-add-form-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.char-input {
+  flex: 1; min-width: 140px; padding: 8px 12px; border-radius: 8px;
+  background: rgba(255,255,255,.04); border: 1px solid var(--vg-line, rgba(255,255,255,.08));
+  color: var(--vg-text, #f3f3f7); font: 500 12.5px/1 Outfit, sans-serif; outline: none;
+}
+.char-input:focus { border-color: #a78bfa; }
+.char-input-select { flex: 0 0 auto; cursor: pointer; }
+.char-input-file { flex: 1; min-width: 180px; color: var(--vg-muted, #b8b8c6); font: 500 12px/1 Outfit, sans-serif; }
+.char-add-save-btn {
+  padding: 8px 16px; border-radius: 999px; border: none; background: var(--grad, linear-gradient(135deg,#7a62f0,#9b8ff6));
+  font: 600 12.5px/1 Outfit, sans-serif; color: #fff; cursor: pointer; flex-shrink: 0;
+}
+.char-add-cancel-btn {
+  padding: 8px 14px; border-radius: 999px; border: none; background: none;
+  color: var(--vg-muted, #b8b8c6); font: 600 12.5px/1 Outfit, sans-serif; cursor: pointer; flex-shrink: 0;
+}
+.char-add-cancel-btn:hover { color: #f87171; }
 .char-fav-btn.on { color: #e11d48; }
 .char-fav-btn.on svg { fill: currentColor; }
 .char-grid-empty { grid-column: 1/-1; text-align: center; color: var(--vg-muted, #b8b8c6); padding: 40px 0; font-size: 13px; }
@@ -1642,6 +1700,24 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
   outline: none;
 }
 .admin-text-input:focus { border-color: var(--purple); }
+.tokens-intro {
+  font-size: 13px; color: var(--sub); line-height: 1.6; max-width: 640px; margin-bottom: 12px;
+}
+.tokens-mcp-url {
+  padding: 10px 14px; border: 1px solid var(--border-s); border-radius: var(--r-sm);
+  background: var(--bg); margin-bottom: 18px; overflow-x: auto;
+}
+.tokens-mcp-url code { font: 500 12.5px/1.4 'SF Mono', ui-monospace, monospace; color: var(--text); }
+.token-reveal {
+  padding: 14px 16px; border: 1px solid var(--purple); border-radius: var(--r-md);
+  background: var(--white); margin-bottom: 16px;
+}
+.token-reveal-label { font: 600 12px/1 'Inter', sans-serif; color: var(--purple); margin-bottom: 8px; }
+.token-reveal-row { display: flex; align-items: center; gap: 10px; }
+.token-reveal-row code {
+  flex: 1; font: 500 12.5px/1.4 'SF Mono', ui-monospace, monospace; color: var(--text);
+  word-break: break-all;
+}
 .admin-grant-btn {
   padding: 6px 14px; border-radius: 7px; border: none; background: var(--grad);
   font: 600 12px/1 'Inter', sans-serif; color: #fff; cursor: pointer; transition: transform .15s;
@@ -2033,7 +2109,10 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
 [data-theme="dark"] .btn-action,
 [data-theme="dark"] .admin-tab,
 [data-theme="dark"] .admin-select,
-[data-theme="dark"] .admin-text-input {
+[data-theme="dark"] .admin-text-input,
+[data-theme="dark"] .tokens-mcp-url,
+[data-theme="dark"] .token-reveal,
+[data-theme="dark"] .sidebar-user-menu {
   background: var(--color-input-bg);
   border-color: var(--color-input-border);
   color: var(--color-text-default);
@@ -2208,6 +2287,10 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         Favourites
       </a>
+      <a class="nav-item" href="#" data-view="tokens" onclick="navigateTo('tokens');return false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+        API Tokens
+      </a>
       <a class="nav-item" href="#" data-view="admin" id="adminNavItem" onclick="navigateTo('admin');return false">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
         Admin
@@ -2215,9 +2298,17 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
     </nav>
 
     <div class="sidebar-spacer"></div>
-    <div class="sidebar-user">
-      <div class="sidebar-user-chip" id="sidebarUserEmail" title=""></div>
-      <button class="sidebar-signout" onclick="signOut()">Sign out</button>
+    <div class="sidebar-user" id="sidebarUserWrap">
+      <button type="button" class="sidebar-user-btn" id="sidebarUserBtn" onclick="toggleSidebarUserMenu(event)" title="">
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="sidebarUserName"></div>
+          <div class="sidebar-user-email" id="sidebarUserFullEmail"></div>
+        </div>
+        <svg class="sidebar-user-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+      </button>
+      <div class="sidebar-user-menu hidden" id="sidebarUserMenu">
+        <button type="button" class="sidebar-signout" onclick="signOut()">Sign out</button>
+      </div>
     </div>
   </aside>
 
@@ -2247,7 +2338,7 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
         <!-- Imagen: model / res / count / aspect — same in-box chrome as Vehiclegen -->
         <div id="imagenConfigPanel" class="vehicle-car-panel imagen-config-panel">
           <div class="vehicle-car-panel-head">
-            <div class="vehicle-car-panel-label">Generation settings</div>
+            <div class="vehicle-car-panel-label">Generation Settings</div>
             <div class="vehicle-car-panel-meta" id="imagenConfigMeta">Model · resolution · count · aspect</div>
           </div>
           <div class="vehicle-select-row imagen-select-row" id="resRatioRow">
@@ -2317,7 +2408,7 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
                 <span>Character</span>
               </button>
-              <button type="button" class="ref-pill" id="refAddBtn" onclick="document.getElementById('refFileInput').click()">
+              <button type="button" class="ref-pill" id="refAddBtn" onclick="openReferencePicker('custom')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 <span>Add</span>
               </button>
@@ -2594,6 +2685,34 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
             <option value="passenger">Passenger-side</option>
           </select>
         </div>
+        <!-- Imagen-only quick filters — hidden in Vehiclegen (see body.vehicle-mode rule) -->
+        <div class="sel-wrap vg-filter gen-chip-filter" id="vgFilterImgRatioWrap">
+          <select id="vgFilterImgRatio" onchange="onVehicleGalleryFilterChange()">
+            <option value="">All ratios</option>
+          </select>
+          <div class="sel-caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </div>
+        <div class="sel-wrap vg-filter gen-chip-filter" id="vgFilterImgModelWrap">
+          <select id="vgFilterImgModel" onchange="onVehicleGalleryFilterChange()">
+            <option value="">All models</option>
+          </select>
+          <div class="sel-caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </div>
+        <div class="sel-wrap vg-filter gen-chip-filter" id="vgFilterImgResWrap">
+          <select id="vgFilterImgRes" onchange="onVehicleGalleryFilterChange()">
+            <option value="">All resolutions</option>
+          </select>
+          <div class="sel-caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </div>
+        <div class="sel-wrap vg-filter gen-chip-filter" id="vgFilterImgTimeWrap">
+          <select id="vgFilterImgTime" onchange="onVehicleGalleryFilterChange()">
+            <option value="">All time</option>
+            <option value="today">Today</option>
+            <option value="week">This week</option>
+            <option value="month">This month</option>
+          </select>
+          <div class="sel-caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </div>
       </div>
       <div class="vehicle-gallery-grid" id="vehicleGalleryGrid"></div>
     </div>
@@ -2652,6 +2771,41 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
       </button>
     </div>
     <div class="gallery-grid" id="favouritesGrid"></div>
+  </div>
+
+  <!-- API TOKENS VIEW -->
+  <div id="view-tokens" class="admin-view">
+    <div class="admin-head">
+      <div class="admin-title">API Tokens</div>
+    </div>
+    <p class="tokens-intro">
+      Generate a personal access token to let your own Claude Desktop app call this tool directly —
+      no need to open this page to generate an image. Register the URL below as a remote MCP server
+      with your token as a bearer header. Each token works exactly like your own account: it can only
+      do what your current permission level already allows.
+    </p>
+    <div class="tokens-mcp-url">
+      <code id="tokensMcpUrl"></code>
+    </div>
+
+    <div class="admin-add-row">
+      <input class="admin-text-input" id="newTokenLabel" type="text" placeholder="Label (e.g. \"My laptop\")" autocomplete="off" onkeydown="if(event.key==='Enter')createApiToken()">
+      <button class="admin-grant-btn" id="createTokenBtn" onclick="createApiToken()">Generate token</button>
+    </div>
+
+    <div class="token-reveal hidden" id="tokenReveal">
+      <div class="token-reveal-label">Copy this now — it won't be shown again.</div>
+      <div class="token-reveal-row">
+        <code id="tokenRevealValue"></code>
+        <button class="admin-grant-btn" onclick="copyRevealedToken()">Copy</button>
+      </div>
+    </div>
+
+    <div class="admin-empty hidden" id="tokensEmpty">No API tokens yet.</div>
+    <table class="admin-table hidden" id="tokensTable">
+      <thead><tr><th>Label</th><th>Token</th><th>Created</th><th>Last used</th><th></th></tr></thead>
+      <tbody id="tokensBody"></tbody>
+    </table>
   </div>
 
   <!-- ADMIN VIEW -->
@@ -2801,6 +2955,27 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
       <div class="char-search-wrap">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input type="search" id="charSearch" placeholder="Search characters…" oninput="renderCharacterGrid()">
+      </div>
+      <button type="button" class="char-tab" id="charAddBtn" onclick="openAddCharacterForm()">+ Add Character</button>
+    </div>
+    <div class="char-add-form hidden" id="charAddForm">
+      <div class="char-add-form-row">
+        <input type="text" id="newCharName" class="char-input" placeholder="Name" autocomplete="off">
+        <input type="text" id="newCharRole" class="char-input" placeholder="Role (optional)" autocomplete="off">
+        <input type="text" id="newCharLocation" class="char-input" placeholder="Location (optional)" autocomplete="off">
+        <select id="newCharAge" class="char-input char-input-select">
+          <option value="0-10">Age 0-10</option>
+          <option value="10-20">Age 10-20</option>
+          <option value="20-30" selected>Age 20-30</option>
+          <option value="30-40">Age 30-40</option>
+          <option value="40-50">Age 40-50</option>
+          <option value="50-60">Age 50-60</option>
+        </select>
+      </div>
+      <div class="char-add-form-row">
+        <input type="file" id="newCharFile" class="char-input-file" accept="image/png,image/jpeg,image/webp">
+        <button type="button" class="char-add-save-btn" id="submitNewCharBtn" onclick="submitNewCharacter()">Save Character</button>
+        <button type="button" class="char-add-cancel-btn" onclick="closeAddCharacterForm()">Cancel</button>
       </div>
     </div>
     <div class="char-grid" id="charGrid"></div>
@@ -2956,7 +3131,7 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
 
 <script>
 // ─── NAVIGATION ───────────────────────────────────────────────────────────────
-const VIEWS = ['generate', 'vehicle', 'history', 'collections', 'favourites', 'admin'];
+const VIEWS = ['generate', 'vehicle', 'history', 'collections', 'favourites', 'tokens', 'admin'];
 const GEN_MODES = {
   generate: {
     title: 'Imagen',
@@ -3046,7 +3221,7 @@ function getVehicleAspect() {
 
 /** In-flight vehicle gens shown as gallery placeholders */
 let vehiclePendingGens = [];
-let vehicleGalleryFilters = { q: '', make: '', year: '', aspect: '', view: '' };
+let vehicleGalleryFilters = { q: '', make: '', year: '', aspect: '', view: '', imgRatio: '', imgModel: '', imgRes: '', imgTime: '' };
 /** 'pipeline' = chronological generations; 'collections' = folders by make */
 let vehicleGalleryMode = 'pipeline';
 /** When in collections mode, null = folder list; string = open make folder */
@@ -3290,7 +3465,7 @@ function syncStudioGalleryChrome() {
   const title = document.getElementById('vgGalleryTitle');
   const search = document.getElementById('vgSearch');
   const imagen = isImagenGalleryMode();
-  if (title) title.textContent = imagen ? 'Image gallery' : 'Vehicle gallery';
+  if (title) title.textContent = imagen ? 'Image Gallery' : 'Vehicle Gallery';
   if (search) {
     search.placeholder = imagen
       ? 'Search prompt, model, ratio…'
@@ -3303,6 +3478,10 @@ function filteredVehicleGalleryItems() {
   const imagen = isImagenGalleryMode();
   return getStudioGallerySourceItems().filter(item => {
     if (imagen) {
+      if (vehicleGalleryFilters.imgRatio && item.ratio !== vehicleGalleryFilters.imgRatio) return false;
+      if (vehicleGalleryFilters.imgModel && item.model !== vehicleGalleryFilters.imgModel) return false;
+      if (vehicleGalleryFilters.imgRes && item.res !== vehicleGalleryFilters.imgRes) return false;
+      if (vehicleGalleryFilters.imgTime && !withinImagenTimeRange(item.ts, vehicleGalleryFilters.imgTime)) return false;
       if (!q) return true;
       const hay = [item.prompt, item.fullPrompt, item.model, item.ratio, item.badge, item.provider]
         .join(' ').toLowerCase();
@@ -3353,18 +3532,52 @@ function syncVehicleGalleryFilterOptions() {
   }
 }
 
+function syncImagenGalleryFilterOptions() {
+  const items = getStudioGallerySourceItems();
+  const ratios = [...new Set(items.map(i => i.ratio).filter(Boolean))];
+  const models = [...new Set(items.map(i => i.model).filter(Boolean))];
+  const resolutions = [...new Set(items.map(i => i.res).filter(Boolean))];
+  const fillSelect = (id, label, values, cur) => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    sel.innerHTML = `<option value="">${label}</option>` + values.map(v =>
+      `<option value="${esc(v)}"${v === cur ? ' selected' : ''}>${esc(v)}</option>`
+    ).join('');
+  };
+  fillSelect('vgFilterImgRatio', 'All ratios', ratios, vehicleGalleryFilters.imgRatio);
+  fillSelect('vgFilterImgModel', 'All models', models, vehicleGalleryFilters.imgModel);
+  fillSelect('vgFilterImgRes', 'All resolutions', resolutions, vehicleGalleryFilters.imgRes);
+}
+
+function withinImagenTimeRange(ts, range) {
+  if (!ts) return false;
+  const diffDays = (Date.now() - ts) / 86400000;
+  if (range === 'today') return diffDays < 1;
+  if (range === 'week') return diffDays < 7;
+  if (range === 'month') return diffDays < 30;
+  return true;
+}
+
 function onVehicleGalleryFilterChange() {
   const search = document.getElementById('vgSearch');
   const makeSel = document.getElementById('vgFilterMake');
   const yearSel = document.getElementById('vgFilterYear');
   const aspectSel = document.getElementById('vgFilterAspect');
   const viewSel = document.getElementById('vgFilterView');
+  const imgRatioSel = document.getElementById('vgFilterImgRatio');
+  const imgModelSel = document.getElementById('vgFilterImgModel');
+  const imgResSel = document.getElementById('vgFilterImgRes');
+  const imgTimeSel = document.getElementById('vgFilterImgTime');
   vehicleGalleryFilters = {
     q: search ? search.value : '',
     make: makeSel ? makeSel.value : '',
     year: yearSel ? yearSel.value : '',
     aspect: aspectSel ? aspectSel.value : '',
     view: viewSel ? viewSel.value : '',
+    imgRatio: imgRatioSel ? imgRatioSel.value : '',
+    imgModel: imgModelSel ? imgModelSel.value : '',
+    imgRes: imgResSel ? imgResSel.value : '',
+    imgTime: imgTimeSel ? imgTimeSel.value : '',
   };
   renderVehicleGallery();
 }
@@ -3716,6 +3929,7 @@ function renderVehicleGallery() {
 
   syncStudioGalleryChrome();
   if (!imagen) syncVehicleGalleryFilterOptions();
+  else syncImagenGalleryFilterOptions();
   // Only show pending placeholders started in the mode currently being viewed —
   // an in-flight Imagen generation should never surface in the Vehiclegen gallery
   // (or vice versa) if the user switches tabs while it's still running.
@@ -4029,43 +4243,26 @@ function clearVehicleModelRef() {
 }
 
 // ─── IMAGEN REFERENCES (Style / Character / Add) ───────────────────────────
-const CHARACTER_LIBRARY = [
-  // Age 0-10
-  { id: 'arjun-deshmukh', name: 'Arjun Deshmukh', location: 'Pune, Maharashtra', role: 'Student', age: '0-10', gender: 'male' },
-  { id: 'imran-ansari', name: 'Imran Ansari', location: 'Lucknow, Uttar Pradesh', role: 'Student', age: '0-10', gender: 'male' },
-  { id: 'pema-angmo', name: 'Pema Angmo', location: 'Leh, Ladakh', role: 'Student', age: '0-10', gender: 'female' },
-  { id: 'meena-subramanian', name: 'Meena Subramanian', location: 'Chennai, Tamil Nadu', role: 'Student', age: '0-10', gender: 'female' },
+// Character library is server-backed (character_store.py via main.py's
+// /api/characters* routes) — loaded once on page load by loadCharacterLibrary(),
+// re-fetched after add/delete. Rows keep the same {id,name,location,role,age}
+// shape the old hardcoded array used, so renderCharacterGrid()/selectCharacter()
+// below need no changes beyond the data source.
+let CHARACTER_LIBRARY = [];
+let charactersLoaded = false;
 
-  // Age 10-20
-  { id: 'rohan-malhotra', name: 'Rohan Malhotra', location: 'Delhi', role: 'College Student', age: '10-20', gender: 'male' },
-  { id: 'bikram-doley', name: 'Bikram Doley', location: 'Guwahati, Assam', role: 'Student', age: '10-20', gender: 'male' },
-  { id: 'simran-kaur', name: 'Simran Kaur', location: 'Chandigarh, Punjab', role: 'Student', age: '10-20', gender: 'female' },
-  { id: 'neha-verma', name: 'Neha Verma', location: 'Patna, Bihar', role: 'Student', age: '10-20', gender: 'female' },
+async function loadCharacterLibrary(force = false) {
+  if (charactersLoaded && !force) return CHARACTER_LIBRARY;
+  try {
+    const { characters } = await adminFetch('/api/characters');
+    CHARACTER_LIBRARY = characters;
+    charactersLoaded = true;
+  } catch (e) {
+    console.warn('Could not load character library:', e.message);
+  }
+  return CHARACTER_LIBRARY;
+}
 
-  // Age 20-30
-  { id: 'manoj-yadav', name: 'Manoj Yadav', location: 'Jaipur, Rajasthan', role: 'Shop Owner', age: '20-30', gender: 'male' },
-  { id: 'sahil-shaikh', name: 'Sahil Shaikh', location: 'Surat, Gujarat', role: 'Textile Trader', age: '20-30', gender: 'male' },
-  { id: 'aanya-nair', name: 'Aanya Nair', location: 'Bengaluru, Karnataka', role: 'Researcher', age: '20-30', gender: 'female' },
-  { id: 'priya-fernandes', name: 'Priya Fernandes', location: 'Goa', role: 'Content Creator', age: '20-30', gender: 'female' },
-
-  // Age 30-40
-  { id: 'vikram-shetty', name: 'Vikram Shetty', location: 'Mumbai, Maharashtra', role: 'Marine Engineer', age: '30-40', gender: 'male' },
-  { id: 'imran-ansari', name: 'Imran Ansari', location: 'Lucknow, Uttar Pradesh', role: 'Mechanic', age: '30-40', gender: 'male' },
-  { id: 'fatima-khan', name: 'Fatima Khan', location: 'Hyderabad, Telangana', role: 'Small Business Owner', age: '30-40', gender: 'female' },
-  { id: 'lakshmi-reddy', name: 'Lakshmi Reddy', location: 'Vijayawada, Andhra Pradesh', role: 'Entrepreneur', age: '30-40', gender: 'female' },
-
-  // Age 40-50
-  { id: 'sanjay-singh', name: 'Sanjay Singh', location: 'Haryana', role: 'Farmer', age: '40-50', gender: 'male' },
-  { id: 'mahesh-kumar', name: 'Mahesh Kumar', location: 'Bhopal, Madhya Pradesh', role: 'Electrician', age: '40-50', gender: 'male' },
-  { id: 'tsering-dolma', name: 'Tsering Dolma', location: 'Sikkim', role: 'Hotel Manager', age: '40-50', gender: 'female' },
-  { id: 'anjali-iyer', name: 'Anjali Iyer', location: 'Mysuru, Karnataka', role: 'Architect', age: '40-50', gender: 'female' },
-
-  // Age 50-60
-  { id: 'joseph-thomas', name: 'Joseph Thomas', location: 'Kottayam, Kerala', role: 'Bank Manager', age: '50-60', gender: 'male' },
-  { id: 'harpreet-sandhu', name: 'Harpreet Sandhu', location: 'Amritsar, Punjab', role: 'Business Owner', age: '50-60', gender: 'male' },
-  { id: 'sunita-devi', name: 'Sunita Devi', location: 'Ranchi, Jharkhand', role: 'ASHA Worker', age: '50-60', gender: 'female' },
-  { id: 'parul-chatterjee', name: 'Parul Chatterjee', location: 'Kolkata, West Bengal', role: 'Journalist', age: '50-60', gender: 'female' },
-];
 const CHAR_AVATAR_COLORS = ['#7a62f0', '#e0759a', '#4aa8d8', '#e0954a', '#5cb85c', '#c0563f', '#9b59b6', '#2e9e8f'];
 function charInitials(name) {
   return String(name || '').trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
@@ -4078,40 +4275,14 @@ function charHash(id) {
 function charColor(id) {
   return CHAR_AVATAR_COLORS[charHash(id) % CHAR_AVATAR_COLORS.length];
 }
-// Real Indian-looking headshots, generated once through this tool's own Nano Banana
-// pipeline (same engine as regular generations) and persisted under ./generated —
-// one consistent photo per character id. Falls back to a generic placeholder photo
-// if a character is ever added without a generated portrait yet.
-const CHAR_PHOTOS = {
-  'aanya-nair': '/generated/20260729_143205_character_3ddd84d467.png',
-  'rohan-malhotra': '/generated/20260729_143155_character_e9bf59964e.png',
-  'meena-subramanian': '/generated/20260729_143159_character_ec41b7f59d.png',
-  'arjun-deshmukh': '/generated/20260729_143202_character_c427b4d910.png',
-  'fatima-khan': '/generated/20260729_143233_character_59e2a171c5.png',
-  'david-varghese': '/generated/20260729_143237_character_d00af232a5.png',
-  'simran-kaur': '/generated/20260729_143240_character_4431a299d5.png',
-  'bikram-doley': '/generated/20260729_143244_character_240348d5b8.png',
-  'lakshmi-reddy': '/generated/20260729_143340_character_3bce44baeb.png',
-  'imran-ansari': '/generated/20260729_143344_character_170a3905fa.png',
-  'priya-fernandes': '/generated/20260729_143347_character_4c9a6618ef.png',
-  'manoj-yadav': '/generated/20260729_143351_character_906b00da29.png',
-  'neha-verma': '/generated/20260729_143429_character_d2e4a89cd4.png',
-  'pema-angmo': '/generated/20260729_143433_character_f0db2b3446.png',
-  'joseph-thomas': '/generated/20260729_143436_character_a2a34212a3.png',
-  'sanjay-singh': '/generated/20260729_143440_character_bc57189902.png',
-  'vikram-shetty': '/generated/20260729_143517_character_b0c6b769f2.png',
-  'tsering-dolma': '/generated/20260729_143521_character_c9caf25309.png',
-  'mahesh-kumar': '/generated/20260729_143525_character_562c6bfaa1.png',
-  'sunita-devi': '/generated/20260729_143532_character_bb3d6909db.png',
-  'parul-chatterjee': '/generated/20260729_143603_character_916c91a371.png',
-  'harpreet-sandhu': '/generated/20260729_143608_character_9c39f93e4c.png',
-  'anjali-iyer': '/generated/20260729_143612_character_9de6a4f4c7.png',
-  'sahil-shaikh': '/generated/20260729_143616_character_df460dbdf4.png',
-};
+// Portraits are served directly from the DB — no missing-file fallback needed
+// (creating a character always requires an image); the card template's onerror
+// handler still covers a genuine load failure with the initials-avatar div.
 function charPhotoUrl(id) {
-  if (CHAR_PHOTOS[id]) return CHAR_PHOTOS[id];
-  const num = (charHash(id) % 70) + 1;
-  return `https://i.pravatar.cc/300?img=${num}`;
+  // <img src> cannot send the x-session-token header — pass it as a query
+  // param instead, same fallback /api/fetch-image already relies on.
+  const token = getSessionToken();
+  return `/api/characters/${encodeURIComponent(id)}/image${token ? `?token=${encodeURIComponent(token)}` : ''}`;
 }
 
 let imagenReferences = { style: null, character: null, custom: null };
@@ -4211,12 +4382,80 @@ function buildRefChip(kind, label, thumbSrc, character) {
   return chip;
 }
 
-function openCharacterLibrary() {
+async function openCharacterLibrary() {
   document.getElementById('charOverlay').classList.add('open');
+  if (!charactersLoaded) await loadCharacterLibrary();
   renderCharacterGrid();
 }
 function closeCharacterLibrary() {
   document.getElementById('charOverlay').classList.remove('open');
+  closeAddCharacterForm();
+}
+function openAddCharacterForm() {
+  document.getElementById('charAddForm').classList.remove('hidden');
+}
+function closeAddCharacterForm() {
+  document.getElementById('charAddForm').classList.add('hidden');
+  document.getElementById('newCharName').value = '';
+  document.getElementById('newCharRole').value = '';
+  document.getElementById('newCharLocation').value = '';
+  document.getElementById('newCharFile').value = '';
+}
+async function submitNewCharacter() {
+  const name = document.getElementById('newCharName').value.trim();
+  const file = document.getElementById('newCharFile').files[0];
+  if (!name || !file) { alert('Name and photo are required.'); return; }
+  const btn = document.getElementById('submitNewCharBtn');
+  btn.disabled = true;
+  try {
+    const rawUri = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ''));
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+    const compressed = await compressDataUriForReference(rawUri, 350 * 1024);
+    const mime = normalizeMagnificRefMime(mimeFromDataUri(compressed) || file.type);
+    if (!mime) { alert('Unsupported image format — use PNG, JPEG, or WebP.'); return; }
+    await adminFetch('/api/characters/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name, image_b64: compressed,
+        role: document.getElementById('newCharRole').value.trim(),
+        location: document.getElementById('newCharLocation').value.trim(),
+        age: document.getElementById('newCharAge').value,
+      }),
+    });
+    closeAddCharacterForm();
+    await loadCharacterLibrary(true);
+    renderCharacterGrid();
+  } catch (e) {
+    alert('Could not add character: ' + e.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
+async function deleteCharacter(id, ev) {
+  ev.stopPropagation();
+  if (!confirm('Delete this character? Anyone using it as a reference will need to pick a different one. This cannot be undone.')) {
+    return;
+  }
+  try {
+    await adminFetch('/admin/characters/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    });
+    if (imagenReferences.character && imagenReferences.character.id === id) {
+      imagenReferences.character = null;
+      renderRefUI();
+    }
+    await loadCharacterLibrary(true);
+    renderCharacterGrid();
+  } catch (e) {
+    alert('Could not delete character: ' + e.message);
+  }
 }
 function setCharacterTab(tab) {
   characterTab = tab;
@@ -4250,23 +4489,28 @@ function renderCharacterGrid() {
     return;
   }
 
-  const ageGroups = ['0-10', '10-20', '20-30', '30-40', '40-50', '50-60'];
+  const ageGroups = ['0-10', '10-20', '20-30', '30-40', '40-50', '50-60', 'Other'];
   const groupedByAge = {};
   ageGroups.forEach(age => groupedByAge[age] = []);
   list.forEach(c => {
-    if (c.age && groupedByAge[c.age]) groupedByAge[c.age].push(c);
+    const bucket = (c.age && groupedByAge[c.age]) ? c.age : 'Other';
+    groupedByAge[bucket].push(c);
   });
 
+  const isAdmin = currentPermission === 'Admin';
   let html = '';
   ageGroups.forEach(age => {
     const chars = groupedByAge[age];
     if (chars.length) {
-      html += `<div style="grid-column: 1/-1; margin-top: 16px; font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px;">Age ${age}</div>`;
+      html += `<div style="grid-column: 1/-1; margin-top: 16px; font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px;">${age === 'Other' ? 'Other' : 'Age ' + age}</div>`;
       html += chars.map(c => {
         const isFav = characterFavourites.has(c.id);
         const isSelected = imagenReferences.character && imagenReferences.character.id === c.id;
         return `
           <div class="char-card${isSelected ? ' selected' : ''}" onclick="selectCharacter('${c.id}')">
+            ${isAdmin ? `<button class="char-delete-btn" onclick="deleteCharacter('${c.id}', event)" title="Delete">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </button>` : ''}
             <button class="char-fav-btn${isFav ? ' on' : ''}" onclick="toggleCharacterFav('${c.id}', event)" title="Favourite">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
             </button>
@@ -5016,7 +5260,7 @@ function applyGenMode(mode) {
 }
 
 function clearVehicleGalleryFilters() {
-  vehicleGalleryFilters = { q: '', make: '', year: '', aspect: '', view: '' };
+  vehicleGalleryFilters = { q: '', make: '', year: '', aspect: '', view: '', imgRatio: '', imgModel: '', imgRes: '', imgTime: '' };
   vehicleCollectionOpenMake = null;
   const search = document.getElementById('vgSearch');
   const makeSel = document.getElementById('vgFilterMake');
@@ -5055,6 +5299,7 @@ function navigateTo(view) {
     document.body.classList.remove('studio-ui', 'imagen-mode', 'vehicle-mode');
   }
   if (view === 'admin') loadAdminData();
+  else if (view === 'tokens') loadApiTokens();
   else if (!showGenerate) renderGallery(view);
 }
 
@@ -5290,6 +5535,91 @@ function permissionOptions(selected) {
   ).join('');
 }
 
+// ─── API TOKENS (self-service, for the /mcp endpoint) ──────────────────────────
+async function loadApiTokens() {
+  const urlEl = document.getElementById('tokensMcpUrl');
+  if (urlEl) urlEl.textContent = `${location.origin}/mcp`;
+  try {
+    const { tokens } = await adminFetch('/account/tokens');
+    renderApiTokens(tokens);
+  } catch (e) {
+    document.getElementById('tokensBody').innerHTML = '';
+    alert('Could not load API tokens: ' + e.message);
+  }
+}
+
+function renderApiTokens(tokens) {
+  const empty = document.getElementById('tokensEmpty');
+  const table = document.getElementById('tokensTable');
+  const body = document.getElementById('tokensBody');
+  if (!tokens.length) {
+    empty.classList.remove('hidden');
+    table.classList.add('hidden');
+    body.innerHTML = '';
+    return;
+  }
+  empty.classList.add('hidden');
+  table.classList.remove('hidden');
+  body.innerHTML = tokens.map(t => `
+    <tr>
+      <td>${esc(t.label || '—')}</td>
+      <td class="admin-email-muted">${esc(t.preview)}</td>
+      <td class="admin-email-muted">${fmtDate(t.createdAt)}</td>
+      <td class="admin-email-muted">${t.revokedAt ? 'Revoked ' + fmtDate(t.revokedAt) : fmtDate(t.lastUsedAt)}</td>
+      <td>${t.revokedAt ? '' : `<button class="admin-delete-btn" title="Revoke" onclick="revokeApiToken(${t.id}, this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      </button>`}</td>
+    </tr>
+  `).join('');
+}
+
+let _revealedToken = '';
+
+async function createApiToken() {
+  const labelInput = document.getElementById('newTokenLabel');
+  const btn = document.getElementById('createTokenBtn');
+  btn.disabled = true;
+  try {
+    const { token } = await adminFetch('/account/tokens/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ label: labelInput.value.trim() }),
+    });
+    _revealedToken = token;
+    document.getElementById('tokenRevealValue').textContent = token;
+    document.getElementById('tokenReveal').classList.remove('hidden');
+    labelInput.value = '';
+    loadApiTokens();
+  } catch (e) {
+    alert('Could not generate token: ' + e.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function copyRevealedToken() {
+  if (!_revealedToken) return;
+  navigator.clipboard?.writeText(_revealedToken).catch(() => {});
+}
+
+async function revokeApiToken(id, btn) {
+  if (!confirm('Revoke this token? Anything using it (including a connected Claude) will stop working immediately.')) {
+    return;
+  }
+  btn.disabled = true;
+  try {
+    await adminFetch('/account/tokens/revoke', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    });
+    loadApiTokens();
+  } catch (e) {
+    alert('Could not revoke token: ' + e.message);
+    btn.disabled = false;
+  }
+}
+
 function renderAdminPending(pending) {
   const empty = document.getElementById('adminPendingEmpty');
   const table = document.getElementById('adminPendingTable');
@@ -5449,7 +5779,7 @@ function wipeAllLibraryStores() {
   Object.keys(STORE_KEYS).forEach(kind => storeSet(kind, []));
   vehiclePendingGens = [];
   vehicleCollectionOpenMake = null;
-  vehicleGalleryFilters = { q: '', make: '', year: '', aspect: '', view: '' };
+  vehicleGalleryFilters = { q: '', make: '', year: '', aspect: '', view: '', imgRatio: '', imgModel: '', imgRes: '', imgTime: '' };
   const search = document.getElementById('vgSearch');
   if (search) search.value = '';
   ['vgFilterMake', 'vgFilterYear', 'vgFilterAspect', 'vgFilterView'].forEach(id => {
@@ -6512,13 +6842,25 @@ function displayNameFromEmail(email) {
 function hideLoginGate(email) {
   document.getElementById('loginOverlay').classList.add('hidden');
   const resolvedEmail = email || getSessionEmail();
-  const chip = document.getElementById('sidebarUserEmail');
-  chip.textContent = displayNameFromEmail(resolvedEmail);
-  chip.title = resolvedEmail;
+  const nameEl = document.getElementById('sidebarUserName');
+  const emailEl = document.getElementById('sidebarUserFullEmail');
+  const btn = document.getElementById('sidebarUserBtn');
+  if (nameEl) nameEl.textContent = displayNameFromEmail(resolvedEmail);
+  if (emailEl) emailEl.textContent = resolvedEmail;
+  if (btn) btn.title = resolvedEmail;
 }
 function showLoginForm() {
   document.getElementById('loginFormView').classList.remove('hidden');
 }
+function toggleSidebarUserMenu(event) {
+  if (event) event.stopPropagation();
+  document.getElementById('sidebarUserMenu').classList.toggle('hidden');
+}
+document.addEventListener('click', (e) => {
+  const wrap = document.getElementById('sidebarUserWrap');
+  const menu = document.getElementById('sidebarUserMenu');
+  if (wrap && menu && !wrap.contains(e.target)) menu.classList.add('hidden');
+});
 
 function applyPermission(permission) {
   currentPermission = permission;
@@ -6586,6 +6928,7 @@ async function checkSession() {
     if (data.valid) {
       applyPermission(data.permission);
       hideLoginGate(data.email);
+      loadCharacterLibrary();
       if (location.hash === '#admin') navigateTo('admin'); // no-op if not an Admin
     } else {
       clearSession();
@@ -6740,7 +7083,7 @@ function buildPrompt(scene) {
   const subject = subjectParts.join(', ');
   const character = imagenReferences.character;
   const characterClause = character
-    ? ` RECURRING CHARACTER — ${character.name}, a ${character.role} based in ${character.location}: keep this same person's face, build, age and styling consistent with how they've appeared in earlier generations in this session.`
+    ? ` RECURRING CHARACTER — ${character.name}${character.role ? `, a ${character.role}` : ''}${character.location ? ` based in ${character.location}` : ''}: keep this same person's face, build, age and styling consistent with how they've appeared in earlier generations in this session.`
     : '';
 
   return [
@@ -6832,6 +7175,21 @@ function onModelChange() {
   document.getElementById('subModelSection').style.display = m.supportsSubModel ? '' : 'none';
   const resGroup = document.getElementById('resSelect')?.closest('.form-group');
   if (resGroup) resGroup.style.opacity = m.supportsRes ? '1' : '0.4';
+
+  // Reference images (style/character/custom) only ever reach the async
+  // (Nano Banana) upstream call — Magnific's classic/sync endpoint has no
+  // reference-image field at all. Grey the pills out rather than silently
+  // dropping references on this model.
+  const refsSupported = !!m.async;
+  const refTooltip = refsSupported ? '' : 'References aren\'t supported on this model — switch to Nano Banana to use them.';
+  ['refStyleBtn', 'refCharacterBtn', 'refAddBtn'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.disabled = !refsSupported;
+    btn.title = refTooltip;
+    btn.classList.toggle('disabled', !refsSupported);
+  });
+
   syncImagenConfigMeta();
 }
 
