@@ -2027,15 +2027,29 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
 #editMaskCanvas {
   position: absolute; cursor: crosshair; touch-action: none;
 }
-.edit-brush-toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.edit-tool-btn.on { background: linear-gradient(135deg, #7c3aed, #6366f1); border-color: transparent; color: #fff; }
-.edit-brush-size {
-  display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted);
-  padding: 0 10px;
+.edit-brush-toolbar { display: flex; align-items: stretch; gap: 12px; flex-wrap: wrap; }
+.edit-tool-card {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+  width: 92px; height: 88px; flex-shrink: 0; border-radius: 14px; border: 1px solid var(--border-s);
+  background: var(--bg); color: var(--muted); cursor: pointer; transition: all .15s;
+  font: 600 12.5px/1 'Inter', sans-serif;
 }
-.edit-brush-size input[type="range"] { width: 100px; accent-color: #7c3aed; }
-#editClearBtn:disabled { opacity: .45; cursor: not-allowed; }
-.edit-brush-hint { font-size: 11.5px; color: var(--muted); line-height: 1.5; }
+.edit-tool-card svg { width: 22px; height: 22px; }
+.edit-tool-card:hover { border-color: #7c3aed; color: var(--text); }
+.edit-tool-card.on { border-color: #7c3aed; color: #a78bfa; background: rgba(124,58,237,.1); }
+.edit-tool-card:disabled { opacity: .45; cursor: not-allowed; }
+.edit-tool-card:disabled:hover { border-color: var(--border-s); color: var(--muted); }
+.edit-brush-size-card {
+  flex: 1; min-width: 160px; display: flex; flex-direction: column; justify-content: center; gap: 10px;
+  padding: 0 16px; border-radius: 14px; border: 1px solid var(--border-s); background: var(--bg);
+}
+.edit-brush-size-card span { font-size: 12.5px; color: var(--muted); font-weight: 600; }
+.edit-brush-size-card input[type="range"] { width: 100%; accent-color: #7c3aed; }
+.edit-brush-hint {
+  display: flex; align-items: flex-start; gap: 10px; font-size: 12px; color: var(--muted); line-height: 1.5;
+  border: 1px solid var(--border-s); border-radius: 12px; padding: 12px 14px; background: var(--bg);
+}
+.edit-brush-hint svg { flex-shrink: 0; width: 18px; height: 18px; margin-top: 1px; }
 .edit-fields { flex: 0 0 300px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 .edit-textarea {
   width: 100%; min-height: 100px; padding: 10px 12px; border: 1px solid var(--border-s);
@@ -2969,24 +2983,27 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
           <canvas id="editMaskCanvas"></canvas>
         </div>
         <div class="edit-brush-toolbar">
-          <button type="button" class="lb-tool edit-tool-btn on" id="editToolBrush" title="Brush" onclick="setEditTool('brush')">
+          <button type="button" class="edit-tool-card on" id="editToolBrush" title="Brush" onclick="setEditTool('brush')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.06 11.9 8 15l3.1-1.06M9.06 11.9 18 3l3 3-8.94 8.94M9.06 11.9 3 20"/></svg>
             <span>Brush</span>
           </button>
-          <button type="button" class="lb-tool edit-tool-btn" id="editToolEraser" title="Eraser" onclick="setEditTool('eraser')">
+          <button type="button" class="edit-tool-card" id="editToolEraser" title="Eraser" onclick="setEditTool('eraser')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 20H8l-6-6a2 2 0 0 1 0-2.8L13.8 2.4a2 2 0 0 1 2.8 0l5 5a2 2 0 0 1 0 2.8L13.4 18.4"/></svg>
             <span>Eraser</span>
           </button>
-          <label class="edit-brush-size">
+          <div class="edit-brush-size-card">
             <span>Size</span>
             <input type="range" id="editBrushSizeInput" min="8" max="70" value="26" oninput="setEditBrushSize(this.value)">
-          </label>
-          <button type="button" class="lb-tool" id="editClearBtn" title="Clear marks" onclick="clearEditMarks()" disabled>
+          </div>
+          <button type="button" class="edit-tool-card" id="editClearBtn" title="Clear marks" onclick="clearEditMarks()" disabled>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
             <span>Clear marks</span>
           </button>
         </div>
-        <div class="edit-brush-hint">Paint over the area(s) you want changed — the edit will be steered toward the marked region(s). Leave unmarked to edit the whole image.</div>
+        <div class="edit-brush-hint">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <span>Paint over the area(s) you want changed — the edit will be steered toward the marked region(s). Leave unmarked to edit the whole image.</span>
+        </div>
       </div>
       <div class="edit-fields">
         <label class="adv-label">What would you like to change?</label>
