@@ -2025,8 +2025,14 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
   object-fit: contain; user-select: none; -webkit-user-drag: none;
 }
 #editMaskCanvas {
-  position: absolute; cursor: crosshair; touch-action: none;
+  position: absolute; cursor: none; touch-action: none;
 }
+.edit-brush-cursor {
+  position: absolute; border-radius: 50%; pointer-events: none; z-index: 5;
+  transform: translate(-50%, -50%); display: none;
+  border: 1.5px solid rgba(255,45,85,.9); background: rgba(255,45,85,.15);
+}
+.edit-brush-cursor.eraser { border-color: rgba(255,255,255,.9); background: rgba(255,255,255,.12); }
 .edit-brush-toolbar { display: flex; align-items: stretch; gap: 12px; flex-wrap: wrap; }
 .edit-tool-card {
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
@@ -2045,6 +2051,16 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
 }
 .edit-brush-size-card span { font-size: 12.5px; color: var(--muted); font-weight: 600; }
 .edit-brush-size-card input[type="range"] { width: 100%; accent-color: #7c3aed; }
+.edit-brush-size-head { display: flex; align-items: center; justify-content: space-between; }
+.edit-brush-size-swatch {
+  width: 32px; height: 32px; border-radius: 8px; background: var(--white);
+  border: 1px solid var(--border-s); display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.edit-brush-size-dot {
+  border-radius: 50%; background: rgba(255,45,85,.55); border: 1px solid rgba(255,45,85,.9);
+  transition: background .15s, border-color .15s;
+}
+.edit-brush-size-dot.eraser { background: rgba(255,255,255,.35); border-color: rgba(255,255,255,.7); }
 .edit-brush-hint {
   display: flex; align-items: flex-start; gap: 10px; font-size: 12px; color: var(--muted); line-height: 1.5;
   border: 1px solid var(--border-s); border-radius: 12px; padding: 12px 14px; background: var(--bg);
@@ -2981,6 +2997,7 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
         <div class="edit-canvas-wrap" id="editCanvasWrap">
           <img id="editPreviewImg" src="" alt="Image to edit">
           <canvas id="editMaskCanvas"></canvas>
+          <div class="edit-brush-cursor" id="editBrushCursor"></div>
         </div>
         <div class="edit-brush-toolbar">
           <button type="button" class="edit-tool-card on" id="editToolBrush" title="Brush" onclick="setEditTool('brush')">
@@ -2992,7 +3009,10 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
             <span>Eraser</span>
           </button>
           <div class="edit-brush-size-card">
-            <span>Size</span>
+            <div class="edit-brush-size-head">
+              <span>Size</span>
+              <div class="edit-brush-size-swatch"><div class="edit-brush-size-dot" id="editBrushSizeDot"></div></div>
+            </div>
             <input type="range" id="editBrushSizeInput" min="8" max="70" value="26" oninput="setEditBrushSize(this.value)">
           </div>
           <button type="button" class="edit-tool-card" id="editClearBtn" title="Clear marks" onclick="clearEditMarks()" disabled>
@@ -6904,8 +6924,45 @@ function setEditTool(tool) {
   editTool = tool;
   document.getElementById('editToolBrush').classList.toggle('on', tool === 'brush');
   document.getElementById('editToolEraser').classList.toggle('on', tool === 'eraser');
+  updateEditBrushPreviews();
 }
-function setEditBrushSize(v) { editBrushSize = Number(v) || 26; }
+function setEditBrushSize(v) {
+  editBrushSize = Number(v) || 26;
+  updateEditBrushPreviews();
+}
+
+/** Keeps the small "Size" swatch and the on-canvas hover cursor in sync with
+ * the current brush size/tool, so the user can see exactly how big a mark
+ * they're about to make before they paint. */
+function updateEditBrushPreviews() {
+  const isEraser = editTool === 'eraser';
+  const dot = document.getElementById('editBrushSizeDot');
+  if (dot) {
+    const d = Math.max(4, Math.min(24, editBrushSize * 0.34));
+    dot.style.width = d + 'px';
+    dot.style.height = d + 'px';
+    dot.classList.toggle('eraser', isEraser);
+  }
+  const cursor = document.getElementById('editBrushCursor');
+  if (cursor) {
+    cursor.style.width = editBrushSize + 'px';
+    cursor.style.height = editBrushSize + 'px';
+    cursor.classList.toggle('eraser', isEraser);
+  }
+}
+function positionEditBrushCursor(e) {
+  const wrap = document.getElementById('editCanvasWrap');
+  const cursor = document.getElementById('editBrushCursor');
+  if (!wrap || !cursor) return;
+  const rect = wrap.getBoundingClientRect();
+  cursor.style.left = (e.clientX - rect.left) + 'px';
+  cursor.style.top = (e.clientY - rect.top) + 'px';
+  cursor.style.display = 'block';
+}
+function hideEditBrushCursor() {
+  const cursor = document.getElementById('editBrushCursor');
+  if (cursor) cursor.style.display = 'none';
+}
 
 function editCanvasPoint(e, canvas) {
   const rect = canvas.getBoundingClientRect();
@@ -6948,6 +7005,7 @@ function editPointerDown(e) {
   editStrokeTo(editLastPt, null);
 }
 function editPointerMove(e) {
+  positionEditBrushCursor(e);
   if (!editDrawing) return;
   e.preventDefault();
   const pt = editCanvasPoint(e, e.currentTarget);
@@ -6963,7 +7021,8 @@ function wireEditCanvas() {
   canvas.addEventListener('pointerdown', editPointerDown);
   canvas.addEventListener('pointermove', editPointerMove);
   canvas.addEventListener('pointerup', editPointerUp);
-  canvas.addEventListener('pointerleave', editPointerUp);
+  canvas.addEventListener('pointerleave', () => { editPointerUp(); hideEditBrushCursor(); });
+  canvas.addEventListener('pointerenter', positionEditBrushCursor);
   window.addEventListener('resize', () => {
     if (document.getElementById('editOverlay').classList.contains('open')) layoutEditCanvas();
   });
@@ -7004,6 +7063,7 @@ function closeEditModal() {
   document.getElementById('editOverlay').classList.remove('open');
   editItem = null;
   resetEditCanvas();
+  hideEditBrushCursor();
 }
 
 function ratioValueFromLabel(label) {
