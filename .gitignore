@@ -1,5 +1,6 @@
 .env
 *.env
+.mcp.json
 .session_secret
 acko_gen.db
 vehicle_catalogue.db

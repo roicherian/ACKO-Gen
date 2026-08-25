@@ -147,10 +147,10 @@ def generate_magnific(prompt, ratio, guidance=1.2, seed=None, api_key=None):
 
 
 # ── NANO BANANA 2 via Magnific (async, returns URL) ───────────────────────────
-def generate_nano_banana(prompt, ratio, resolution="2K"):
+def generate_nano_banana(prompt, ratio, resolution="2K", api_key=None):
     headers = {
         "Content-Type":       "application/json",
-        "x-magnific-api-key": MAGNIFIC_KEY,
+        "x-magnific-api-key": api_key or MAGNIFIC_KEY,
     }
     body = {
         "prompt":                 prompt,
@@ -178,11 +178,13 @@ def generate_nano_banana(prompt, ratio, resolution="2K"):
             raise RuntimeError("Nano Banana generation failed.")
     raise RuntimeError("Timed out waiting for Nano Banana 2.")
 
-# NOTE: generate_nano_banana() above is deliberately NOT exposed via TOOL below.
-# Its blocking ~2-minute poll loop is unsafe to run inline inside a single /mcp
-# request — a future phase would wrap it in a job-id/poll-tool pair instead of
-# calling it directly from a synchronous tool call. Kept here, unused for now,
-# as the starting point for that work.
+# NOTE: generate_nano_banana() blocks inline for up to ~2 minutes (job creation
+# + polling) when called from /mcp's tools/call. This is safe from freezing the
+# whole app (main.py runs a ThreadingHTTPServer, so this only ties up one
+# request's thread), but a calling MCP client with a shorter tool-call timeout
+# than the job takes may see the call fail even though generation still
+# succeeds server-side. Accepted tradeoff — a job-id/poll-tool pair would avoid
+# that but is real additional infrastructure, not built here.
 
 
 # ── TOOL DEFINITION ───────────────────────────────────────────────────────────
@@ -192,7 +194,8 @@ TOOL = {
         "Generate an ACKO brand-compliant image via Magnific. "
         "Automatically builds the correct ACKO prompt style (Indian commercial photography, "
         "warm light, candid, real settings) from a plain-language scene description. "
-        "Use this whenever a user asks to generate, create, or produce an image for ACKO."
+        "Use this whenever a user asks to generate, create, or produce an image for ACKO. "
+        "nano_banana_2 takes roughly 30-90 seconds — say so before calling it."
     ),
     "inputSchema": {
         "type":     "object",
@@ -202,6 +205,19 @@ TOOL = {
                 "type":        "string",
                 "description": "Plain-language description of the scene to generate. "
                                "E.g. 'A woman photographing the dent on her car on a residential street'",
+            },
+            "model": {
+                "type":        "string",
+                "enum":        ["magnific", "nano_banana_2"],
+                "default":     "magnific",
+                "description": "magnific = fast (few seconds), high-fidelity. "
+                               "nano_banana_2 = Google Gemini Flash, slower (~30-90s), call it knowing it will block for a while.",
+            },
+            "resolution": {
+                "type":        "string",
+                "enum":        ["1K", "2K", "4K"],
+                "default":     "2K",
+                "description": "nano_banana_2 only — output resolution.",
             },
             "moment": {
                 "type":        "string",

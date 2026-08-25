@@ -596,16 +596,28 @@ class ProxyHandler(BaseHTTPRequestHandler):
                 return
 
             scene = str(args.get("scene", ""))
+            model = str(args.get("model", "magnific"))
             prompt = acko_mcp_server.build_prompt(
                 scene, args.get("moment", "care"), args.get("product", "general"),
                 args.get("skin_tone", ""), args.get("region", ""), args.get("age", ""),
                 args.get("life_stage", ""),
             )
             try:
-                b64, _meta = acko_mcp_server.generate_magnific(
-                    prompt, args.get("ratio", "16:9"), float(args.get("guidance", 1.2)),
-                    args.get("seed"), api_key=MAGNIFIC_KEY,
-                )
+                if model == "nano_banana_2":
+                    # Blocks this request's thread for up to ~2 minutes (job
+                    # creation + polling) — safe under ThreadingHTTPServer
+                    # (doesn't freeze other users), but a calling MCP client
+                    # with a shorter tool-call timeout may see this fail even
+                    # though generation succeeds server-side. Accepted tradeoff.
+                    b64, _meta = acko_mcp_server.generate_nano_banana(
+                        prompt, args.get("ratio", "16:9"), args.get("resolution", "2K"),
+                        api_key=MAGNIFIC_KEY,
+                    )
+                else:
+                    b64, _meta = acko_mcp_server.generate_magnific(
+                        prompt, args.get("ratio", "16:9"), float(args.get("guidance", 1.2)),
+                        args.get("seed"), api_key=MAGNIFIC_KEY,
+                    )
             except Exception as e:
                 self.send_json(200, {"jsonrpc": "2.0", "id": id_, "result": {
                     "content": [{"type": "text", "text": f"Generation failed: {e}"}],
