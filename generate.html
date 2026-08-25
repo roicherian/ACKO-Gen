@@ -1445,6 +1445,8 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
 .btn-gen:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
 .btn-gen svg { width: 16px; height: 16px; }
 .btn-gen i[class^="cil-"] { font-size: 16px; line-height: 1; }
+.btn-gen.stopping { background: linear-gradient(135deg, #ef4444, #b91c1c); }
+.btn-gen.stopping:hover:not(:disabled) { filter: brightness(1.08); }
 .btn-spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.3); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -2650,8 +2652,8 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
 
     <!-- Action buttons -->
     <div class="action-row">
-      <button class="btn-gen" id="genBtn" onclick="generate()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      <button class="btn-gen" id="genBtn" onclick="handleGenBtnClick()">
+        <span id="genBtnIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
         <span id="genBtnLabel">Generate</span>
       </button>
     </div>
@@ -7711,6 +7713,8 @@ function setProgress(pct) {
 function cancelGeneration() {
   state.cancelRequested = true;
   setStatus('err', 'Cancelled');
+  const label = document.getElementById('genBtnLabel');
+  if (label && isGenerating) label.textContent = 'Stopping…';
   const progressCard = document.getElementById('progressCard');
   if (progressCard) progressCard.classList.add('hidden');
   vehiclePendingGens = [];
@@ -7740,6 +7744,14 @@ function getAspectCls() {
 // ─── GENERATE ────────────────────────────────────────────────────────────────
 let isGenerating = false;
 let lastGenMeta = { prompt: '', fullPrompt: '', model: '', modelId: '', provider: '', ratio: '' };
+
+function handleGenBtnClick() {
+  if (isGenerating) { cancelGeneration(); return; }
+  generate();
+}
+
+const GEN_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>';
+const STOP_ICON = '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>';
 
 async function generate() {
   if (isGenerating) return;
@@ -7840,8 +7852,9 @@ async function generate() {
 
     state.cancelRequested = false;
     isGenerating = true;
-    if (btn) btn.disabled = true;
-    document.getElementById('genBtnLabel').innerHTML = '<span class="btn-spinner"></span>&nbsp; Generating…';
+    if (btn) btn.classList.add('stopping');
+    document.getElementById('genBtnIcon').innerHTML = STOP_ICON;
+    document.getElementById('genBtnLabel').innerHTML = '<span class="btn-spinner"></span>&nbsp; Stop generating';
     setStatus('working', 'Generating…');
 
     // Shared gallery pending cards (Imagen + Vehiclegen)
@@ -7887,7 +7900,9 @@ async function generate() {
   } finally {
     if (timerInterval) clearInterval(timerInterval);
     isGenerating = false;
-    if (btn) btn.disabled = false;
+    if (btn) btn.classList.remove('stopping');
+    const icon = document.getElementById('genBtnIcon');
+    if (icon) icon.innerHTML = GEN_ICON;
     const label = document.getElementById('genBtnLabel');
     if (label) label.textContent = 'Generate';
   }
