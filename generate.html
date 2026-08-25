@@ -890,6 +890,13 @@ body.vehicle-mode .vehicle-car-panel-head {
   filter: brightness(1.06);
   border-color: transparent; color: #fff;
 }
+.vg-card-actions .btn-dl.danger {
+  flex: 0 0 auto; padding-left: 12px; padding-right: 12px;
+  color: #fda4af; border-color: rgba(225,29,72,.35);
+}
+.vg-card-actions .btn-dl.danger:hover {
+  background: rgba(225,29,72,.18); border-color: rgba(225,29,72,.5); color: #fff;
+}
 .vg-card-actions .btn-dl:disabled {
   opacity: .65; cursor: wait; transform: none; filter: none;
 }
@@ -1020,11 +1027,10 @@ body.vehicle-mode .vehicle-car-panel-head {
 
 .sidebar-spacer { flex: 1; }
 .sidebar-user {
-  padding: 10px 16px; border-top: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 10px 12px; border-top: 1px solid var(--border); position: relative;
 }
 .sidebar-user-email {
-  font-size: 11px; color: var(--muted); overflow: hidden; text-overflow: ellipsis;
+  font-size: 11.5px; color: var(--muted); overflow: hidden; text-overflow: ellipsis;
   white-space: nowrap; min-width: 0;
 }
 .sidebar-signout {
@@ -1033,21 +1039,27 @@ body.vehicle-mode .vehicle-car-panel-head {
   border-radius: 6px; transition: all .15s;
 }
 .sidebar-signout:hover { background: var(--bg); color: var(--red); }
-.sidebar-user { position: relative; }
 .sidebar-user-btn {
-  width: 100%; background: none; border: none; padding: 4px 6px; border-radius: 8px;
-  display: flex; align-items: center; justify-content: space-between; gap: 8px;
-  cursor: pointer; text-align: left;
+  width: 100%; background: var(--color-card-bg, var(--bg)); border: 1px solid var(--border-s);
+  padding: 8px 10px; border-radius: 14px;
+  display: flex; align-items: center; gap: 10px;
+  cursor: pointer; text-align: left; transition: border-color .15s, background .15s;
 }
-.sidebar-user-btn:hover { background: var(--bg); }
-.sidebar-user-info { min-width: 0; overflow: hidden; }
+.sidebar-user-btn:hover { border-color: var(--purple, #7c3aed); }
+.sidebar-user-avatar {
+  flex-shrink: 0; width: 38px; height: 38px; border-radius: 50%;
+  background: linear-gradient(135deg, #7c3aed, #6366f1); color: #fff;
+  font: 700 15px/1 'Outfit', 'Inter', sans-serif;
+  display: flex; align-items: center; justify-content: center;
+}
+.sidebar-user-info { flex: 1; min-width: 0; overflow: hidden; }
 .sidebar-user-name {
-  font-size: 12.5px; font-weight: 700; color: var(--text);
+  font-size: 13px; font-weight: 700; color: var(--text);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.sidebar-user-chevron { width: 14px; height: 14px; color: var(--muted); flex-shrink: 0; }
+.sidebar-user-chevron { width: 16px; height: 16px; color: var(--muted); flex-shrink: 0; }
 .sidebar-user-menu {
-  position: absolute; bottom: calc(100% + 6px); left: 16px; right: 16px;
+  position: absolute; bottom: calc(100% + 6px); left: 12px; right: 12px;
   background: var(--white); border: 1px solid var(--border-s); border-radius: var(--r-sm);
   box-shadow: var(--shadow-sm); padding: 6px; z-index: 50;
 }
@@ -1640,6 +1652,14 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
 .gcard:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,.10); }
 .gcard:hover .img-zoom-hint { opacity: 1; }
 .gcard img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.gcard-removed { cursor: default; }
+.gcard-removed-inner {
+  height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 6px; padding: 14px; text-align: center; color: var(--muted);
+}
+.gcard-removed-title { font: 700 13px/1.2 Outfit, Inter, sans-serif; color: var(--text); }
+.gcard-removed-desc { font-size: 11px; line-height: 1.3; max-height: 2.6em; overflow: hidden; }
+.gcard-removed-inner .gact { position: static; width: auto; height: auto; padding: 5px 10px; border-radius: 999px; font: 600 11px/1 Outfit, Inter, sans-serif; }
 .gcard-actions { position: absolute; top: 8px; right: 8px; display: flex; gap: 6px; opacity: 0; transition: opacity .15s; }
 .gcard:hover .gcard-actions { opacity: 1; }
 .gact {
@@ -1989,16 +2009,34 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
 }
 .edit-overlay.open { display: flex; }
 .edit-modal {
-  background: var(--white); border-radius: var(--r-lg); width: 640px; max-width: 100%;
-  max-height: 88vh; overflow-y: auto; box-shadow: var(--shadow-lg); padding: 22px 24px;
+  background: var(--white); border-radius: var(--r-lg); width: min(1180px, 96vw); max-width: 100%;
+  max-height: 94vh; overflow-y: auto; box-shadow: var(--shadow-lg); padding: 22px 24px;
 }
 .edit-modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
-.edit-modal-body { display: flex; gap: 18px; }
-#editPreviewImg {
-  flex: 0 0 220px; width: 220px; height: 220px; object-fit: cover;
-  border-radius: var(--r-md); background: var(--bg); border: 1px solid var(--border-s);
+.edit-modal-body { display: flex; gap: 20px; align-items: flex-start; }
+.edit-canvas-col { flex: 1 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.edit-canvas-wrap {
+  position: relative; width: 100%; min-height: 260px; max-height: 64vh;
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+  background: var(--bg); border-radius: var(--r-md); border: 1px solid var(--border-s);
 }
-.edit-fields { flex: 1; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+#editPreviewImg {
+  display: block; max-width: 100%; max-height: 64vh; width: auto; height: auto;
+  object-fit: contain; user-select: none; -webkit-user-drag: none;
+}
+#editMaskCanvas {
+  position: absolute; cursor: crosshair; touch-action: none;
+}
+.edit-brush-toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.edit-tool-btn.on { background: linear-gradient(135deg, #7c3aed, #6366f1); border-color: transparent; color: #fff; }
+.edit-brush-size {
+  display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted);
+  padding: 0 10px;
+}
+.edit-brush-size input[type="range"] { width: 100px; accent-color: #7c3aed; }
+#editClearBtn:disabled { opacity: .45; cursor: not-allowed; }
+.edit-brush-hint { font-size: 11.5px; color: var(--muted); line-height: 1.5; }
+.edit-fields { flex: 0 0 300px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 .edit-textarea {
   width: 100%; min-height: 100px; padding: 10px 12px; border: 1px solid var(--border-s);
   border-radius: var(--r-sm); font: 400 13px/1.55 'Inter', sans-serif; color: var(--text);
@@ -2006,9 +2044,9 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
 }
 .edit-textarea:focus { border-color: var(--purple); box-shadow: 0 0 0 3px var(--purple-l); }
 .edit-note { font-size: 11.5px; color: var(--muted); line-height: 1.5; }
-@media (max-width: 560px) {
+@media (max-width: 900px) {
   .edit-modal-body { flex-direction: column; }
-  #editPreviewImg { width: 100%; flex-basis: auto; }
+  .edit-fields { flex-basis: auto; width: 100%; }
 }
 
 /* LOGIN GATE — fallback literals alongside every var() so the gate still renders
@@ -2300,6 +2338,7 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
     <div class="sidebar-spacer"></div>
     <div class="sidebar-user" id="sidebarUserWrap">
       <button type="button" class="sidebar-user-btn" id="sidebarUserBtn" onclick="toggleSidebarUserMenu(event)" title="">
+        <div class="sidebar-user-avatar" id="sidebarUserAvatar"></div>
         <div class="sidebar-user-info">
           <div class="sidebar-user-name" id="sidebarUserName"></div>
           <div class="sidebar-user-email" id="sidebarUserFullEmail"></div>
@@ -2924,7 +2963,31 @@ body.imagen-mode .action-row .btn-gen { flex: 1; justify-content: center; }
       </button>
     </div>
     <div class="edit-modal-body">
-      <img id="editPreviewImg" src="" alt="Image to edit">
+      <div class="edit-canvas-col">
+        <div class="edit-canvas-wrap" id="editCanvasWrap">
+          <img id="editPreviewImg" src="" alt="Image to edit">
+          <canvas id="editMaskCanvas"></canvas>
+        </div>
+        <div class="edit-brush-toolbar">
+          <button type="button" class="lb-tool edit-tool-btn on" id="editToolBrush" title="Brush" onclick="setEditTool('brush')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.06 11.9 8 15l3.1-1.06M9.06 11.9 18 3l3 3-8.94 8.94M9.06 11.9 3 20"/></svg>
+            <span>Brush</span>
+          </button>
+          <button type="button" class="lb-tool edit-tool-btn" id="editToolEraser" title="Eraser" onclick="setEditTool('eraser')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 20H8l-6-6a2 2 0 0 1 0-2.8L13.8 2.4a2 2 0 0 1 2.8 0l5 5a2 2 0 0 1 0 2.8L13.4 18.4"/></svg>
+            <span>Eraser</span>
+          </button>
+          <label class="edit-brush-size">
+            <span>Size</span>
+            <input type="range" id="editBrushSizeInput" min="8" max="70" value="26" oninput="setEditBrushSize(this.value)">
+          </label>
+          <button type="button" class="lb-tool" id="editClearBtn" title="Clear marks" onclick="clearEditMarks()" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            <span>Clear marks</span>
+          </button>
+        </div>
+        <div class="edit-brush-hint">Paint over the area(s) you want changed — the edit will be steered toward the marked region(s). Leave unmarked to edit the whole image.</div>
+      </div>
       <div class="edit-fields">
         <label class="adv-label">What would you like to change?</label>
         <textarea id="editInstruction" class="edit-textarea" placeholder="e.g. Change the shirt colour to navy blue, remove the laptop from the desk, make the background brighter…"></textarea>
@@ -3424,11 +3487,12 @@ function galleryCardTitle(item) {
 }
 
 function galleryCardLine(item) {
+  const creator = displayNameFromEmail(item.email);
   if (isVehicleHistoryItem(item)) {
     const v = getItemVehicleMeta(item) || {};
-    return [v.year, v.color].filter(Boolean).join(' · ') || '—';
+    return [v.year, v.color, creator].filter(Boolean).join(' · ') || '—';
   }
-  return [item.model, item.ratio].filter(Boolean).join(' · ') || '—';
+  return [item.model, item.ratio, creator].filter(Boolean).join(' · ') || '—';
 }
 
 function snapshotImagenPendingMeta() {
@@ -3509,6 +3573,22 @@ function removeHistoryItemById(id) {
     const arr = storeGet(kind).filter(x => x.id !== id);
     storeSet(kind, arr);
   });
+}
+
+/** Own item, or Admin — matches the server's /api/history/delete rule. */
+function canDeleteHistoryItem(item) {
+  return !!item && (item.email === getSessionEmail() || currentPermission === 'Admin');
+}
+
+/** Deletes the shared history row server-side, then drops it from local caches. */
+async function deleteHistoryItem(id) {
+  const res = await fetch('/api/history/delete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-session-token': getSessionToken() },
+    body: JSON.stringify({ id }),
+  });
+  if (!res.ok) throw new Error(parseApiError(res.status, await res.text()));
+  removeHistoryItemById(id);
 }
 
 function syncVehicleGalleryFilterOptions() {
@@ -3748,6 +3828,22 @@ function buildVehicleGalleryCard(item) {
     }
   };
   actions.appendChild(dl);
+  if (canDeleteHistoryItem(item)) {
+    const del = document.createElement('button');
+    del.className = 'btn-dl danger';
+    del.innerHTML = '<i class="cil-trash" aria-hidden="true"></i><span>Delete</span>';
+    del.onclick = async (e) => {
+      e.stopPropagation();
+      if (!confirm('Delete this image? This removes it from the shared library for everyone.')) return;
+      try {
+        await deleteHistoryItem(item.id);
+        renderVehicleGallery();
+      } catch (err) {
+        alert('Delete failed: ' + (err.message || err));
+      }
+    };
+    actions.appendChild(del);
+  }
   body.appendChild(actions);
   wrap.appendChild(body);
   return wrap;
@@ -3837,16 +3933,22 @@ function buildImagenGridCard(item) {
   };
   overlay.appendChild(coll);
 
-  const del = document.createElement('button');
-  del.className = 'gen-icon-btn danger';
-  del.title = 'Delete';
-  del.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
-  del.onclick = () => {
-    if (!confirm('Delete this image?')) return;
-    removeHistoryItemById(item.id);
-    renderVehicleGallery();
-  };
-  overlay.appendChild(del);
+  if (canDeleteHistoryItem(item)) {
+    const del = document.createElement('button');
+    del.className = 'gen-icon-btn danger';
+    del.title = 'Delete';
+    del.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
+    del.onclick = async () => {
+      if (!confirm('Delete this image? This removes it from the shared library for everyone.')) return;
+      try {
+        await deleteHistoryItem(item.id);
+        renderVehicleGallery();
+      } catch (err) {
+        alert('Delete failed: ' + (err.message || err));
+      }
+    };
+    overlay.appendChild(del);
+  }
 
   card.appendChild(overlay);
   return card;
@@ -3890,7 +3992,7 @@ function buildImagenBatchGroups(items) {
 
     const chips = document.createElement('div');
     chips.className = 'gen-batch-chips';
-    [head.ratio, head.model, head.res, relativeTimeLabel(head.ts)].filter(Boolean).forEach(text => {
+    [displayNameFromEmail(head.email), head.ratio, head.model, head.res, relativeTimeLabel(head.ts)].filter(Boolean).forEach(text => {
       const chip = document.createElement('span');
       chip.className = 'gen-chip';
       chip.textContent = text;
@@ -5301,6 +5403,9 @@ function navigateTo(view) {
   if (view === 'admin') loadAdminData();
   else if (view === 'tokens') loadApiTokens();
   else if (!showGenerate) renderGallery(view);
+  // Shared history — always pull the latest from the server when a view that
+  // shows it becomes active, so teammates' newest generations show up.
+  if (view === 'history' || showGenerate) refreshHistoryCache();
 }
 
 // ─── LIBRARY STORE (history / favourites / collections) ───────────────────────
@@ -5320,7 +5425,67 @@ const EMPTY_STATES = {
   },
 };
 
-function storeGet(kind) { try { return JSON.parse(localStorage.getItem(STORE_KEYS[kind])) || []; } catch { return []; } }
+// History is a shared, server-side library (every user's generations) rather
+// than a private per-browser localStorage array. storeGet/storeSet('history', …)
+// are redirected to this in-memory cache so every existing lookup/linking
+// helper (findItem, getLbRootItem, linkVariantOnRoot, etc.) keeps working
+// unmodified against the shared data. Favourites/Collections stay in
+// localStorage — those really are personal.
+let HISTORY_CACHE = [];
+
+function mapServerHistoryItem(row) {
+  const isMirror = row.kind === 'mirror';
+  const isEdit = row.kind === 'edit';
+  const isCutout = row.kind === 'no-bg';
+  const badge = isMirror ? 'Mirrored' : isEdit ? 'Edited' : isCutout ? 'No BG' : 'Original';
+  return {
+    id: row.id,
+    src: row.imageUrl,
+    localUrl: row.imageUrl,
+    sourceUrl: row.imageUrl,
+    imageData: { url: row.imageUrl, mime: row.mime || 'image/png', localUrl: row.imageUrl },
+    prompt: row.prompt || '',
+    fullPrompt: row.fullPrompt || row.prompt || '',
+    model: row.model || '',
+    modelId: row.modelId || '',
+    ratio: row.ratio || '',
+    res: row.res || '',
+    kind: row.vehicle ? 'vehicle' : 'generate',
+    vehicle: row.vehicle || null,
+    product: row.product || 'general',
+    batchId: row.batchId || null,
+    ts: row.ts,
+    email: row.email || '',
+    badge,
+    isMirror, isEdit, isCutout,
+    mirrorOf: isMirror ? row.variantOf : undefined,
+    editedFrom: isEdit ? row.variantOf : undefined,
+    cutoutOf: isCutout ? row.variantOf : undefined,
+    variantOf: row.variantOf || undefined,
+    rootId: row.variantOf || undefined,
+  };
+}
+
+async function refreshHistoryCache({ rerender = true } = {}) {
+  try {
+    const res = await fetch('/api/history?limit=200', {
+      headers: { 'x-session-token': getSessionToken() },
+    });
+    if (res.ok) {
+      const data = await res.json();
+      HISTORY_CACHE = (data.items || []).map(mapServerHistoryItem);
+    }
+  } catch (e) {
+    console.warn('Failed to load shared history', e);
+  }
+  if (rerender) refreshOpenView();
+  return HISTORY_CACHE;
+}
+
+function storeGet(kind) {
+  if (kind === 'history') return HISTORY_CACHE;
+  try { return JSON.parse(localStorage.getItem(STORE_KEYS[kind])) || []; } catch { return []; }
+}
 function slimHistoryItemForStorage(item) {
   // Keep metadata + durable /generated URL; drop huge base64 from localStorage (quota ~5MB).
   const slim = { ...item };
@@ -5345,6 +5510,7 @@ function slimHistoryItemForStorage(item) {
   return slim;
 }
 function storeSet(kind, arr) {
+  if (kind === 'history') { HISTORY_CACHE = arr; return true; }
   try {
     localStorage.setItem(STORE_KEYS[kind], JSON.stringify(arr));
     return true;
@@ -5364,7 +5530,16 @@ function inStore(kind, id) { return storeGet(kind).some(x => x.id === id); }
 function toggleStore(kind, item) {
   let arr = storeGet(kind);
   if (arr.some(x => x.id === item.id)) arr = arr.filter(x => x.id !== item.id);
-  else arr.unshift(item);
+  else {
+    // Favourites/Collections keep only a thin {id, cachedTitle, cachedTs}
+    // reference — the shared history row is the single source of truth for
+    // everything else, so a later edit/delete there can't leave a stale copy
+    // behind here. Rendered by resolving against HISTORY_CACHE (see
+    // renderGallery); an "Image removed" placeholder covers a missing id.
+    arr.unshift(kind === 'history'
+      ? item
+      : { id: item.id, cachedTitle: galleryCardTitle(item), cachedTs: item.ts || null });
+  }
   storeSet(kind, arr);
   return arr.some(x => x.id === item.id);
 }
@@ -5373,21 +5548,17 @@ let itemSeq = 0;
 function newItemId() { return 'img_' + (Date.now().toString(36)) + '_' + (itemSeq++); }
 
 function saveToHistory(item) {
-  if (item && item.id && item.src) imageSrcCache.set(item.id, item.src);
-  const arr = storeGet('history');
+  if (!item) return true;
+  if (item.id && item.src) imageSrcCache.set(item.id, item.src);
+  if (!item.email) item.email = getSessionEmail();
+  // Optimistic insert into the shared in-memory cache — the row is already
+  // durably saved server-side by the caller (persistImageDataForHistory /
+  // the remove-bg endpoint); this just makes it appear instantly without
+  // waiting on the next refreshHistoryCache() round-trip.
+  const arr = storeGet('history').filter(x => x.id !== item.id);
   arr.unshift(slimHistoryItemForStorage(item));
-  if (arr.length > 60) arr.length = 60;
-  const ok = storeSet('history', arr);
-  if (!ok && item) {
-    // Keep visible this session even if localStorage rejected the write
-    const existing = storeGet('history');
-    if (!existing.some(x => x.id === item.id)) {
-      try {
-        sessionStorage.setItem('acko_live_' + item.id, JSON.stringify(slimHistoryItemForStorage(item)));
-      } catch (_) { /* ignore */ }
-    }
-  }
-  return ok;
+  storeSet('history', arr);
+  return true;
 }
 
 // ─── GALLERY RENDER ───────────────────────────────────────────────────────────
@@ -5430,7 +5601,12 @@ function renderGallery(kind) {
   const clearBtn = document.getElementById(kind + 'ClearBtn');
   const searchEl = document.getElementById(kind + 'Search');
   const query = (searchEl && searchEl.value || '').trim().toLowerCase();
-  let allItems = storeGet(kind);
+  // Favourites/Collections hold thin {id,cachedTitle,cachedTs} refs — resolve
+  // each against the shared history cache; a missing id renders as a small
+  // "Image removed" placeholder instead of a broken/blank card.
+  let allItems = kind === 'history'
+    ? storeGet(kind)
+    : storeGet(kind).map(ref => findItem(ref.id) || { id: ref.id, removed: true, cachedTitle: ref.cachedTitle, ts: ref.cachedTs });
 
   // Apply history filter (Imagen = all, Vechilegen = motor only)
   if (kind === 'history' && historyFilter === 'motor') {
@@ -5461,6 +5637,15 @@ function renderGallery(kind) {
   }
 
   grid.innerHTML = items.map(it => {
+    if (it.removed) {
+      return `<div class="gcard gcard-removed">
+        <div class="gcard-removed-inner">
+          <div class="gcard-removed-title">Image removed</div>
+          <div class="gcard-removed-desc">${esc(it.cachedTitle || '')}</div>
+          <button class="gact" title="Remove this reference" onclick="dismissRemovedRef('${kind}','${it.id}')">Dismiss</button>
+        </div>
+      </div>`;
+    }
     const fav = inStore('favourites', it.id);
     const coll = inStore('collections', it.id);
     const tags = deriveTags(it).slice(0, 3);
@@ -5759,10 +5944,20 @@ function cardToggle(kind, id, currentView, btn) {
   else if (currentView !== kind) { /* just update counts if that view later opens */ }
 }
 
-// Find an item across all stores (history is the superset, but check all)
+function dismissRemovedRef(kind, id) {
+  storeSet(kind, storeGet(kind).filter(x => x.id !== id));
+  renderGallery(kind);
+}
+
+// Resolve a full item by id. History is the only store of full items now —
+// Favourites/Collections hold thin {id,cachedTitle,cachedTs} refs (see
+// toggleStore), so only trust a favourites/collections hit that still has
+// real image data (a legacy full-copy entry from before this change).
 function findItem(id) {
-  for (const kind of ['history', 'favourites', 'collections']) {
-    const found = storeGet(kind).find(x => x.id === id);
+  const inHistory = storeGet('history').find(x => x.id === id);
+  if (inHistory) return inHistory;
+  for (const kind of ['favourites', 'collections']) {
+    const found = storeGet(kind).find(x => x.id === id && x.src);
     if (found) return found;
   }
   return null;
@@ -6412,7 +6607,16 @@ async function lbMirrorImage() {
     'and the current exterior left/right body orientation exactly.';
 
   const saveMirrorItem = async (imageData, fullPromptNote) => {
-    const persisted = await persistImageDataForHistory(imageData, { kind: 'mirror' });
+    const persisted = await persistImageDataForHistory(imageData, {
+      kind: 'mirror',
+      meta: {
+        prompt: `${root.prompt || ''} — mirrored`,
+        full_prompt: `${root.fullPrompt || root.prompt || ''}\n\n[Mirror] ${fullPromptNote}`,
+        model: root.model, model_id: root.modelId, ratio: root.ratio, resolution: root.res || '',
+        variant_of: root.id, product: root.product || 'general',
+        vehicle: root.vehicle || null,
+      },
+    });
     const src = persisted
       ? persisted.src
       : (imageData.b64
@@ -6420,7 +6624,7 @@ async function lbMirrorImage() {
         : proxiedImageUrl(imageData.url));
     if (!src) throw new Error('No mirrored image returned.');
     const mirrorItem = {
-      id: newItemId(),
+      id: (persisted && persisted.historyId) || newItemId(),
       src,
       localUrl: (persisted && persisted.localUrl) || '',
       sourceUrl: (persisted && persisted.sourceUrl) || imageData.url || '',
@@ -6574,6 +6778,11 @@ async function lbRegenerate() {
     const imageData = await doRegenerate(item);
     const persisted = await persistImageDataForHistory(imageData, {
       kind: item.kind === 'vehicle' || item.vehicle ? 'vehicle-regen' : 'regen',
+      meta: {
+        prompt: item.prompt, full_prompt: item.fullPrompt, model: item.model, model_id: item.modelId,
+        ratio: item.ratio, resolution: item.res || '', product: item.product || 'general',
+        vehicle: item.vehicle || null,
+      },
     });
     const src = persisted
       ? persisted.src
@@ -6582,7 +6791,7 @@ async function lbRegenerate() {
         : proxiedImageUrl(imageData.url));
     if (!src) throw new Error('No image returned.');
     const newItem = {
-      id: newItemId(),
+      id: (persisted && persisted.historyId) || newItemId(),
       src,
       localUrl: (persisted && persisted.localUrl) || '',
       sourceUrl: (persisted && persisted.sourceUrl) || imageData.url || '',
@@ -6623,17 +6832,162 @@ function refreshOpenView() {
 
 // ─── EDIT IMAGE ───────────────────────────────────────────────────────────────
 let editItem = null;
+
+// Brush mark-up — there's no true inpainting/mask API here (Magnific/Nano Banana
+// are prompt + reference-image edit models, not mask-based inpainting), so the
+// brush works by baking translucent marks onto a copy of the source image and
+// sending that as a second reference with an instruction to only change the
+// marked area. See doRegenerateEdit's markupDataUri handling.
+let editTool = 'brush';
+let editBrushSize = 26;
+let editHasMarks = false;
+let editDrawing = false;
+let editLastPt = null;
+
+function editMaskCtx() {
+  const canvas = document.getElementById('editMaskCanvas');
+  return canvas ? canvas.getContext('2d') : null;
+}
+
+/** Sizes/positions the overlay canvas to exactly match the rendered <img> box,
+ * and (re)sizes its backing store to the image's natural resolution so brush
+ * marks composite pixel-accurately into the final reference image later. */
+function layoutEditCanvas() {
+  const img = document.getElementById('editPreviewImg');
+  const wrap = document.getElementById('editCanvasWrap');
+  const canvas = document.getElementById('editMaskCanvas');
+  if (!img || !wrap || !canvas || !img.naturalWidth) return;
+  const wrapRect = wrap.getBoundingClientRect();
+  const imgRect = img.getBoundingClientRect();
+  canvas.style.left = (imgRect.left - wrapRect.left) + 'px';
+  canvas.style.top = (imgRect.top - wrapRect.top) + 'px';
+  canvas.style.width = imgRect.width + 'px';
+  canvas.style.height = imgRect.height + 'px';
+  if (canvas.width !== img.naturalWidth || canvas.height !== img.naturalHeight) {
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+  }
+}
+
+function resetEditCanvas() {
+  editHasMarks = false;
+  editDrawing = false;
+  editLastPt = null;
+  const canvas = document.getElementById('editMaskCanvas');
+  if (canvas && canvas.width && canvas.height) {
+    const ctx = editMaskCtx();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+  const clearBtn = document.getElementById('editClearBtn');
+  if (clearBtn) clearBtn.disabled = true;
+}
+function clearEditMarks() { resetEditCanvas(); }
+
+function setEditTool(tool) {
+  editTool = tool;
+  document.getElementById('editToolBrush').classList.toggle('on', tool === 'brush');
+  document.getElementById('editToolEraser').classList.toggle('on', tool === 'eraser');
+}
+function setEditBrushSize(v) { editBrushSize = Number(v) || 26; }
+
+function editCanvasPoint(e, canvas) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: (e.clientX - rect.left) / rect.width * canvas.width,
+    y: (e.clientY - rect.top) / rect.height * canvas.height,
+    lineWidth: editBrushSize * (canvas.width / rect.width),
+  };
+}
+function editStrokeTo(pt, from) {
+  const ctx = editMaskCtx();
+  if (!ctx) return;
+  ctx.globalCompositeOperation = editTool === 'eraser' ? 'destination-out' : 'source-over';
+  ctx.strokeStyle = 'rgba(255,45,85,0.55)';
+  ctx.fillStyle = 'rgba(255,45,85,0.55)';
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = pt.lineWidth;
+  if (from) {
+    ctx.beginPath();
+    ctx.moveTo(from.x, from.y);
+    ctx.lineTo(pt.x, pt.y);
+    ctx.stroke();
+  } else {
+    ctx.beginPath();
+    ctx.arc(pt.x, pt.y, pt.lineWidth / 2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+function editPointerDown(e) {
+  e.preventDefault();
+  layoutEditCanvas();
+  const canvas = e.currentTarget;
+  canvas.setPointerCapture(e.pointerId);
+  editDrawing = true;
+  editHasMarks = true;
+  const clearBtn = document.getElementById('editClearBtn');
+  if (clearBtn) clearBtn.disabled = false;
+  editLastPt = editCanvasPoint(e, canvas);
+  editStrokeTo(editLastPt, null);
+}
+function editPointerMove(e) {
+  if (!editDrawing) return;
+  e.preventDefault();
+  const pt = editCanvasPoint(e, e.currentTarget);
+  editStrokeTo(pt, editLastPt);
+  editLastPt = pt;
+}
+function editPointerUp() { editDrawing = false; editLastPt = null; }
+
+function wireEditCanvas() {
+  const canvas = document.getElementById('editMaskCanvas');
+  if (!canvas || canvas.dataset.wired === '1') return;
+  canvas.dataset.wired = '1';
+  canvas.addEventListener('pointerdown', editPointerDown);
+  canvas.addEventListener('pointermove', editPointerMove);
+  canvas.addEventListener('pointerup', editPointerUp);
+  canvas.addEventListener('pointerleave', editPointerUp);
+  window.addEventListener('resize', () => {
+    if (document.getElementById('editOverlay').classList.contains('open')) layoutEditCanvas();
+  });
+}
+
+/** Bakes the brush marks onto a copy of the source image at full resolution,
+ * for use as the "where to edit" reference sent alongside the clean source. */
+function buildEditMarkupDataUri() {
+  const img = document.getElementById('editPreviewImg');
+  const maskCanvas = document.getElementById('editMaskCanvas');
+  const out = document.createElement('canvas');
+  out.width = img.naturalWidth;
+  out.height = img.naturalHeight;
+  const ctx = out.getContext('2d');
+  ctx.drawImage(img, 0, 0, out.width, out.height);
+  ctx.drawImage(maskCanvas, 0, 0, out.width, out.height);
+  return out.toDataURL('image/png');
+}
+
 function openEditModal() {
   if (!lbItem) return;
   editItem = lbItem;
-  document.getElementById('editPreviewImg').src = resolveItemImageSrc(editItem) || editItem.src || '';
+  const img = document.getElementById('editPreviewImg');
+  img.src = resolveItemImageSrc(editItem) || editItem.src || '';
   document.getElementById('editInstruction').value = '';
   document.getElementById('editNote').textContent = "Edits are saved next to the original (and mirror) in this car's version strip.";
   document.getElementById('editApplyBtn').textContent = 'Apply Edit';
   document.getElementById('editApplyBtn').disabled = false;
+  setEditTool('brush');
+  document.getElementById('editBrushSizeInput').value = editBrushSize;
+  resetEditCanvas();
+  wireEditCanvas();
+  img.onload = layoutEditCanvas;
+  if (img.complete && img.naturalWidth) layoutEditCanvas();
   document.getElementById('editOverlay').classList.add('open');
 }
-function closeEditModal() { document.getElementById('editOverlay').classList.remove('open'); editItem = null; }
+function closeEditModal() {
+  document.getElementById('editOverlay').classList.remove('open');
+  editItem = null;
+  resetEditCanvas();
+}
 
 function ratioValueFromLabel(label) {
   const opt = [...document.getElementById('ratioSelect').options].find(o => o.dataset.label === label);
@@ -6651,8 +7005,19 @@ async function applyEdit() {
 
   try {
     const root = getLbRootItem(editItem) || editItem;
-    const imageData = await doRegenerateEdit(editItem, instruction);
-    const persisted = await persistImageDataForHistory(imageData, { kind: 'edit' });
+    const markupDataUri = editHasMarks ? buildEditMarkupDataUri() : null;
+    const imageData = await doRegenerateEdit(editItem, instruction, { markupDataUri });
+    const persisted = await persistImageDataForHistory(imageData, {
+      kind: 'edit',
+      meta: {
+        prompt: `${root.prompt || editItem.prompt} — edited: ${instruction}`,
+        full_prompt: `${editItem.fullPrompt || editItem.prompt || ''} Additional edit instruction: ${instruction}.`,
+        model: editItem.model || root.model, model_id: editItem.modelId || root.modelId,
+        ratio: editItem.ratio || root.ratio, variant_of: root.id,
+        product: root.product || editItem.product || 'general',
+        vehicle: root.vehicle || editItem.vehicle || null,
+      },
+    });
     const src = persisted
       ? persisted.src
       : (imageData.b64
@@ -6661,7 +7026,7 @@ async function applyEdit() {
     if (!src) throw new Error('No edited image returned.');
 
     const newItem = {
-      id: newItemId(),
+      id: (persisted && persisted.historyId) || newItemId(),
       src,
       localUrl: (persisted && persisted.localUrl) || '',
       sourceUrl: (persisted && persisted.sourceUrl) || imageData.url || '',
@@ -6754,6 +7119,17 @@ async function doRegenerateEdit(item, instruction, opts = {}) {
   }
   const mime = normalizeMagnificRefMime(mimeFromDataUri(sourceUri)) || 'image/png';
 
+  // Brush mark-up (optional): a copy of the SOURCE with translucent red brush
+  // strokes showing exactly where to edit. There's no true mask/inpainting API
+  // here, so this is sent as a second reference image with steering text —
+  // best-effort spatial guidance for the diffusion model, not a hard mask.
+  let markupUri = null;
+  let markupMime = null;
+  if (opts.markupDataUri) {
+    markupUri = await compressDataUriForReference(opts.markupDataUri, 900 * 1024);
+    markupMime = normalizeMagnificRefMime(mimeFromDataUri(markupUri)) || 'image/png';
+  }
+
   // Mirror / edit must use the *generated car* as reference — not a full text regen
   // with the universal base ref (that redesigns the car and blocks mirroring).
   let combinedPrompt;
@@ -6767,9 +7143,13 @@ async function doRegenerateEdit(item, instruction, opts = {}) {
     );
   } else {
     const fullPrompt = item.fullPrompt || item.prompt || '';
+    const markupNote = markupUri
+      ? ' A MARKUP reference image is also attached — identical to the SOURCE image but with translucent red brush strokes over the exact region(s) to change. Apply the edit instruction ONLY inside the marked/highlighted region(s); every other pixel must stay identical to the SOURCE image (same composition, lighting, and unrelated details). Do not reproduce the red marks in the output.'
+      : '';
     combinedPrompt = clampPromptForApi(
       `${fullPrompt} Additional edit instruction: ${instruction}. ` +
-      'Use the attached SOURCE image as the exact vehicle to edit — preserve identity and composition unless the edit requires a change.'
+      'Use the attached SOURCE image as the exact vehicle to edit — preserve identity and composition unless the edit requires a change.' +
+      markupNote
     );
   }
 
@@ -6782,18 +7162,27 @@ async function doRegenerateEdit(item, instruction, opts = {}) {
     }
   }
 
+  const referenceImages = [
+    {
+      image: sourceUri,
+      mime_type: mime,
+      text: isMirror
+        ? 'SOURCE IMAGE (primary): already left/right flipped vehicle exterior. Do NOT flip body again. CRITICAL: brand logos/badges/emblems/centre-caps MUST NOT remain mirrored — restore real OEM orientation so the brand is recognizable (backwards logo = fail). INDIA RHD: steering wheel + driver controls on the RIGHT through the windscreen. Plain white blank plates. No model-name lettering. Preserve paint, identity, lighting, transparency, ground shadow, exterior orientation.'
+        : 'SOURCE IMAGE (primary): the exact previously generated image to edit. Preserve vehicle identity and details; apply only the edit instruction.',
+    },
+  ];
+  if (markupUri) {
+    referenceImages.push({
+      image: markupUri,
+      mime_type: markupMime,
+      text: 'MARKUP REFERENCE: same as the SOURCE image but with translucent red brush marks showing exactly which region(s) the user wants edited. The marks are only a location guide — do not reproduce them in the output. Only change pixels inside the marked region(s); leave everything else pixel-identical to the SOURCE image.',
+    });
+  }
+
   return doAsync(model, combinedPrompt, DEFAULT_NEG, ratioValue, '2K', 1.2, undefined, 'edit', {
     skipVehicleRef: true,
     aspectColon,
-    referenceImages: [
-      {
-        image: sourceUri,
-        mime_type: mime,
-        text: isMirror
-          ? 'SOURCE IMAGE (primary): already left/right flipped vehicle exterior. Do NOT flip body again. CRITICAL: brand logos/badges/emblems/centre-caps MUST NOT remain mirrored — restore real OEM orientation so the brand is recognizable (backwards logo = fail). INDIA RHD: steering wheel + driver controls on the RIGHT through the windscreen. Plain white blank plates. No model-name lettering. Preserve paint, identity, lighting, transparency, ground shadow, exterior orientation.'
-          : 'SOURCE IMAGE (primary): the exact previously generated image to edit. Preserve vehicle identity and details; apply only the edit instruction.',
-      },
-    ],
+    referenceImages,
   });
 }
 
@@ -6844,9 +7233,12 @@ function hideLoginGate(email) {
   const resolvedEmail = email || getSessionEmail();
   const nameEl = document.getElementById('sidebarUserName');
   const emailEl = document.getElementById('sidebarUserFullEmail');
+  const avatarEl = document.getElementById('sidebarUserAvatar');
   const btn = document.getElementById('sidebarUserBtn');
-  if (nameEl) nameEl.textContent = displayNameFromEmail(resolvedEmail);
+  const displayName = displayNameFromEmail(resolvedEmail);
+  if (nameEl) nameEl.textContent = displayName;
   if (emailEl) emailEl.textContent = resolvedEmail;
+  if (avatarEl) avatarEl.textContent = (displayName || resolvedEmail || '?').charAt(0).toUpperCase();
   if (btn) btn.title = resolvedEmail;
 }
 function showLoginForm() {
@@ -6895,6 +7287,7 @@ async function submitLogin() {
     setSession(data.token, data.email);
     applyPermission(data.permission);
     hideLoginGate(data.email);
+    refreshHistoryCache();
   } catch (e) {
     errEl.textContent = e.message.includes('fetch')
       ? 'Could not reach the local proxy. Is proxy.py running?'
@@ -6929,6 +7322,7 @@ async function checkSession() {
       applyPermission(data.permission);
       hideLoginGate(data.email);
       loadCharacterLibrary();
+      refreshHistoryCache();
       if (location.hash === '#admin') navigateTo('admin'); // no-op if not an Admin
     } else {
       clearSession();
@@ -7597,11 +7991,12 @@ async function blobToPersisted(blob, sourceUrl) {
 }
 
 /** Save image bytes to server ./generated (local disk; S3 later). */
-async function saveGeneratedToLocalDisk({ b64, mime, url, kind }) {
+async function saveGeneratedToLocalDisk({ b64, mime, url, kind, meta }) {
   const body = { kind: kind || (genMode === 'vehicle' ? 'vehicle' : 'generate'), mime: mime || 'image/png' };
   if (b64) body.image_b64 = String(b64).startsWith('data:') ? b64 : `data:${body.mime};base64,${b64}`;
   else if (url) body.image_url = url;
   else return null;
+  if (meta) Object.assign(body, meta);
   const res = await fetch('/api/generated/save', {
     method: 'POST',
     headers: {
@@ -7664,7 +8059,9 @@ async function persistImageDataForHistory(imageData, opts = {}) {
       mime: (persisted.imageData && persisted.imageData.mime) || 'image/png',
       url: persisted.sourceUrl || (imageData && imageData.url) || '',
       kind,
+      meta: opts.meta,
     });
+    if (saved && saved.history_id) persisted.historyId = saved.history_id;
     if (saved && saved.url) {
       persisted.localUrl = saved.url;
       persisted.localPath = saved.path;
@@ -7686,7 +8083,15 @@ async function persistImageDataForHistory(imageData, opts = {}) {
 }
 
 async function showImage(idx, imageData, pendingId) {
-  const persisted = await persistImageDataForHistory(imageData);
+  const persisted = await persistImageDataForHistory(imageData, {
+    meta: {
+      prompt: lastGenMeta.prompt, full_prompt: lastGenMeta.fullPrompt,
+      model: lastGenMeta.model, model_id: lastGenMeta.modelId,
+      ratio: lastGenMeta.ratio, resolution: lastGenMeta.res || '',
+      batch_id: lastGenMeta.batchId || null, product: state.product || 'general',
+      vehicle: lastGenMeta.vehicle || null,
+    },
+  });
 
   if (!persisted && !imageData) {
     if (pendingId) finishVehicleGalleryPending(pendingId);
@@ -7709,7 +8114,7 @@ async function showImage(idx, imageData, pendingId) {
   // Persist to history — keep both the short display prompt and the exact full
   // master-compliant prompt actually sent to the API, so Edit/Regenerate can reuse it.
   const item = {
-    id: newItemId(),
+    id: (persisted && persisted.historyId) || newItemId(),
     src,
     localUrl: (persisted && persisted.localUrl) || (src && String(src).startsWith('/generated/') ? src : ''),
     sourceUrl: (persisted && persisted.sourceUrl) || imageData.url || '',
@@ -7879,9 +8284,12 @@ async function removeBackgroundForItem(item, opts = {}) {
       'Content-Type': 'application/json',
       'x-session-token': getSessionToken(),
     },
-    body: JSON.stringify(imageB64
-      ? { image_b64: imageB64 }
-      : { image_url: imageUrl }),
+    body: JSON.stringify({
+      ...(imageB64 ? { image_b64: imageB64 } : { image_url: imageUrl }),
+      variant_of: root.id || item.id || null,
+      product: root.product || item.product || 'general',
+      vehicle: root.vehicle || item.vehicle || null,
+    }),
   });
   if (!res.ok) {
     throw new Error(parseApiError(res.status, await res.text()));
@@ -7893,7 +8301,7 @@ async function removeBackgroundForItem(item, opts = {}) {
     || `data:${data.mime || 'image/png'};base64,${data.b64}`;
 
   const cutoutItem = {
-    id: newItemId(),
+    id: data.history_id || newItemId(),
     src: finalSrc,
     localUrl: data.local_url || '',
     sourceUrl: '',

@@ -26,6 +26,7 @@ import catalogue_validation
 import catalogue_prompt_builder
 import acko_mcp_server
 import character_store
+import history_store
 
 PORT = int(os.environ.get("PORT", 3458))
 MAGNIFIC_BASE = "https://api.magnific.com"
@@ -403,6 +404,7 @@ if _bootstrap_admin_emails:
 
 catalogue_db.init_db()
 character_store.init_db()
+history_store.init_db()
 
 
 def get_session_secret():
@@ -628,7 +630,13 @@ class ProxyHandler(BaseHTTPRequestHandler):
             # Best-effort — an MCP-originated image should be as visible/auditable
             # to admins as a web-app one, but a save hiccup shouldn't fail the call.
             try:
-                save_generated_bytes(base64.b64decode(b64), mime="image/png", kind="mcp-generate", email=email)
+                saved = save_generated_bytes(base64.b64decode(b64), mime="image/png", kind="mcp-generate", email=email)
+                history_store.add_history_row(
+                    email, saved["url"], "image/png", kind="mcp-generate",
+                    prompt=scene, full_prompt=prompt, model=model,
+                    ratio=args.get("ratio", "16:9"), resolution=args.get("resolution", ""),
+                    product=str(args.get("product", "general")),
+                )
             except Exception as ex:
                 print(f"  MCP save-to-gallery failed (non-fatal): {ex}")
 
@@ -1010,6 +1018,32 @@ class ProxyHandler(BaseHTTPRequestHandler):
             self.send_cors()
             self.end_headers()
             self.wfile.write(img_bytes)
+            return
+
+        # Shared generation history — every user's generations, most-recent-first.
+        # Cursor-paginated via before_ts (epoch ms, exclusive) so a growing shared
+        # library never forces one giant response.
+        if path_no_query == "/api/history":
+            ok, email = verify_session(self.headers.get("x-session-token", ""))
+            if not ok:
+                self.send_json(401, {"error": "Not signed in. Please sign in with your acko.tech email."})
+                return
+            perm_ok, perm_err = require_permission(email, user_store.IMAGE_GEN_ALLOWED)
+            if not perm_ok:
+                self.send_json(403, perm_err)
+                return
+            qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+            try:
+                limit = min(300, max(1, int((qs.get("limit") or ["150"])[0])))
+            except ValueError:
+                limit = 150
+            before_ts = (qs.get("before_ts") or [""])[0]
+            try:
+                before_ts = int(before_ts) if before_ts else None
+            except ValueError:
+                before_ts = None
+            items = history_store.list_history(limit=limit, before_ts=before_ts)
+            self.send_json(200, {"items": items, "you": email})
             return
 
         # ── Vehicle catalogue (new, sourced relational data — separate from the
@@ -1398,6 +1432,38 @@ class ProxyHandler(BaseHTTPRequestHandler):
             self.send_json(200, {"ok": True})
             return
 
+        # Shared history — delete your own item, or (Admin) anyone's. Closer to
+        # /account/tokens/revoke's self-service model than the Admin-only
+        # character delete: nothing else references a history row by id, so
+        # letting people clean up their own noise while Admins moderate the
+        # rest fits a shared gallery better than an Admin-only landmine.
+        if self.path == "/api/history/delete":
+            ok, email = verify_session(self.headers.get("x-session-token", ""))
+            if not ok:
+                self.send_json(401, {"error": "Not signed in. Please sign in with your acko.tech email."})
+                return
+            length = int(self.headers.get("Content-Length", 0))
+            try:
+                data = json.loads(self.rfile.read(length) or b"{}")
+            except Exception:
+                self.send_json(400, {"error": "Invalid request body."})
+                return
+            hist_id = str(data.get("id", "")).strip()
+            row = history_store.get_history_row(hist_id)
+            if row is None:
+                self.send_json(404, {"error": "No such history item."})
+                return
+            if row["email"] != email and user_store.get_permission(email) != "Admin":
+                self.send_json(403, {"error": "You can only delete your own history items."})
+                return
+            try:
+                history_store.delete_history_row(hist_id)
+            except ValueError as e:
+                self.send_json(400, {"error": str(e)})
+                return
+            self.send_json(200, {"ok": True})
+            return
+
         # Persist any generation / edit / cutout to ./generated (local disk; S3 later).
         if self.path == "/api/generated/save":
             ok, email = verify_session(self.headers.get("x-session-token", ""))
@@ -1418,6 +1484,16 @@ class ProxyHandler(BaseHTTPRequestHandler):
             mime = str(data.get("mime") or "image/png").strip() or "image/png"
             image_b64 = str(data.get("image_b64") or "").strip()
             image_url = str(data.get("image_url") or "").strip()
+            hist_prompt = str(data.get("prompt") or "")
+            hist_full_prompt = str(data.get("full_prompt") or "")
+            hist_model = str(data.get("model") or "")
+            hist_model_id = str(data.get("model_id") or "")
+            hist_ratio = str(data.get("ratio") or "")
+            hist_resolution = str(data.get("resolution") or "")
+            hist_batch_id = data.get("batch_id") or None
+            hist_variant_of = data.get("variant_of") or None
+            hist_product = str(data.get("product") or "")
+            hist_vehicle = data.get("vehicle") if isinstance(data.get("vehicle"), dict) else None
             raw = None
             if image_b64.startswith("data:"):
                 try:
@@ -1457,6 +1533,17 @@ class ProxyHandler(BaseHTTPRequestHandler):
             except Exception as ex:
                 self.send_json(500, {"error": f"Failed to save generated image: {ex}"})
                 return
+            try:
+                saved["history_id"] = history_store.add_history_row(
+                    email, saved["url"], mime, kind=kind,
+                    prompt=hist_prompt, full_prompt=hist_full_prompt,
+                    model=hist_model, model_id=hist_model_id,
+                    ratio=hist_ratio, resolution=hist_resolution,
+                    batch_id=hist_batch_id, variant_of=hist_variant_of,
+                    product=hist_product, vehicle=hist_vehicle,
+                )
+            except Exception as ex:
+                _log_gen_debug(f"history row insert failed: {ex}")
             self.send_json(200, saved)
             return
 
@@ -1537,6 +1624,17 @@ class ProxyHandler(BaseHTTPRequestHandler):
                 saved = save_generated_bytes(png_bytes, mime="image/png", kind="no-bg", email=email)
             except Exception as ex:
                 _log_gen_debug(f"local save (no-bg) failed: {ex}")
+            history_id = None
+            if saved:
+                try:
+                    history_id = history_store.add_history_row(
+                        email, saved["url"], "image/png", kind="no-bg",
+                        variant_of=data.get("variant_of") or None,
+                        product=str(data.get("product") or ""),
+                        vehicle=data.get("vehicle") if isinstance(data.get("vehicle"), dict) else None,
+                    )
+                except Exception as ex:
+                    _log_gen_debug(f"history row insert failed (no-bg): {ex}")
             payload = {
                 "b64": base64.b64encode(png_bytes).decode("ascii"),
                 "mime": "image/png",
@@ -1549,6 +1647,8 @@ class ProxyHandler(BaseHTTPRequestHandler):
                 payload["local_url"] = saved["url"]
                 payload["local_path"] = saved["path"]
                 payload["local_filename"] = saved["filename"]
+            if history_id:
+                payload["history_id"] = history_id
             self.send_json(200, payload)
             return
 
