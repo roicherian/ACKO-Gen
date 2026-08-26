@@ -82,6 +82,8 @@ body {
 .vehicle-car-panel-label {
   font-size: 12px; font-weight: 700; color: var(--text); letter-spacing: .02em;
 }
+.vehicle-car-panel-label.vcpl-icon { display: flex; align-items: center; gap: 8px; }
+.vehicle-car-panel-label.vcpl-icon svg { width: 16px; height: 16px; color: var(--purple); flex-shrink: 0; }
 .vehicle-car-panel-meta { font-size: 11px; color: var(--muted); }
 .vehicle-select-row {
   display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
@@ -214,6 +216,9 @@ body.imagen-mode .btn-action {
   color: #cfcfd8;
   border-radius: 999px;
   box-shadow: none;
+}
+body.imagen-mode .btn-action.btn-enhance {
+  color: #c4b5fd; border-color: rgba(196,181,253,.4); background: rgba(124,58,237,.14);
 }
 body.imagen-mode .btn-action:hover {
   border-color: rgba(196,181,253,.45);
@@ -1160,7 +1165,9 @@ svg.sel-icon {
 }
 .btn-icon-sq svg { width: 14px; height: 14px; }
 .btn-icon-sq:hover { border-color: var(--purple); color: var(--purple); }
-.imagen-enhance-row { padding: 0 16px 14px; display: flex; justify-content: flex-end; }
+.imagen-enhance-row { padding: 0 16px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.btn-enhance { color: var(--purple); border-color: rgba(196,181,253,.4); background: var(--purple-pale, rgba(124,58,237,.08)); }
+.enhance-hint { font-size: 11.5px; color: var(--vg-muted, var(--muted)); }
 /* Legacy non-studio layout only — studio-ui uses Vehiclegen-style footer */
 body:not(.studio-ui):not(.vehicle-mode) .prompt-footer {
   flex-direction: column;
@@ -1222,10 +1229,11 @@ body.imagen-mode .action-row .btn-gen { flex: 0 0 auto; justify-content: center;
 /* REFERENCES row (Style / Character / Add) */
 .ref-row { padding: 14px 16px 4px; }
 .ref-row-head {
-  display: flex; align-items: center; justify-content: space-between;
-  font: 700 11px/1 var(--font-family); letter-spacing: .08em; text-transform: uppercase;
-  color: var(--vg-muted, var(--muted)); margin-bottom: 10px;
+  display: flex; align-items: baseline; justify-content: flex-start; gap: 6px;
+  font: 700 13px/1 var(--font-family);
+  color: var(--vg-text, var(--text)); margin-bottom: 10px;
 }
+.ref-row-head .ref-count { font: 500 12px/1 var(--font-family); color: var(--vg-muted, var(--muted)); }
 .ref-pills { display: flex; gap: 10px; }
 .ref-pill {
   flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;
@@ -2408,7 +2416,7 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
   <main class="center">
     <div class="center-head">
       <div>
-        <div class="center-title" id="genTitle">Imagen</div>
+        <div class="center-title" id="genTitle">Image</div>
         <div class="center-sub" id="genSub">Create brand-compliant images with AI</div>
       </div>
     </div>
@@ -2427,7 +2435,10 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
         <!-- Imagen: model / res / count / aspect — same in-box chrome as Vehiclegen -->
         <div id="imagenConfigPanel" class="vehicle-car-panel imagen-config-panel">
           <div class="vehicle-car-panel-head">
-            <div class="vehicle-car-panel-label">Generation Settings</div>
+            <div class="vehicle-car-panel-label vcpl-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2" fill="currentColor" stroke="none"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="15" cy="12" r="2" fill="currentColor" stroke="none"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="11" cy="18" r="2" fill="currentColor" stroke="none"/></svg>
+              <span>Generation Settings</span>
+            </div>
             <div class="vehicle-car-panel-meta" id="imagenConfigMeta">Model · resolution · count · aspect</div>
           </div>
           <div class="vehicle-select-row imagen-select-row" id="resRatioRow">
@@ -2486,7 +2497,7 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
           <div class="ref-row">
             <div class="ref-row-head">
               <span>References</span>
-              <span id="refCount">0/16</span>
+              <span class="ref-count">(<span id="refCount">0/16</span>)</span>
             </div>
             <div class="ref-pills">
               <button type="button" class="ref-pill" id="refStyleBtn" onclick="openReferencePicker('style')">
@@ -2499,7 +2510,7 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
               </button>
               <button type="button" class="ref-pill" id="refAddBtn" onclick="openReferencePicker('custom')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                <span>Add</span>
+                <span>Add Reference</span>
               </button>
               <input type="file" id="refFileInput" accept="image/png,image/jpeg,image/webp" hidden onchange="onRefFileSelected(event)">
             </div>
@@ -2647,10 +2658,11 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
         </div>
 
         <div class="imagen-enhance-row">
-          <button class="btn-action" onclick="enhancePrompt()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          <button class="btn-action btn-enhance" onclick="enhancePrompt()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6L12 3z"/><path d="M19 14l.8 2.2L22 17l-2.2.8L19 20l-.8-2.2L16 17l2.2-.8L19 14z"/></svg>
             Enhance Prompt
           </button>
+          <span class="enhance-hint">Improve clarity and detail with AI</span>
         </div>
 
         <!-- Enhanced Prompt (same plain look as the Prompt tab — no separate header/badge) -->
@@ -2670,9 +2682,9 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
 
     <!-- Action buttons -->
     <div class="action-row">
-      <button class="btn-gen" id="genBtn" onclick="handleGenBtnClick()" title="Generate" aria-label="Generate">
-        <span class="btn-gen-icon" id="genBtnIcon"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="7 4 20 12 7 20"/></svg></span>
-        <span id="genBtnLabel">Generate</span>
+      <button class="btn-gen" id="genBtn" onclick="handleGenBtnClick()" title="Generate Image" aria-label="Generate Image">
+        <span class="btn-gen-icon" id="genBtnIcon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8L12 2z"/><path d="M18 14l.9 2.1L21 17l-2.1.9L18 20l-.9-2.1L15 17l2.1-.9L18 14z"/></svg></span>
+        <span id="genBtnLabel">Generate Image</span>
       </button>
     </div>
   </main>
@@ -3254,7 +3266,7 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
 const VIEWS = ['generate', 'vehicle', 'history', 'collections', 'favourites', 'tokens', 'admin'];
 const GEN_MODES = {
   generate: {
-    title: 'Imagen',
+    title: 'Image',
     sub: 'Create brand-compliant images with AI',
     placeholder: 'Describe the image you want to generate…',
   },
@@ -5399,7 +5411,7 @@ function applyGenMode(mode) {
   }
   const genLabel = document.getElementById('genBtnLabel');
   if (genLabel && !isGenerating) {
-    genLabel.textContent = 'Generate';
+    genLabel.textContent = 'Generate Image';
   }
   // Both modes share the vehicle gallery panel (classic results stay unused)
   const classicResults = document.getElementById('resultsSectionClassic');
@@ -7770,7 +7782,7 @@ function handleGenBtnClick() {
   generate();
 }
 
-const GEN_ICON = '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="7 4 20 12 7 20"/></svg>';
+const GEN_ICON = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8L12 2z"/><path d="M18 14l.9 2.1L21 17l-2.1.9L18 20l-.9-2.1L15 17l2.1-.9L18 14z"/></svg>';
 const STOP_ICON = '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>';
 
 async function generate() {
@@ -7920,11 +7932,11 @@ async function generate() {
   } finally {
     if (timerInterval) clearInterval(timerInterval);
     isGenerating = false;
-    if (btn) { btn.classList.remove('stopping'); btn.title = 'Generate'; btn.setAttribute('aria-label', 'Generate'); }
+    if (btn) { btn.classList.remove('stopping'); btn.title = 'Generate Image'; btn.setAttribute('aria-label', 'Generate Image'); }
     const icon = document.getElementById('genBtnIcon');
     if (icon) icon.innerHTML = GEN_ICON;
     const label = document.getElementById('genBtnLabel');
-    if (label) label.textContent = 'Generate';
+    if (label) label.textContent = 'Generate Image';
   }
 }
 
