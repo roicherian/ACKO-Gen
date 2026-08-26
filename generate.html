@@ -262,7 +262,9 @@ body.studio-ui .prompt-wrap .vehicle-car-panel {
 }
 body.studio-ui .prompt-wrap .vehicle-car-panel.visible { display: block; }
 body.vehicle-mode .prompt-wrap .vg-combo-panel { z-index: 90; }
+body.imagen-mode #imagenConfigPanel.vehicle-car-panel { padding: 22px; }
 body.studio-ui .vehicle-car-panel-head { margin-bottom: 10px; }
+body.imagen-mode #imagenConfigPanel .vehicle-car-panel-head { margin-bottom: 20px; }
 body.studio-ui .vehicle-car-panel-label {
   font-size: 11px; font-weight: 600; letter-spacing: .08em;
   text-transform: uppercase; color: var(--vg-muted);
@@ -704,7 +706,10 @@ body.vehicle-mode #vgFilterImgTimeWrap { display: none !important; }
 body.imagen-mode #imagenConfigMeta { display: none; }
 body.imagen-mode .prompt-wrap .imagen-select-row,
 body.vehicle-mode .prompt-wrap .vehicle-select-row {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
+}
+body.imagen-mode .prompt-wrap .imagen-select-row {
+  grid-template-columns: 1fr;
 }
 body.imagen-mode .prompt-wrap .imagen-select-row .form-group,
 body.vehicle-mode .prompt-wrap .vehicle-select-row .form-group {
@@ -714,16 +719,25 @@ body.imagen-mode .prompt-wrap .imagen-select-row .form-label,
 body.vehicle-mode .prompt-wrap .vehicle-select-row .form-label {
   position: static; width: auto; height: auto; overflow: visible; clip: auto;
   white-space: normal; display: block;
-  font: 600 12px/1 var(--font-family); color: var(--vg-muted);
-  margin-bottom: 6px; text-transform: none; letter-spacing: 0;
+  font: 600 13.5px/1 var(--font-family); color: var(--vg-muted);
+  margin-bottom: 9px; text-transform: none; letter-spacing: 0;
 }
 body.imagen-mode .prompt-wrap .imagen-select-row .sel-wrap,
 body.vehicle-mode .prompt-wrap .vehicle-select-row .sel-wrap {
-  height: 44px; border-radius: 10px; width: 100%;
+  height: 56px; border-radius: 12px; width: 100%; padding: 0 14px 0 16px;
 }
 body.imagen-mode .prompt-wrap .imagen-select-row select,
 body.vehicle-mode .prompt-wrap .vehicle-select-row select {
   max-width: none; margin-right: 0; padding-right: 36px; width: 100%;
+  font-size: 16px;
+}
+body.imagen-mode .prompt-wrap .imagen-select-row svg.sel-icon,
+body.vehicle-mode .prompt-wrap .vehicle-select-row svg.sel-icon {
+  width: 20px; height: 20px; margin-right: 10px;
+}
+body.imagen-mode .prompt-wrap .imagen-select-row .sel-caret svg,
+body.vehicle-mode .prompt-wrap .vehicle-select-row .sel-caret svg {
+  width: 18px; height: 18px;
 }
 body.vehicle-mode .prompt-wrap .vehicle-select-row .vg-combo-trigger {
   height: 44px; border-radius: 10px; width: 100%;
@@ -733,6 +747,10 @@ body.imagen-mode .vehicle-car-panel-label,
 body.vehicle-mode .vehicle-car-panel-label { font-size: 14px; font-weight: 700; }
 body.imagen-mode #imagenConfigPanel .vehicle-car-panel-label {
   text-transform: none; letter-spacing: normal; color: var(--text);
+  font-size: 17px;
+}
+body.imagen-mode #imagenConfigPanel .vehicle-car-panel-label.vcpl-icon svg {
+  width: 19px; height: 19px;
 }
 body.vehicle-mode .vehicle-car-panel-head {
   flex-direction: column; align-items: flex-start; gap: 3px;
@@ -1092,8 +1110,12 @@ body.vehicle-mode .vehicle-car-panel-head {
 .btn-adv:hover { border-color: var(--purple); color: var(--purple); }
 .btn-adv svg { width: 14px; height: 14px; }
 .btn-adv i[class^="cil-"] { font-size: 14px; line-height: 1; }
-#imagenAdvBtn { width: 100%; justify-content: space-between; margin-top: 14px; padding: 10px 13px; }
-#imagenAdvBtn svg:last-child { width: 15px; height: 15px; }
+#imagenAdvBtn {
+  width: 100%; justify-content: space-between; margin-top: 20px; padding: 16px 18px;
+  font-size: 14.5px; border-radius: 12px;
+}
+#imagenAdvBtn svg:first-child { width: 18px; height: 18px; }
+#imagenAdvBtn svg:last-child { width: 17px; height: 17px; }
 
 /* FORM ROW */
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
@@ -1228,21 +1250,21 @@ body.imagen-mode .action-row .btn-gen { flex: 0 0 auto; justify-content: center;
 
 /* DIVERSITY / ADVANCED (in advanced modal) */
 /* REFERENCES row (Style / Character / Add) */
-.ref-row { padding: 14px 16px 4px; }
+.ref-row { padding: 22px 0 4px; }
 .ref-row-head {
-  display: flex; align-items: baseline; justify-content: flex-start; gap: 6px;
-  font: 700 13px/1 var(--font-family);
-  color: var(--vg-text, var(--text)); margin-bottom: 10px;
+  display: flex; align-items: baseline; justify-content: flex-start; gap: 7px;
+  font: 700 15px/1 var(--font-family);
+  color: var(--vg-text, var(--text)); margin-bottom: 14px;
 }
-.ref-row-head .ref-count { font: 500 12px/1 var(--font-family); color: var(--vg-muted, var(--muted)); }
-.ref-pills { display: flex; gap: 10px; }
+.ref-row-head .ref-count { font: 500 13px/1 var(--font-family); color: var(--vg-muted, var(--muted)); }
+.ref-pills { display: flex; gap: 14px; }
 .ref-pill {
-  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;
-  padding: 12px 8px; border: 1.5px dashed var(--vg-line, var(--border-s)); border-radius: 12px;
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 10px;
+  padding: 20px 10px; border: 1.5px dashed var(--vg-line, var(--border-s)); border-radius: 14px;
   background: rgba(255,255,255,.02); color: var(--vg-muted, var(--muted));
-  font: 600 11.5px/1 var(--font-family); cursor: pointer; transition: all .15s;
+  font: 600 13px/1 var(--font-family); cursor: pointer; transition: all .15s;
 }
-.ref-pill svg { width: 20px; height: 20px; }
+.ref-pill svg { width: 26px; height: 26px; }
 .ref-pill:hover { border-color: rgba(196,181,253,.6); color: var(--vg-text, var(--text)); background: rgba(124,58,237,.08); }
 .ref-pill.has-ref { border-style: solid; border-color: rgba(196,181,253,.7); color: var(--vg-text, var(--text)); }
 .ref-pill:disabled, .ref-pill.disabled {
