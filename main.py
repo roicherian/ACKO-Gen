@@ -1432,6 +1432,31 @@ class ProxyHandler(BaseHTTPRequestHandler):
             self.send_json(200, {"ok": True})
             return
 
+        # Character reference library — admin-only rename/metadata edit.
+        if self.path == "/admin/characters/update":
+            ok, admin_email = require_admin(self.headers.get("x-session-token", ""))
+            if not ok:
+                self.send_json(403, {"error": "Admin access required."})
+                return
+            length = int(self.headers.get("Content-Length", 0))
+            try:
+                data = json.loads(self.rfile.read(length) or b"{}")
+            except Exception:
+                self.send_json(400, {"error": "Invalid request body."})
+                return
+            char_id = str(data.get("id", "")).strip()
+            kwargs = {}
+            for field in ("name", "role", "location", "age"):
+                if field in data:
+                    kwargs[field] = str(data.get(field) or "")
+            try:
+                record = character_store.update_character(char_id, **kwargs)
+            except ValueError as e:
+                self.send_json(400, {"error": str(e)})
+                return
+            self.send_json(200, {"character": record})
+            return
+
         # Shared history — delete your own item, or (Admin) anyone's. Closer to
         # /account/tokens/revoke's self-service model than the Admin-only
         # character delete: nothing else references a history row by id, so

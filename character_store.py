@@ -117,6 +117,27 @@ def get_character_image(char_id):
     return (row["image_bytes"], row["mime"]) if row else (None, None)
 
 
+def update_character(char_id, name=None, role=None, location=None, age=None):
+    """Admin action: updates one or more metadata fields in place (the id/slug
+    and image bytes are untouched). Raises ValueError for an unknown id."""
+    with _lock:
+        conn = _connect()
+        row = conn.execute("SELECT id FROM characters WHERE id = ?", (char_id,)).fetchone()
+        if row is None:
+            raise ValueError(f"No such character: {char_id}")
+        fields, values = [], []
+        for col, val in (("name", name), ("role", role), ("location", location), ("age", age)):
+            if val is not None:
+                fields.append(f"{col} = ?")
+                values.append(val.strip())
+        if fields:
+            values.append(char_id)
+            conn.execute(f"UPDATE characters SET {', '.join(fields)} WHERE id = ?", values)
+            conn.commit()
+        row = conn.execute("SELECT * FROM characters WHERE id = ?", (char_id,)).fetchone()
+    return _row_to_dict(row)
+
+
 def delete_character(char_id):
     """Admin action: permanently removes a character. Raises ValueError for an
     unknown id — callers turn that into a 400."""
