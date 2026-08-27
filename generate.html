@@ -682,7 +682,7 @@ body.vehicle-mode #vgFilterImgTimeWrap { display: none !important; }
 @media (min-width: 1200px) {
   body.imagen-mode .app,
   body.vehicle-mode .app {
-    grid-template-columns: var(--sidebar-w) minmax(440px, 540px) minmax(320px, 1fr);
+    grid-template-columns: var(--sidebar-w) minmax(360px, 420px) minmax(320px, 1fr);
     grid-template-rows: 1fr;
     column-gap: 24px;
   }
@@ -2517,10 +2517,6 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
               <span class="ref-count">(<span id="refCount">0/16</span>)</span>
             </div>
             <div class="ref-pills">
-              <button type="button" class="ref-pill" id="refStyleBtn" onclick="openReferencePicker('style')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l2.6 6.6L22 9.3l-5.5 4.6L18 21l-6-3.9L6 21l1.5-7.1L2 9.3l7.4-.7L12 2z"/></svg>
-                <span>Style</span>
-              </button>
               <button type="button" class="ref-pill" id="refCharacterBtn" onclick="openCharacterLibrary()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
                 <span>Character</span>
@@ -7694,7 +7690,7 @@ function onModelChange() {
   // dropping references on this model.
   const refsSupported = !!m.async;
   const refTooltip = refsSupported ? '' : 'References aren\'t supported on this model — switch to Nano Banana to use them.';
-  ['refStyleBtn', 'refCharacterBtn', 'refAddBtn'].forEach(id => {
+  ['refCharacterBtn', 'refAddBtn'].forEach(id => {
     const btn = document.getElementById(id);
     if (!btn) return;
     btn.disabled = !refsSupported;
