@@ -245,10 +245,7 @@ body.imagen-mode .enhanced-body:empty:before { color: #6d6d7c; }
 body.imagen-mode:not(.vehicle-mode) .action-row { display: flex !important; }
 body.imagen-mode:not(.vehicle-mode) .enhanced-wrap { display: block !important; }
 body.imagen-mode:not(.vehicle-mode) .center-head .btn-adv { display: flex !important; }
-/* Generation Settings card removed from Imagen — model/resolution/count/ratio
-   keep their default selected values (Nano Banana 2 / 2K / 4 images / 16:9)
-   since generate() still reads these elements; they're just not shown/editable. */
-body.imagen-mode:not(.vehicle-mode) #imagenConfigPanel.visible { display: none !important; }
+body.imagen-mode:not(.vehicle-mode) #imagenConfigPanel.visible { display: block !important; }
 body.vehicle-mode #imagenConfigPanel { display: none !important; }
 
 /* Shared in-prompt config panel chrome (Imagen settings + Vehicle make/model) */
