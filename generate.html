@@ -1432,10 +1432,14 @@ body.imagen-mode .action-row .btn-gen { flex: 0 0 auto; justify-content: center;
 .adv-save {
   width: 100%; padding: 12px; border-radius: var(--r-md); border: none;
   background: var(--grad); font: 600 14px/1 var(--font-family); color: #fff;
-  cursor: pointer; transition: transform .15s, box-shadow .15s; margin-top: 4px;
+  cursor: pointer; transition: transform .15s, box-shadow .15s, background .15s; margin-top: 4px;
   box-shadow: var(--shadow-sm);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
 }
-.adv-save:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.adv-save:hover:not(:disabled) { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.adv-save:disabled { opacity: .7; cursor: not-allowed; }
+.adv-save.stopping { background: linear-gradient(135deg, #ef4444, #b91c1c); cursor: pointer; }
+.adv-save .btn-gen-icon svg { width: 16px; height: 16px; }
 
 /* TOGGLE SWITCH (No Characters, etc.) */
 .toggle-row {
@@ -3075,7 +3079,10 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
         <label class="adv-label">What would you like to change?</label>
         <textarea id="editInstruction" class="edit-textarea" placeholder="e.g. Change the shirt colour to navy blue, remove the laptop from the desk, make the background brighter…"></textarea>
         <div class="edit-note" id="editNote"></div>
-        <button class="adv-save" id="editApplyBtn" onclick="applyEdit()">Apply Edit</button>
+        <button class="adv-save" id="editApplyBtn" onclick="handleEditApplyClick()">
+          <span class="btn-gen-icon" id="editApplyIcon"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="7 4 20 12 7 20"/></svg></span>
+          <span id="editApplyLabel">Apply Edit</span>
+        </button>
       </div>
     </div>
   </div>
@@ -7086,7 +7093,10 @@ function openEditModal() {
   img.src = resolveItemImageSrc(editItem) || editItem.src || '';
   document.getElementById('editInstruction').value = '';
   document.getElementById('editNote').textContent = "Edits are saved next to the original (and mirror) in this car's version strip.";
-  document.getElementById('editApplyBtn').textContent = 'Apply Edit';
+  isEditingImage = false;
+  document.getElementById('editApplyBtn').classList.remove('stopping');
+  document.getElementById('editApplyIcon').innerHTML = GEN_ICON;
+  document.getElementById('editApplyLabel').textContent = 'Apply Edit';
   document.getElementById('editApplyBtn').disabled = false;
   setEditTool('brush');
   document.getElementById('editBrushSizeInput').value = editBrushSize;
@@ -7108,14 +7118,31 @@ function ratioValueFromLabel(label) {
   return opt ? opt.value : 'widescreen_16_9';
 }
 
+let isEditingImage = false;
+
+function handleEditApplyClick() {
+  if (isEditingImage) {
+    state.cancelRequested = true;
+    const label = document.getElementById('editApplyLabel');
+    if (label) label.textContent = 'Stopping…';
+    return;
+  }
+  applyEdit();
+}
+
 async function applyEdit() {
   const instruction = document.getElementById('editInstruction').value.trim();
   if (!instruction) { alert('Describe what you want to change first.'); return; }
   if (!editItem) return;
 
   const btn = document.getElementById('editApplyBtn');
-  btn.disabled = true;
-  btn.textContent = 'Applying…';
+  const icon = document.getElementById('editApplyIcon');
+  const label = document.getElementById('editApplyLabel');
+  state.cancelRequested = false;
+  isEditingImage = true;
+  btn.classList.add('stopping');
+  icon.innerHTML = STOP_ICON;
+  label.textContent = 'Stop editing';
 
   try {
     const root = getLbRootItem(editItem) || editItem;
@@ -7177,10 +7204,12 @@ async function applyEdit() {
     openLightbox(root.id, lbFromView || 'history');
     selectLbVersion(newItem.id);
   } catch (e) {
-    alert('Edit failed: ' + e.message);
+    if (!state.cancelRequested) alert('Edit failed: ' + e.message);
   } finally {
-    btn.disabled = false;
-    btn.textContent = 'Apply Edit';
+    isEditingImage = false;
+    btn.classList.remove('stopping');
+    icon.innerHTML = GEN_ICON;
+    label.textContent = 'Apply Edit';
   }
 }
 
