@@ -1486,7 +1486,8 @@ body.studio-ui .btn-gen {
   box-shadow: var(--shadow-sm); transition: transform .15s, box-shadow .15s;
 }
 body.studio-ui .btn-gen:hover:not(:disabled) { transform: translateY(-1px); box-shadow: var(--shadow-md); }
-body.studio-ui .btn-gen-icon { display: none; }
+body.studio-ui .btn-gen-icon { display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+body.studio-ui .btn-gen-icon svg { width: 16px; height: 16px; }
 body.studio-ui #genBtnLabel { font: 600 14px/1 var(--font-family); }
 body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, #b91c1c); box-shadow: var(--shadow-sm); }
 .btn-spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.3); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; }
@@ -2700,7 +2701,7 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
     <!-- Action buttons -->
     <div class="action-row">
       <button class="btn-gen" id="genBtn" onclick="handleGenBtnClick()" title="Generate Image" aria-label="Generate Image">
-        <span class="btn-gen-icon" id="genBtnIcon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8L12 2z"/><path d="M18 14l.9 2.1L21 17l-2.1.9L18 20l-.9-2.1L15 17l2.1-.9L18 14z"/></svg></span>
+        <span class="btn-gen-icon" id="genBtnIcon"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="7 4 20 12 7 20"/></svg></span>
         <span id="genBtnLabel">Generate Image</span>
       </button>
     </div>
@@ -3115,10 +3116,10 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
         <select id="newCharAge" class="char-input char-input-select">
           <option value="0-10">Age 0-10</option>
           <option value="10-20">Age 10-20</option>
-          <option value="20-30" selected>Age 20-30</option>
-          <option value="30-40">Age 30-40</option>
+          <option value="20-29" selected>Age 20-29</option>
+          <option value="30-39">Age 30-39</option>
           <option value="40-50">Age 40-50</option>
-          <option value="50-60">Age 50-60</option>
+          <option value="50+">Age 50+</option>
         </select>
       </div>
       <div class="char-add-form-row">
@@ -4663,7 +4664,7 @@ function renderCharacterGrid() {
     return;
   }
 
-  const ageGroups = ['0-10', '10-20', '20-30', '30-40', '40-50', '50-60', 'Other'];
+  const ageGroups = ['0-10', '10-20', '20-29', '30-39', '40-50', '50+', 'Other'];
   const groupedByAge = {};
   ageGroups.forEach(age => groupedByAge[age] = []);
   list.forEach(c => {
@@ -7790,7 +7791,7 @@ function handleGenBtnClick() {
   generate();
 }
 
-const GEN_ICON = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8L12 2z"/><path d="M18 14l.9 2.1L21 17l-2.1.9L18 20l-.9-2.1L15 17l2.1-.9L18 14z"/></svg>';
+const GEN_ICON = '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="7 4 20 12 7 20"/></svg>';
 const STOP_ICON = '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>';
 
 async function generate() {
