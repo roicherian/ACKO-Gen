@@ -1069,9 +1069,9 @@ body.vehicle-mode .vehicle-car-panel-head {
 .sidebar-user-avatar {
   flex-shrink: 0; width: 38px; height: 38px; border-radius: 50%;
   background: linear-gradient(135deg, #7c3aed, #6366f1); color: #fff;
-  font: 700 15px/1 'var(--font-family);
   display: flex; align-items: center; justify-content: center;
 }
+.sidebar-user-avatar svg { width: 20px; height: 20px; }
 .sidebar-user-info { flex: 1; min-width: 0; overflow: hidden; }
 .sidebar-user-name {
   font-size: 13px; font-weight: 700; color: var(--text);
@@ -7390,7 +7390,7 @@ function hideLoginGate(email) {
   const displayName = displayNameFromEmail(resolvedEmail);
   if (nameEl) nameEl.textContent = displayName;
   if (emailEl) emailEl.textContent = resolvedEmail;
-  if (avatarEl) avatarEl.textContent = (displayName || resolvedEmail || '?').charAt(0).toUpperCase();
+  if (avatarEl) avatarEl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>';
   if (btn) btn.title = resolvedEmail;
 }
 function showLoginForm() {
