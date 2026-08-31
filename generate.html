@@ -2479,6 +2479,7 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
                 <select id="modelSelect" onchange="onModelChange()">
                   <option value="nano-banana" selected>Nano Banana 2</option>
                   <option value="gpt-2">GPT 2</option>
+                  <option value="flux-2-pro">Flux 2 Pro</option>
                 </select>
                 <div class="sel-caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
               </div>
@@ -7496,6 +7497,9 @@ const MODELS = {
   'gpt-2':       { provider: 'magnific', path: '/v1/ai/text-to-image', async: false, supportsRes: false, supportsSubModel: false, colRatio: false },
   // Google Nano Banana 2 via Magnific (async, colon aspect ratios; supports reference_images)
   'nano-banana': { provider: 'magnific', path: '/v1/ai/text-to-image/nano-banana-pro-flash', async: true, supportsRes: true, supportsSubModel: false, colRatio: true },
+  // Flux 2 Pro via Magnific (async; takes fixed width/height, not aspect_ratio —
+  // the ratio/resolution controls are ignored server-side, same as gpt-2)
+  'flux-2-pro':  { provider: 'magnific', path: '/v1/ai/text-to-image/flux-2-pro', async: true, supportsRes: false, supportsSubModel: false, colRatio: false },
 };
 
 // Nano Banana expects colon format; all other models use underscore format
@@ -7724,11 +7728,12 @@ function onModelChange() {
   const resGroup = document.getElementById('resSelect')?.closest('.form-group');
   if (resGroup) resGroup.style.opacity = m.supportsRes ? '1' : '0.4';
 
-  // Reference images (style/character/custom) only ever reach the async
-  // (Nano Banana) upstream call — Magnific's classic/sync endpoint has no
+  // Reference images (style/character/custom) only ever reach Nano Banana's
+  // upstream call as `reference_images` — Flux 2 Pro takes single named
+  // input_image fields instead, and the classic/sync endpoint has no
   // reference-image field at all. Grey the pills out rather than silently
-  // dropping references on this model.
-  const refsSupported = !!m.async;
+  // dropping references on models that wouldn't apply them.
+  const refsSupported = id === 'nano-banana';
   const refTooltip = refsSupported ? '' : 'References aren\'t supported on this model — switch to Nano Banana to use them.';
   ['refCharacterBtn', 'refAddBtn'].forEach(id => {
     const btn = document.getElementById(id);
