@@ -1,7 +1,10 @@
 {
-  "buildCommand": "pip install -r requirements.txt || echo 'No dependencies to install'",
-  "outputDirectory": ".",
-  "env": {
-    "PYTHONUNBUFFERED": "1"
-  }
+  "functions": {
+    "main.py": {
+      "maxDuration": 10
+    }
+  },
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/main.py" }
+  ]
 }

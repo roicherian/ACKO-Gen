@@ -2,61 +2,45 @@
 Shared generation history for ACKO Image Generator.
 
 Every generated image (web app, MCP, edits/mirrors, background-removal) is
-already saved to disk under GENERATED_DIR by main.py's save_generated_bytes().
-This module indexes that metadata in SQLite (same acko_gen.db user_store.py
-uses) so it can be listed and shared across every user — replacing the old
-private, per-browser localStorage history. Images themselves stay as files;
+saved to Vercel Blob by main.py's save_generated_bytes(). This module indexes
+that metadata in Postgres (same database user_store.py uses) so it can be
+listed and shared across every user. Images themselves live in Blob storage;
 this table only ever stores a pointer (image_url) to them, never the bytes.
 
-Mirrors character_store.py's connection/lock pattern.
+Mirrors character_store.py's pattern.
 """
-import os
-import sqlite3
-import threading
 import time
 import uuid
 import json
 
-DATA_DIR = os.environ.get("DATA_DIR", os.path.dirname(os.path.abspath(__file__)))
-DB_PATH = os.path.join(DATA_DIR, "acko_gen.db")
-
-_lock = threading.Lock()
-_local = threading.local()
-
-
-def _connect():
-    if getattr(_local, "conn", None) is None:
-        _local.conn = sqlite3.connect(DB_PATH)
-        _local.conn.row_factory = sqlite3.Row
-    return _local.conn
+import db
 
 
 def init_db():
-    with _lock:
-        conn = _connect()
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS history (
-                id           TEXT PRIMARY KEY,
-                email        TEXT NOT NULL DEFAULT '',
-                prompt       TEXT,
-                full_prompt  TEXT,
-                model        TEXT,
-                model_id     TEXT,
-                ratio        TEXT,
-                resolution   TEXT,
-                kind         TEXT NOT NULL DEFAULT 'generate',
-                batch_id     TEXT,
-                variant_of   TEXT,
-                product      TEXT,
-                vehicle_json TEXT,
-                image_url    TEXT NOT NULL,
-                mime         TEXT NOT NULL DEFAULT 'image/png',
-                created_at   INTEGER NOT NULL
-            )
-        """)
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_history_created_at ON history(created_at DESC)")
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_history_email ON history(email)")
-        conn.commit()
+    conn = db.get_conn()
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS history (
+            id           TEXT PRIMARY KEY,
+            email        TEXT NOT NULL DEFAULT '',
+            prompt       TEXT,
+            full_prompt  TEXT,
+            model        TEXT,
+            model_id     TEXT,
+            ratio        TEXT,
+            resolution   TEXT,
+            kind         TEXT NOT NULL DEFAULT 'generate',
+            batch_id     TEXT,
+            variant_of   TEXT,
+            product      TEXT,
+            vehicle_json TEXT,
+            image_url    TEXT NOT NULL,
+            mime         TEXT NOT NULL DEFAULT 'image/png',
+            created_at   BIGINT NOT NULL
+        )
+    """)
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_history_created_at ON history(created_at DESC)")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_history_email ON history(email)")
+    conn.commit()
 
 
 def _row_to_dict(row):
@@ -91,51 +75,47 @@ def add_history_row(email, image_url, mime, kind="generate", prompt="", full_pro
     row_id = uuid.uuid4().hex
     created_at = int(time.time() * 1000)
     vehicle_json = json.dumps(vehicle) if vehicle else None
-    with _lock:
-        conn = _connect()
-        conn.execute(
-            "INSERT INTO history (id, email, prompt, full_prompt, model, model_id, ratio, "
-            "resolution, kind, batch_id, variant_of, product, vehicle_json, image_url, mime, created_at) "
-            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-            (row_id, email or "", prompt or "", full_prompt or "", model or "", model_id or "",
-             ratio or "", resolution or "", kind or "generate", batch_id, variant_of, product or "",
-             vehicle_json, image_url, mime or "image/png", created_at),
-        )
-        conn.commit()
+    conn = db.get_conn()
+    conn.execute(
+        "INSERT INTO history (id, email, prompt, full_prompt, model, model_id, ratio, "
+        "resolution, kind, batch_id, variant_of, product, vehicle_json, image_url, mime, created_at) "
+        "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+        (row_id, email or "", prompt or "", full_prompt or "", model or "", model_id or "",
+         ratio or "", resolution or "", kind or "generate", batch_id, variant_of, product or "",
+         vehicle_json, image_url, mime or "image/png", created_at),
+    )
+    conn.commit()
     return row_id
 
 
 def list_history(limit=150, before_ts=None):
     """Most-recent-first page. before_ts (exclusive, epoch ms) is the cursor
     for 'load more' — matches how ts is already epoch-ms everywhere client-side."""
-    with _lock:
-        conn = _connect()
-        if before_ts:
-            rows = conn.execute(
-                "SELECT * FROM history WHERE created_at < ? ORDER BY created_at DESC LIMIT ?",
-                (before_ts, limit),
-            ).fetchall()
-        else:
-            rows = conn.execute(
-                "SELECT * FROM history ORDER BY created_at DESC LIMIT ?", (limit,)
-            ).fetchall()
+    conn = db.get_conn()
+    if before_ts:
+        rows = conn.execute(
+            "SELECT * FROM history WHERE created_at < %s ORDER BY created_at DESC LIMIT %s",
+            (before_ts, limit),
+        ).fetchall()
+    else:
+        rows = conn.execute(
+            "SELECT * FROM history ORDER BY created_at DESC LIMIT %s", (limit,)
+        ).fetchall()
     return [_row_to_dict(r) for r in rows]
 
 
 def get_history_row(row_id):
-    with _lock:
-        conn = _connect()
-        row = conn.execute("SELECT * FROM history WHERE id = ?", (row_id,)).fetchone()
+    conn = db.get_conn()
+    row = conn.execute("SELECT * FROM history WHERE id = %s", (row_id,)).fetchone()
     return _row_to_dict(row)
 
 
 def delete_history_row(row_id):
     """Raises ValueError for an unknown id — callers turn that into a 404,
     same convention as character_store.delete_character."""
-    with _lock:
-        conn = _connect()
-        row = conn.execute("SELECT id FROM history WHERE id = ?", (row_id,)).fetchone()
-        if row is None:
-            raise ValueError(f"No such history item: {row_id}")
-        conn.execute("DELETE FROM history WHERE id = ?", (row_id,))
-        conn.commit()
+    conn = db.get_conn()
+    row = conn.execute("SELECT id FROM history WHERE id = %s", (row_id,)).fetchone()
+    if row is None:
+        raise ValueError(f"No such history item: {row_id}")
+    conn.execute("DELETE FROM history WHERE id = %s", (row_id,))
+    conn.commit()
