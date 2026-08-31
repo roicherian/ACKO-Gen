@@ -2478,7 +2478,6 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
                 <svg class="sel-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
                 <select id="modelSelect" onchange="onModelChange()">
                   <option value="nano-banana" selected>Nano Banana 2</option>
-                  <option value="gpt-2">GPT 2</option>
                   <option value="flux-2-pro">Flux 2 Pro</option>
                 </select>
                 <div class="sel-caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
@@ -7493,12 +7492,10 @@ async function checkSession() {
 
 // ─── MODEL CATALOGUE ─────────────────────────────────────────────────────────
 const MODELS = {
-  // Classic Magnific text-to-image (sync, underscore size keys)
-  'gpt-2':       { provider: 'magnific', path: '/v1/ai/text-to-image', async: false, supportsRes: false, supportsSubModel: false, colRatio: false },
   // Google Nano Banana 2 via Magnific (async, colon aspect ratios; supports reference_images)
   'nano-banana': { provider: 'magnific', path: '/v1/ai/text-to-image/nano-banana-pro-flash', async: true, supportsRes: true, supportsSubModel: false, colRatio: true },
   // Flux 2 Pro via Magnific (async; takes fixed width/height, not aspect_ratio —
-  // the ratio/resolution controls are ignored server-side, same as gpt-2)
+  // the ratio/resolution controls are ignored server-side)
   'flux-2-pro':  { provider: 'magnific', path: '/v1/ai/text-to-image/flux-2-pro', async: true, supportsRes: false, supportsSubModel: false, colRatio: false },
 };
 
