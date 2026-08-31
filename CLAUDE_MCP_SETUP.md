@@ -19,19 +19,24 @@ same Magnific-backed generator as the web app, through a remote MCP server.
 4. Copy the token (starts with `acko_pat_...`) immediately — it's only shown
    once. If you lose it, just generate a new one.
 
-## Step 3: Open the project in Claude Code
+## Step 3: Register it with one command
 
-1. Clone the repo if you don't already have it:
-   ```bash
-   git clone https://github.com/roicherian/ACKO-Gen.git
-   cd ACKO-Gen
-   ```
-2. Open this folder in Claude Code (terminal or desktop app).
+This is a *remote* MCP server — you don't need to clone this repo or create
+any files by hand. Just run this once in a terminal, with your real token
+swapped in:
 
-## Step 4: Create the `.mcp.json` file
+```bash
+claude mcp add acko-image-gen --transport http https://web-production-af07c.up.railway.app/mcp --header "Authorization: Bearer YOUR_TOKEN_HERE" --scope user
+```
 
-Create a file named exactly `.mcp.json` (the leading dot is part of the name)
-in the project root:
+`--scope user` registers it globally for your account, so it works in every
+Claude Code project you open from now on — no per-project setup needed.
+
+<details>
+<summary>Alternative: project-level <code>.mcp.json</code> (if you'd rather scope it to one folder)</summary>
+
+Create a file named exactly `.mcp.json` in whichever folder you're working
+in:
 
 ```bash
 cat > .mcp.json << 'EOF'
@@ -49,15 +54,16 @@ cat > .mcp.json << 'EOF'
 EOF
 ```
 
-Replace `YOUR_TOKEN_HERE` with the token from Step 2. This file is already
-gitignored, so your token stays local and is never committed.
+If this repo happens to be that folder, it's already gitignored, so your
+token stays local and is never committed.
+</details>
 
-## Step 5: Restart Claude Code
+## Step 4: Restart Claude Code
 
 MCP servers only load on startup — fully quit and reopen Claude Code (or
-start a new session) in this project folder.
+start a new session).
 
-## Step 6: Use it
+## Step 5: Use it
 
 Start a new conversation and just ask in plain language, e.g.:
 
