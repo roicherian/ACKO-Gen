@@ -19,24 +19,11 @@ same Magnific-backed generator as the web app, through a remote MCP server.
 4. Copy the token (starts with `acko_pat_...`) immediately — it's only shown
    once. If you lose it, just generate a new one.
 
-## Step 3: Register it with one command
+## Step 3: Register it
 
-This is a *remote* MCP server — you don't need to clone this repo or create
-any files by hand. Just run this once in a terminal, with your real token
-swapped in:
-
-```bash
-claude mcp add acko-image-gen --transport http https://web-production-af07c.up.railway.app/mcp --header "Authorization: Bearer YOUR_TOKEN_HERE" --scope user
-```
-
-`--scope user` registers it globally for your account, so it works in every
-Claude Code project you open from now on — no per-project setup needed.
-
-<details>
-<summary>Alternative: project-level <code>.mcp.json</code> (if you'd rather scope it to one folder)</summary>
-
-Create a file named exactly `.mcp.json` in whichever folder you're working
-in:
+This is a *remote* MCP server — you don't need to clone this repo. Pick
+(or create) any folder you'll open in Claude Code, and create a file named
+exactly `.mcp.json` in it:
 
 ```bash
 cat > .mcp.json << 'EOF'
@@ -54,8 +41,24 @@ cat > .mcp.json << 'EOF'
 EOF
 ```
 
-If this repo happens to be that folder, it's already gitignored, so your
-token stays local and is never committed.
+Replace `YOUR_TOKEN_HERE` with your real token before running this. If this
+repo happens to be that folder, it's already gitignored, so your token stays
+local and is never committed.
+
+<details>
+<summary>Alternative: one-line command (only if you have the standalone Claude Code CLI installed)</summary>
+
+Most people only have the Claude desktop app, not the separate `claude` CLI
+binary — check first by running `claude --version`. If that works, you can
+register the server globally (works in every project, no per-folder file
+needed) instead of creating `.mcp.json`:
+
+```bash
+claude mcp add acko-image-gen --transport http https://web-production-af07c.up.railway.app/mcp --header "Authorization: Bearer YOUR_TOKEN_HERE" --scope user
+```
+
+If you instead see `command not found: claude`, use the `.mcp.json` method
+above.
 </details>
 
 ## Step 4: Restart Claude Code
