@@ -385,6 +385,13 @@ _mcp_rate_lock = threading.Lock()
 _mcp_rate_log = {}  # email -> [timestamps]
 MCP_RATE_LIMIT_PER_HOUR = int(os.environ.get("MCP_RATE_LIMIT_PER_HOUR", "20"))
 
+# Per-person daily cap on actual image generations (web app + MCP alike, since
+# both ultimately call history_store.add_history_row on success) — backed by
+# the history table itself (history_store.count_today), not a separate
+# in-memory counter, so it survives restarts and isn't per-instance like the
+# MCP hourly limiter above.
+DAILY_GENERATION_LIMIT = int(os.environ.get("DAILY_GENERATION_LIMIT", "100"))
+
 
 def check_mcp_rate_limit(email):
     now = time.time()
@@ -1046,6 +1053,16 @@ class ProxyHandler(BaseHTTPRequestHandler):
             self.send_json(200, {"items": items, "you": email})
             return
 
+        # Today's generation-count vs the per-person daily cap — lets the UI
+        # show "X / 100 today" without exposing anyone else's usage.
+        if path_no_query == "/api/usage/today":
+            ok, email = verify_session(self.headers.get("x-session-token", ""))
+            if not ok:
+                self.send_json(401, {"error": "Not signed in. Please sign in with your acko.tech email."})
+                return
+            self.send_json(200, {"used": history_store.count_today(email), "limit": DAILY_GENERATION_LIMIT})
+            return
+
         # ── Vehicle catalogue (new, sourced relational data — separate from the
         # legacy vehicle_catalog.json flat file the current selector still uses).
         # Gated the same way as the rest of Vehiclegen: signed-in + image-gen access.
@@ -1690,6 +1707,16 @@ class ProxyHandler(BaseHTTPRequestHandler):
         perm_ok, perm_err = require_permission(email, user_store.IMAGE_GEN_ALLOWED)
         if not perm_ok:
             self.send_json(403, perm_err)
+            return
+
+        used_today = history_store.count_today(email)
+        if used_today >= DAILY_GENERATION_LIMIT:
+            self.send_json(429, {
+                "error": f"Daily image generation limit reached ({DAILY_GENERATION_LIMIT}/day). "
+                         "Try again tomorrow.",
+                "used": used_today,
+                "limit": DAILY_GENERATION_LIMIT,
+            })
             return
 
         length = int(self.headers.get("Content-Length", 0))

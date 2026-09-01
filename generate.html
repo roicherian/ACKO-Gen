@@ -1218,6 +1218,10 @@ body:not(.studio-ui):not(.vehicle-mode) .prompt-footer .btn-gen { width: 100%; m
 /* ACTION BUTTONS */
 .action-row { display: flex; gap: 8px; margin-bottom: 14px; justify-content: center; }
 body.imagen-mode .action-row .btn-gen { flex: 0 0 auto; justify-content: center; }
+.daily-usage-note {
+  text-align: center; font-size: 12px; color: var(--muted); margin-top: -6px; margin-bottom: 14px;
+}
+.daily-usage-note.near-limit { color: var(--red, #e11d48); font-weight: 600; }
 .btn-action {
   display: flex; align-items: center; gap: 7px; padding: 8px 14px;
   border: 1px solid var(--border-s); border-radius: var(--r-sm); background: var(--white);
@@ -2500,8 +2504,7 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
                 <select id="numSelect" onchange="syncImagenConfigMeta()">
                   <option value="1">1 image</option>
                   <option value="2">2 images</option>
-                  <option value="3">3 images</option>
-                  <option value="4" selected>4 images</option>
+                  <option value="3" selected>3 images</option>
                 </select>
                 <div class="sel-caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
               </div>
@@ -2714,6 +2717,7 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
         <span id="genBtnLabel">Generate Image</span>
       </button>
     </div>
+    <div class="daily-usage-note" id="dailyUsageNote"></div>
   </main>
 
   <!-- RIGHT PANEL -->
@@ -7477,6 +7481,7 @@ async function checkSession() {
       hideLoginGate(data.email);
       loadCharacterLibrary();
       refreshHistoryCache();
+      refreshDailyUsage();
       if (location.hash === '#admin') navigateTo('admin'); // no-op if not an Admin
     } else {
       clearSession();
@@ -7487,6 +7492,26 @@ async function checkSession() {
     // Proxy unreachable — fall back to trusting the locally stored session
     // so the UI isn't blocked purely by a transient network hiccup.
     hideLoginGate();
+  }
+}
+
+/** Shows "X / N images today" near the Generate button — refreshed on load
+ * and after each generation completes, so the count stays current without
+ * the user having to reload. Fails silently (just hides the note) since
+ * this is informational, not something that should ever block generating. */
+async function refreshDailyUsage() {
+  const el = document.getElementById('dailyUsageNote');
+  if (!el) return;
+  try {
+    const res = await fetch(proxyUrl('/api/usage/today'), {
+      headers: { 'x-session-token': getSessionToken() },
+    });
+    if (!res.ok) { el.textContent = ''; return; }
+    const data = await res.json();
+    el.textContent = `${data.used} / ${data.limit} images today`;
+    el.classList.toggle('near-limit', data.used >= data.limit);
+  } catch {
+    el.textContent = '';
   }
 }
 
@@ -7961,6 +7986,7 @@ async function generate() {
       if (vehiclePendingGens.some(p => p.id === id)) finishVehicleGalleryPending(id);
     });
     renderVehicleGallery();
+    refreshDailyUsage();
     if (successes) {
       setStatus('done', `${successes} of ${num} completed`);
     } else {
