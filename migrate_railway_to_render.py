@@ -1,23 +1,23 @@
 #!/usr/bin/env python3
 """
 One-time migration: copy live data from the Railway deployment into the new
-Postgres (db.py) + Vercel Blob (blob_store.py) backend, before decommissioning
-Railway.
+Postgres (db.py, e.g. Neon) + Cloudflare R2 (blob_store.py) backend, before
+decommissioning Railway.
 
-Run this AFTER setting DATABASE_URL, BLOB_READ_WRITE_TOKEN, and SESSION_SECRET
-as real environment variables (e.g. via `vercel env pull .env.migrate` then
-`set -a; source .env.migrate; set +a`) — it imports and writes through the
-same store modules (user_store, character_store, history_store) the app
-itself uses, so there's only one place that knows how to talk to Postgres/Blob.
+Run this AFTER setting DATABASE_URL, R2_ACCOUNT_ID, R2_ACCESS_KEY_ID,
+R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME, R2_PUBLIC_URL_BASE, and SESSION_SECRET
+as real environment variables in your shell — it imports and writes through
+the same store modules (user_store, character_store, history_store) the app
+itself uses, so there's only one place that knows how to talk to Postgres/R2.
 
 Not migrated: raw API token values — they're hashed at rest and cannot be
 recovered. Every user needs to generate a fresh personal access token from
-the API Tokens panel once the app is live on Vercel. This script does print
+the API Tokens panel once the app is live on Render. This script does print
 each user's token labels so you know who had one and should be told to
 regenerate it.
 
 Usage:
-    python3 migrate_railway_to_vercel.py
+    python3 migrate_railway_to_render.py
 """
 import json
 import urllib.request
@@ -70,7 +70,7 @@ def migrate_users(token):
     for t in tokens:
         if t.get("revokedAt"):
             continue
-        print(f"  {t['email']} had an active token labeled {t['label']!r} — tell them to regenerate it on Vercel.")
+        print(f"  {t['email']} had an active token labeled {t['label']!r} — tell them to regenerate it once the app is live on Render.")
 
 
 def migrate_characters(token):

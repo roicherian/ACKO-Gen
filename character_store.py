@@ -1,14 +1,14 @@
 """
 Character reference library for ACKO Image Generator.
 
-Postgres-backed metadata (via db.py), portrait images in Vercel Blob (via
+Postgres-backed metadata (via db.py), portrait images in Cloudflare R2 (via
 blob_store.py) — a content library, not identity/permissions data, hence its
 own module (mirrors catalogue_db.py's separation), but sharing the Postgres
 database user_store.py uses.
 
-Images used to be stored as BLOBs directly in SQLite; on the move to Vercel
-serverless they moved to Blob storage instead (consolidating with how
-generated images are stored — see history_store.py / main.py's
+Images used to be stored as BLOBs directly in SQLite; on the move off
+Railway's ephemeral disk they moved to object storage instead (consolidating
+with how generated images are stored — see history_store.py / main.py's
 save_generated_bytes()), so this table now holds an image_url, not bytes.
 """
 import re

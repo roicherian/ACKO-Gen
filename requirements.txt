@@ -1,5 +1,7 @@
-# Postgres client for db.py — everything else is still stdlib only.
+# Postgres client for db.py (points at Neon in production).
 psycopg2-binary
+# S3-compatible client for blob_store.py (points at Cloudflare R2).
+boto3
 # Used by main.py's get_vehicle_reference_image() to compress the vehicle
 # base reference to JPEG (already wrapped in a try/except with a PNG
 # fallback if this is ever missing, but install it for the smaller/faster

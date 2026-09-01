@@ -2,8 +2,8 @@
 User/permission store for ACKO Image Generator.
 
 Postgres-backed (via db.py) — right-sized for a few dozen internal users.
-Was SQLite until the move to Vercel serverless, which has no durable local
-disk; Postgres (Vercel Postgres) is the durable store now.
+Was SQLite until the move off Railway's ephemeral disk; Postgres (e.g. a
+free Neon database) is the durable store now.
 
 Permission levels are a fixed enum, enforced at the DB layer via CHECK:
   "No access", "Full access", "Imagen access", "Icongen access", "Admin"

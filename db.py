@@ -2,9 +2,9 @@
 Shared Postgres connection helper for ACKO Image Generator.
 
 Replaces the old "each *_store.py opens its own sqlite3.connect(DATA_DIR/acko_gen.db)"
-pattern — Vercel's serverless filesystem has no durable writable disk, so all
-persistent state now lives in Postgres (DATABASE_URL, provided by Vercel Postgres
-once attached to the project).
+pattern — Render's own filesystem is not durable across restarts/redeploys/
+sleep on the free tier, so all persistent state now lives in Postgres
+(DATABASE_URL, e.g. a free Neon database).
 
 _ConnWrapper exists purely so the *_store.py modules stay close to their original
 sqlite3 form (they were written against sqlite3.Connection's convenience
@@ -46,8 +46,8 @@ def get_conn():
     connection on that cold start)."""
     if not DATABASE_URL:
         raise RuntimeError(
-            "DATABASE_URL is not configured. Attach a Vercel Postgres database "
-            "to this project (or set DATABASE_URL for local dev against your own Postgres)."
+            "DATABASE_URL is not configured. Create a free Neon Postgres database "
+            "and set its connection string as DATABASE_URL."
         )
     wrapped = getattr(_local, "conn", None)
     if wrapped is None or wrapped._conn.closed:

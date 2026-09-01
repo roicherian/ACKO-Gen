@@ -2,7 +2,7 @@
 Shared generation history for ACKO Image Generator.
 
 Every generated image (web app, MCP, edits/mirrors, background-removal) is
-saved to Vercel Blob by main.py's save_generated_bytes(). This module indexes
+saved to Cloudflare R2 by main.py's save_generated_bytes(). This module indexes
 that metadata in Postgres (same database user_store.py uses) so it can be
 listed and shared across every user. Images themselves live in Blob storage;
 this table only ever stores a pointer (image_url) to them, never the bytes.

@@ -1,75 +1,77 @@
 """
-Vercel Blob storage helper for ACKO Image Generator.
+Cloudflare R2 storage helper for ACKO Image Generator.
 
-Raw REST calls (stdlib urllib only, no requests dependency) against Vercel
-Blob's HTTP API. There's no official @vercel/blob SDK for Python; this
-request shape (PUT with x-api-version/x-content-type headers and a raw-bytes
-body; POST /delete with a JSON url list) is verified against the open-source
-`vercel_blob` PyPI package's implementation, which calls the same endpoint.
-
-Replaces local-disk storage (GENERATED_DIR, character image bytes) now that
-the app runs as Vercel serverless functions with no durable writable disk.
+R2 is S3-compatible, so this talks to it exactly like real S3 via boto3, just
+pointed at R2's endpoint with SigV4 signing. Replaces Vercel Blob (used
+during a brief detour to Vercel) now that the app runs on Render + Neon + R2
+instead — same public functions (upload_bytes/delete_urls), so nothing else
+in the codebase needed to change for this swap.
 """
 import os
-import json
-import urllib.request
-import urllib.parse
+import uuid
 
-BLOB_API_BASE = "https://blob.vercel-storage.com"
-BLOB_API_VERSION = "10"
+import boto3
+from botocore.config import Config
+
+R2_ACCOUNT_ID = os.environ.get("R2_ACCOUNT_ID", "")
+R2_ACCESS_KEY_ID = os.environ.get("R2_ACCESS_KEY_ID", "")
+R2_SECRET_ACCESS_KEY = os.environ.get("R2_SECRET_ACCESS_KEY", "")
+R2_BUCKET = os.environ.get("R2_BUCKET_NAME", "")
+# Public URL base for the bucket — either R2's own r2.dev subdomain (enabled
+# per-bucket in the Cloudflare dashboard) or a custom domain mapped to it.
+R2_PUBLIC_URL_BASE = os.environ.get("R2_PUBLIC_URL_BASE", "")
+
+_client = None
 
 
-def _token():
-    token = os.environ.get("BLOB_READ_WRITE_TOKEN", "")
-    if not token:
+def _get_client():
+    global _client
+    if _client is not None:
+        return _client
+    if not (R2_ACCOUNT_ID and R2_ACCESS_KEY_ID and R2_SECRET_ACCESS_KEY and R2_BUCKET):
         raise RuntimeError(
-            "BLOB_READ_WRITE_TOKEN is not configured. Attach a Vercel Blob "
-            "store to this project (Storage tab in the Vercel dashboard)."
+            "R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, and "
+            "R2_BUCKET_NAME must all be set — create an R2 bucket and API "
+            "token in the Cloudflare dashboard (R2 → Manage API Tokens)."
         )
-    return token
+    _client = boto3.client(
+        "s3",
+        endpoint_url=f"https://{R2_ACCOUNT_ID}.r2.cloudflarestorage.com",
+        aws_access_key_id=R2_ACCESS_KEY_ID,
+        aws_secret_access_key=R2_SECRET_ACCESS_KEY,
+        config=Config(signature_version="s3v4"),
+        region_name="auto",
+    )
+    return _client
 
 
 def upload_bytes(data, mime, path_hint):
-    """Uploads bytes to Vercel Blob under a path derived from path_hint — a
-    random suffix is always added so repeated uploads (e.g. re-generating for
-    the same character id) never collide or silently overwrite. Returns the
-    public URL. Raises on any non-2xx response."""
-    query = urllib.parse.urlencode({"pathname": path_hint})
-    req = urllib.request.Request(
-        f"{BLOB_API_BASE}/?{query}",
-        data=data,
-        method="PUT",
-        headers={
-            "access": "public",
-            "authorization": f"Bearer {_token()}",
-            "x-api-version": BLOB_API_VERSION,
-            "x-content-type": mime or "application/octet-stream",
-            "x-add-random-suffix": "1",
-        },
+    """Uploads bytes to R2 under a key derived from path_hint plus a random
+    suffix (so repeated uploads never collide), returns the public URL."""
+    if not R2_PUBLIC_URL_BASE:
+        raise RuntimeError(
+            "R2_PUBLIC_URL_BASE is not configured — enable public access for "
+            "the bucket (r2.dev subdomain, or a custom domain) and set this "
+            "to that base URL."
+        )
+    key = f"{path_hint}-{uuid.uuid4().hex[:12]}"
+    _get_client().put_object(
+        Bucket=R2_BUCKET, Key=key, Body=data,
+        ContentType=mime or "application/octet-stream",
     )
-    with urllib.request.urlopen(req, timeout=30) as r:
-        result = json.loads(r.read())
-    url = result.get("url")
-    if not url:
-        raise RuntimeError(f"Vercel Blob upload did not return a URL: {result}")
-    return url
+    return f"{R2_PUBLIC_URL_BASE.rstrip('/')}/{key}"
 
 
 def delete_urls(urls):
-    """Best-effort delete of one or more blob URLs. Callers should treat
-    failures as non-fatal — a stray orphaned blob is a wart, not a bug."""
+    """Best-effort delete of one or more R2 object URLs. Callers should treat
+    failures as non-fatal — a stray orphaned object is a wart, not a bug."""
     if not urls:
         return
-    body = json.dumps({"urls": urls if isinstance(urls, list) else [urls]}).encode()
-    req = urllib.request.Request(
-        f"{BLOB_API_BASE}/delete",
-        data=body,
-        method="POST",
-        headers={
-            "authorization": f"Bearer {_token()}",
-            "x-api-version": BLOB_API_VERSION,
-            "Content-Type": "application/json",
-        },
+    urls = urls if isinstance(urls, list) else [urls]
+    base = R2_PUBLIC_URL_BASE.rstrip("/") + "/"
+    keys = [u[len(base):] for u in urls if u.startswith(base)]
+    if not keys:
+        return
+    _get_client().delete_objects(
+        Bucket=R2_BUCKET, Delete={"Objects": [{"Key": k} for k in keys]}
     )
-    with urllib.request.urlopen(req, timeout=30) as r:
-        r.read()

@@ -3,10 +3,12 @@
 CORS proxy + app backend for ACKO Image Generator.
 Relays browser requests → api.magnific.com, adding CORS headers.
 Also gates access behind a simple @acko.tech email login.
-Local dev: python3 main.py, then open generate.html in any browser.
-Deployed on Vercel as a serverless function (see the module-level `handler`
-at the bottom) — persistent state lives in Postgres (db.py) and Vercel Blob
-(blob_store.py), not local disk, since serverless functions have none.
+Run: python3 main.py, then open generate.html in any browser.
+Deployed on Render as a normal long-running process (no serverless entry
+point needed). Persistent state lives in Postgres (db.py, e.g. Neon) and
+Cloudflare R2 (blob_store.py) — Render's own filesystem is NOT durable
+across restarts/redeploys/sleep on the free tier, so nothing here writes to
+local disk for anything that needs to survive.
 """
 import json
 import time
@@ -38,7 +40,7 @@ OPENAI_BASE = "https://api.openai.com"
 REMOVE_BG_API = "https://api.remove.bg/v1.0/removebg"
 HTML_DIR = os.path.dirname(os.path.abspath(__file__))
 ENV_FILE = os.path.join(HTML_DIR, ".env")
-# Only used for local dev now — Vercel deployments get every var from the
+# Only used for local dev now — Render deployments get every var from the
 # dashboard's Environment Variables, not a checked-in-adjacent .env file.
 DATA_DIR = os.environ.get("DATA_DIR", HTML_DIR)
 
@@ -56,7 +58,7 @@ def _ext_for_mime(mime):
 
 def save_generated_bytes(raw_bytes, mime="image/png", kind="generate", email=""):
     """
-    Persist image bytes to Vercel Blob (no durable local disk on serverless).
+    Persist image bytes to Cloudflare R2 (no durable local disk on Render's free tier).
     Returns metadata including the blob's public URL.
     """
     if not raw_bytes:
@@ -194,7 +196,7 @@ _vehicle_ref_cache = None  # (data_uri, mime, mtime)
 
 
 def _log_gen_debug(message):
-    # Vercel captures function stdout as logs — no local disk to append to.
+    # Render captures process stdout as logs — no local disk to append to.
     print(f"  [gen_debug] {message}")
 
 
@@ -801,8 +803,8 @@ class ProxyHandler(BaseHTTPRequestHandler):
                 self.end_headers()
             return
 
-        # Generated images now live in Vercel Blob (history.image_url points
-        # straight at a Blob public URL) — no /generated/<file> route needed.
+        # Generated images now live in Cloudflare R2 (history.image_url points
+        # straight at a public R2 URL) — no /generated/<file> route needed.
 
         # Design-system Skills (tokens, fonts) — read-only static assets.
         if path_no_query.startswith("/Skills/"):
@@ -935,7 +937,7 @@ class ProxyHandler(BaseHTTPRequestHandler):
             self.send_json(200, {"characters": character_store.list_characters()})
             return
 
-        # Character portraits now live in Vercel Blob (characters.imageUrl,
+        # Character portraits now live in Cloudflare R2 (characters.imageUrl,
         # returned directly by /api/characters) — no separate image route needed.
 
         # Shared generation history — every user's generations, most-recent-first.
@@ -1006,7 +1008,8 @@ class ProxyHandler(BaseHTTPRequestHandler):
                 "amazonaws.com",
                 "cloudfront.net",
                 "googleusercontent.com",
-                "vercel-storage.com",
+                "r2.dev",
+                "r2.cloudflarestorage.com",
             )
             if not any(host == h or host.endswith("." + h) for h in allowed_hosts):
                 self.send_json(400, {"error": "Host not allowed for image fetch."})
@@ -1737,13 +1740,6 @@ class ProxyHandler(BaseHTTPRequestHandler):
             self.send_cors()
             self.end_headers()
             self.wfile.write(msg)
-
-
-# Vercel's Python runtime imports this module and looks for a top-level
-# `handler` class extending BaseHTTPRequestHandler, invoking it once per
-# request (no persistent process, no serve_forever()). Local dev still uses
-# the ThreadingHTTPServer below via `python3 main.py`.
-handler = ProxyHandler
 
 
 if __name__ == "__main__":
