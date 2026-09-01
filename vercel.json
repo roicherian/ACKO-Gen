@@ -1,10 +1,7 @@
 {
-  "functions": {
-    "api/main.py": {
-      "maxDuration": 10
-    }
-  },
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/api/main" }
-  ]
+  "buildCommand": "pip install -r requirements.txt || echo 'No dependencies to install'",
+  "outputDirectory": ".",
+  "env": {
+    "PYTHONUNBUFFERED": "1"
+  }
 }

@@ -21,7 +21,7 @@ is_healthy() {
 
 start_proxy() {
   echo "Starting proxy..."
-  nohup python3 api/main.py > /tmp/acko_proxy.log 2>&1 &
+  nohup python3 proxy.py > /tmp/acko_proxy.log 2>&1 &
 }
 
 # Poll for up to ~8s instead of checking once immediately — startup (DB init,
