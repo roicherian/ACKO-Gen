@@ -3,10 +3,14 @@
 CORS proxy + app backend for ACKO Image Generator.
 Relays browser requests → api.magnific.com, adding CORS headers.
 Also gates access behind a simple @acko.tech email login.
-Local dev: python3 main.py, then open generate.html in any browser.
-Deployed on Vercel as a serverless function (see the module-level `handler`
-at the bottom) — persistent state lives in Postgres (db.py) and Vercel Blob
-(blob_store.py), not local disk, since serverless functions have none.
+Local dev: python3 api/main.py (from the project root), then open
+generate.html in any browser.
+Deployed on Vercel as a serverless function — lives under api/ because
+Vercel's Python runtime only recognizes the BaseHTTPRequestHandler-based
+`handler` convention (see the module-level `handler` near the bottom) for
+files inside /api, not for a root-level entrypoint. Persistent state lives in
+Postgres (db.py) and Vercel Blob (blob_store.py), not local disk, since
+serverless functions have none.
 """
 import json
 import time
@@ -36,7 +40,11 @@ PORT = int(os.environ.get("PORT", 3458))
 MAGNIFIC_BASE = "https://api.magnific.com"
 OPENAI_BASE = "https://api.openai.com"
 REMOVE_BG_API = "https://api.remove.bg/v1.0/removebg"
-HTML_DIR = os.path.dirname(os.path.abspath(__file__))
+# main.py lives in api/ (required for Vercel's Python "handler" convention —
+# see the module-level `handler` near the bottom), but generate.html, Skills/,
+# Vehicles-data/, vehicle_catalog.*, etc. all still live at the project root,
+# one level up.
+HTML_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENV_FILE = os.path.join(HTML_DIR, ".env")
 # Only used for local dev now — Vercel deployments get every var from the
 # dashboard's Environment Variables, not a checked-in-adjacent .env file.
