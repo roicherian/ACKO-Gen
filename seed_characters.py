@@ -17,6 +17,7 @@ from io import BytesIO
 
 from PIL import Image
 
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "api"))
 import character_store
 
 # (source filename, character name, age bracket) — filename order matches the

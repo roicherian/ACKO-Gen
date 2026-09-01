@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
 """
-Local CORS proxy for ACKO Image Generator.
+CORS proxy + app backend for ACKO Image Generator.
 Relays browser requests → api.magnific.com, adding CORS headers.
 Also gates access behind a simple @acko.tech email login.
-Run: python3 proxy.py
-Then open generate.html in any browser.
+Local dev: python3 api/main.py (from the project root), then open
+generate.html in any browser.
+Deployed on Vercel as a serverless function — lives under api/ because
+Vercel's Python runtime only recognizes the BaseHTTPRequestHandler-based
+`handler` convention (see the module-level `handler` near the bottom) for
+files inside /api, not for a root-level entrypoint. Persistent state lives in
+Postgres (db.py) and Vercel Blob (blob_store.py), not local disk, since
+serverless functions have none.
 """
 import json
 import time
@@ -20,6 +26,8 @@ import urllib.parse
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 import os
 
+import db
+import blob_store
 import user_store
 import catalogue_db
 import catalogue_validation
@@ -32,16 +40,15 @@ PORT = int(os.environ.get("PORT", 3458))
 MAGNIFIC_BASE = "https://api.magnific.com"
 OPENAI_BASE = "https://api.openai.com"
 REMOVE_BG_API = "https://api.remove.bg/v1.0/removebg"
-HTML_DIR = os.path.dirname(os.path.abspath(__file__))
+# main.py lives in api/ (required for Vercel's Python "handler" convention —
+# see the module-level `handler` near the bottom), but generate.html, Skills/,
+# Vehicles-data/, vehicle_catalog.*, etc. all still live at the project root,
+# one level up.
+HTML_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENV_FILE = os.path.join(HTML_DIR, ".env")
-# On a real host, point this at a persistent volume/disk (e.g. Render's mounted
-# disk path) so the user DB and session secret survive restarts/redeploys.
-# Defaults to living alongside the code, which is fine for local dev.
+# Only used for local dev now — Vercel deployments get every var from the
+# dashboard's Environment Variables, not a checked-in-adjacent .env file.
 DATA_DIR = os.environ.get("DATA_DIR", HTML_DIR)
-os.makedirs(DATA_DIR, exist_ok=True)
-# Local image store (S3 later). All generations / edits / cutouts land here.
-GENERATED_DIR = os.path.join(DATA_DIR, "generated")
-os.makedirs(GENERATED_DIR, exist_ok=True)
 
 
 def _ext_for_mime(mime):
@@ -57,40 +64,18 @@ def _ext_for_mime(mime):
 
 def save_generated_bytes(raw_bytes, mime="image/png", kind="generate", email=""):
     """
-    Persist image bytes under ./generated for local durability.
-    Returns metadata including a same-origin URL (/generated/<file>).
+    Persist image bytes to Vercel Blob (no durable local disk on serverless).
+    Returns metadata including the blob's public URL.
     """
     if not raw_bytes:
         raise ValueError("No image bytes to save.")
     safe_kind = "".join(c if c.isalnum() or c in "-_" else "-" for c in (kind or "generate"))[:40] or "generate"
-    stamp = time.strftime("%Y%m%d_%H%M%S")
     short = uuid.uuid4().hex[:10]
-    filename = f"{stamp}_{safe_kind}_{short}{_ext_for_mime(mime)}"
-    fpath = os.path.join(GENERATED_DIR, filename)
-    with open(fpath, "wb") as f:
-        f.write(raw_bytes)
-    meta_path = fpath + ".json"
-    try:
-        with open(meta_path, "w", encoding="utf-8") as mf:
-            json.dump(
-                {
-                    "filename": filename,
-                    "mime": mime or "image/png",
-                    "kind": kind or "generate",
-                    "email": email or "",
-                    "bytes": len(raw_bytes),
-                    "ts": int(time.time() * 1000),
-                },
-                mf,
-                indent=2,
-            )
-    except Exception:
-        pass
+    path_hint = f"generated/{safe_kind}-{short}{_ext_for_mime(mime)}"
+    url = blob_store.upload_bytes(raw_bytes, mime or "image/png", path_hint)
     return {
         "id": short,
-        "filename": filename,
-        "path": os.path.join("generated", filename),
-        "url": f"/generated/{filename}",
+        "url": url,
         "mime": mime or "image/png",
         "bytes": len(raw_bytes),
     }
@@ -214,15 +199,11 @@ VEHICLE_REF_PATH = os.path.join(
     HTML_DIR, "Vehicles-data", "vehicle_base_reference.png"
 )
 _vehicle_ref_cache = None  # (data_uri, mime, mtime)
-GEN_DEBUG_LOG = os.path.join(DATA_DIR, "gen_debug.log")
 
 
 def _log_gen_debug(message):
-    try:
-        with open(GEN_DEBUG_LOG, "a") as f:
-            f.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')} {message}\n")
-    except OSError:
-        pass
+    # Vercel captures function stdout as logs — no local disk to append to.
+    print(f"  [gen_debug] {message}")
 
 
 def get_vehicle_reference_image():
@@ -375,26 +356,37 @@ def sanitize_reference_images(refs):
 
 ALLOWED_EMAIL_DOMAIN = "acko.tech"
 SESSION_TTL_SECONDS = 12 * 60 * 60  # 12 hours
-SESSION_SECRET_FILE = os.path.join(DATA_DIR, ".session_secret")
 
-# /mcp cost guardrail — a lightweight in-memory sliding-window limit, not an audit
-# record (last_used_at on the token already covers that). Deliberately not
-# persisted to SQLite: resets on restart, which is fine for a rate limit, and
-# assumes a single Railway instance (see MCP_RATE_LIMIT_PER_HOUR usage below).
-_mcp_rate_lock = threading.Lock()
-_mcp_rate_log = {}  # email -> [timestamps]
+# /mcp cost guardrail — a sliding-window limit, not an audit record
+# (last_used_at on the token already covers that). Postgres-backed: an
+# in-memory dict wouldn't survive between separate serverless invocations.
 MCP_RATE_LIMIT_PER_HOUR = int(os.environ.get("MCP_RATE_LIMIT_PER_HOUR", "20"))
+
+
+def init_mcp_rate_table():
+    conn = db.get_conn()
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS mcp_rate_log (
+            id         SERIAL PRIMARY KEY,
+            email      TEXT NOT NULL,
+            called_at  DOUBLE PRECISION NOT NULL
+        )
+    """)
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_mcp_rate_log_email_time ON mcp_rate_log(email, called_at)")
+    conn.commit()
 
 
 def check_mcp_rate_limit(email):
     now = time.time()
-    with _mcp_rate_lock:
-        log = _mcp_rate_log.setdefault(email, [])
-        log[:] = [t for t in log if now - t < 3600]
-        if len(log) >= MCP_RATE_LIMIT_PER_HOUR:
-            return False
-        log.append(now)
-        return True
+    conn = db.get_conn()
+    conn.execute("DELETE FROM mcp_rate_log WHERE called_at < %s", (now - 3600,))
+    row = conn.execute("SELECT COUNT(*) AS c FROM mcp_rate_log WHERE email = %s", (email,)).fetchone()
+    if row["c"] >= MCP_RATE_LIMIT_PER_HOUR:
+        conn.commit()
+        return False
+    conn.execute("INSERT INTO mcp_rate_log (email, called_at) VALUES (%s, %s)", (email, now))
+    conn.commit()
+    return True
 
 
 user_store.init_db()
@@ -405,24 +397,17 @@ if _bootstrap_admin_emails:
 catalogue_db.init_db()
 character_store.init_db()
 history_store.init_db()
+init_mcp_rate_table()
 
-
-def get_session_secret():
-    """Load a persistent random secret for signing sessions, creating it on first run."""
-    try:
-        with open(SESSION_SECRET_FILE, "r") as f:
-            secret = f.read().strip()
-            if secret:
-                return secret
-    except FileNotFoundError:
-        pass
-    secret = secrets.token_hex(32)
-    with open(SESSION_SECRET_FILE, "w") as f:
-        f.write(secret)
-    return secret
-
-
-SESSION_SECRET = get_session_secret()
+SESSION_SECRET = os.environ.get("SESSION_SECRET", "")
+if not SESSION_SECRET:
+    raise RuntimeError(
+        "SESSION_SECRET is not configured. Set a fixed random value as an "
+        "environment variable (e.g. python3 -c \"import secrets; "
+        "print(secrets.token_hex(32))\" to generate one) — without it, every "
+        "cold start would sign sessions with a different secret and silently "
+        "invalidate every login."
+    )
 
 
 def make_session(email):
@@ -824,40 +809,8 @@ class ProxyHandler(BaseHTTPRequestHandler):
                 self.end_headers()
             return
 
-        # Local generated images (disk store; S3 later).
-        if path_no_query.startswith("/generated/"):
-            rel = path_no_query[len("/generated/"):]
-            if ".." in rel or rel.startswith("/") or not rel or "/" in rel:
-                self.send_response(400)
-                self.end_headers()
-                return
-            fpath = os.path.join(GENERATED_DIR, rel)
-            try:
-                with open(fpath, "rb") as f:
-                    body = f.read()
-            except FileNotFoundError:
-                self.send_response(404)
-                self.end_headers()
-                return
-            lower = rel.lower()
-            if lower.endswith(".png"):
-                ctype = "image/png"
-            elif lower.endswith(".jpg") or lower.endswith(".jpeg"):
-                ctype = "image/jpeg"
-            elif lower.endswith(".webp"):
-                ctype = "image/webp"
-            elif lower.endswith(".gif"):
-                ctype = "image/gif"
-            else:
-                ctype = "application/octet-stream"
-            self.send_response(200)
-            self.send_header("Content-Type", ctype)
-            self.send_header("Content-Length", len(body))
-            self.send_header("Cache-Control", "private, max-age=86400")
-            self.send_cors()
-            self.end_headers()
-            self.wfile.write(body)
-            return
+        # Generated images now live in Vercel Blob (history.image_url points
+        # straight at a Blob public URL) — no /generated/<file> route needed.
 
         # Design-system Skills (tokens, fonts) — read-only static assets.
         if path_no_query.startswith("/Skills/"):
@@ -990,35 +943,8 @@ class ProxyHandler(BaseHTTPRequestHandler):
             self.send_json(200, {"characters": character_store.list_characters()})
             return
 
-        # Character reference library — the actual portrait bytes, used directly
-        # as an <img src>, same role /generated/<file> plays for other images.
-        if path_no_query.startswith("/api/characters/") and path_no_query.endswith("/image"):
-            qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
-            # <img src> cannot send custom headers — allow token via query too.
-            token = self.headers.get("x-session-token", "") or (qs.get("token") or [""])[0]
-            ok, email = verify_session(token)
-            if not ok:
-                self.send_json(401, {"error": "Not signed in. Please sign in with your acko.tech email."})
-                return
-            perm_ok, perm_err = require_permission(email, user_store.IMAGE_GEN_ALLOWED)
-            if not perm_ok:
-                self.send_json(403, perm_err)
-                return
-            char_id = path_no_query[len("/api/characters/"):-len("/image")]
-            img_bytes, mime = character_store.get_character_image(char_id)
-            if img_bytes is None:
-                self.send_response(404)
-                self.send_cors()
-                self.end_headers()
-                return
-            self.send_response(200)
-            self.send_header("Content-Type", mime or "image/jpeg")
-            self.send_header("Content-Length", str(len(img_bytes)))
-            self.send_header("Cache-Control", "private, max-age=86400")
-            self.send_cors()
-            self.end_headers()
-            self.wfile.write(img_bytes)
-            return
+        # Character portraits now live in Vercel Blob (characters.imageUrl,
+        # returned directly by /api/characters) — no separate image route needed.
 
         # Shared generation history — every user's generations, most-recent-first.
         # Cursor-paginated via before_ts (epoch ms, exclusive) so a growing shared
@@ -1088,6 +1014,7 @@ class ProxyHandler(BaseHTTPRequestHandler):
                 "amazonaws.com",
                 "cloudfront.net",
                 "googleusercontent.com",
+                "vercel-storage.com",
             )
             if not any(host == h or host.endswith("." + h) for h in allowed_hosts):
                 self.send_json(400, {"error": "Host not allowed for image fetch."})
@@ -1670,8 +1597,6 @@ class ProxyHandler(BaseHTTPRequestHandler):
             }
             if saved:
                 payload["local_url"] = saved["url"]
-                payload["local_path"] = saved["path"]
-                payload["local_filename"] = saved["filename"]
             if history_id:
                 payload["history_id"] = history_id
             self.send_json(200, payload)
@@ -1822,13 +1747,18 @@ class ProxyHandler(BaseHTTPRequestHandler):
             self.wfile.write(msg)
 
 
+# Vercel's Python runtime imports this module and looks for a top-level
+# `handler` class extending BaseHTTPRequestHandler, invoking it once per
+# request (no persistent process, no serve_forever()). Local dev still uses
+# the ThreadingHTTPServer below via `python3 main.py`.
+handler = ProxyHandler
+
+
 if __name__ == "__main__":
-    # 0.0.0.0 so this works both locally and on a real host (Render etc. route
-    # external traffic to whatever port the process binds, not just localhost).
+    # 0.0.0.0 so this works both locally and on a real host.
     server = ThreadingHTTPServer(("0.0.0.0", PORT), ProxyHandler)
     print(f"\n  ACKO Image Generator proxy running on port {PORT}")
-    print(f"  Open in browser → http://localhost:{PORT}/generate.html")
-    print(f"  Local image store → {GENERATED_DIR}\n")
+    print(f"  Open in browser → http://localhost:{PORT}/generate.html\n")
     if not MAGNIFIC_KEY:
         print("  WARNING: MAGNIFIC_KEY is not set in .env — image generation will fail with a 401/403 until it is.\n")
     if not OPENAI_API_KEY:

@@ -4462,14 +4462,12 @@ function charHash(id) {
 function charColor(id) {
   return CHAR_AVATAR_COLORS[charHash(id) % CHAR_AVATAR_COLORS.length];
 }
-// Portraits are served directly from the DB — no missing-file fallback needed
-// (creating a character always requires an image); the card template's onerror
-// handler still covers a genuine load failure with the initials-avatar div.
-function charPhotoUrl(id) {
-  // <img src> cannot send the x-session-token header — pass it as a query
-  // param instead, same fallback /api/fetch-image already relies on.
-  const token = getSessionToken();
-  return `/api/characters/${encodeURIComponent(id)}/image${token ? `?token=${encodeURIComponent(token)}` : ''}`;
+// Portraits are served directly from Vercel Blob's public URL — no
+// missing-file fallback needed (creating a character always requires an
+// image); the card template's onerror handler still covers a genuine load
+// failure with the initials-avatar div.
+function charPhotoUrl(character) {
+  return character.imageUrl;
 }
 
 let imagenReferences = { style: null, character: null, custom: null };
@@ -4538,7 +4536,7 @@ function renderRefUI() {
   if (imagenReferences.style) chips.appendChild(buildRefChip('style', imagenReferences.style.label, imagenReferences.style.dataUri));
   if (imagenReferences.character) {
     const c = imagenReferences.character;
-    chips.appendChild(buildRefChip('character', `${c.name} · ${c.role}`, charPhotoUrl(c.id), c));
+    chips.appendChild(buildRefChip('character', `${c.name} · ${c.role}`, charPhotoUrl(c), c));
   }
   if (imagenReferences.custom) chips.appendChild(buildRefChip('custom', imagenReferences.custom.label, imagenReferences.custom.dataUri));
 }
@@ -4701,7 +4699,7 @@ function renderCharacterGrid() {
             <button class="char-fav-btn${isFav ? ' on' : ''}" onclick="toggleCharacterFav('${c.id}', event)" title="Favourite">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
             </button>
-            <div class="char-avatar-photo"><img src="${charPhotoUrl(c.id)}" alt="${esc(c.name)}" loading="lazy" onerror="this.parentElement.outerHTML='<div class=\'char-avatar\' style=\'background:${charColor(c.id)}\'>${esc(charInitials(c.name))}</div>'"></div>
+            <div class="char-avatar-photo"><img src="${charPhotoUrl(c)}" alt="${esc(c.name)}" loading="lazy" onerror="this.parentElement.outerHTML='<div class=\'char-avatar\' style=\'background:${charColor(c.id)}\'>${esc(charInitials(c.name))}</div>'"></div>
             <div class="char-name">${esc(c.name)}</div>
             <div class="char-meta">${esc(c.location)}</div>
             <div class="char-meta">${esc(c.role)}</div>
@@ -4727,7 +4725,7 @@ async function urlToDataUri(url) {
 let characterRefCache = {}; // character id -> {dataUri, mime}, so repeat generations don't refetch/recompress
 async function getCharacterReferenceImage(character) {
   if (characterRefCache[character.id]) return characterRefCache[character.id];
-  const rawUri = await urlToDataUri(charPhotoUrl(character.id));
+  const rawUri = await urlToDataUri(charPhotoUrl(character));
   const compressed = await compressDataUriForReference(rawUri, 350 * 1024);
   const mime = normalizeMagnificRefMime(mimeFromDataUri(compressed) || 'image/png');
   const ref = { dataUri: compressed, mime };
