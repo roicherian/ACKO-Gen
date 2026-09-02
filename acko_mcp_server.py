@@ -33,33 +33,55 @@ MOOD_MAP = {
     "internal-brand": "warm and professionally confident, at ease in their environment",
 }
 
+# Mirrors generate.html's SETTINGS object exactly (the web app's version was
+# already fixed to avoid forcing an unrelated backdrop into every scene, e.g.
+# a "health" product tag no longer forces a hospital ward onto a scene that's
+# actually set on a football turf — see PROPS_RULE/BACKGROUND_RULE below).
+# Kept in sync: any change to one setting's scene/propsHint/light should be
+# mirrored in the other file's copy of the same entry.
 SETTING_MAP = {
     "motor": {
-        "scene": "a clean well-lit Indian car service workshop — pegboard tool wall, cars on lifts in background",
-        "props": 'mechanic in dark navy "Car Care Service" uniform; compact silver Maruti or Tata hatchback with Indian state number plate',
-        "light": "bright even workshop lighting from large open shutter windows — soft natural daylight fill, warm whites",
+        "scene": "a clean, uncluttered modern Indian car service area — one plain wall, a single tidy tool rack, minimal and calm",
+        "props": "if the scene involves a vehicle or mechanic, a plain dark navy work uniform and a single compact Indian hatchback with a state number plate are appropriate",
+        "light": "bright even daylight from a large open shutter — soft natural fill, clean neutral whites",
     },
     "health": {
-        "scene": "a modern Indian hospital ward or clinic — clean beige walls, hospital bed, IV drip stand",
-        "props": 'doctor in white coat with "Dr. [Name]" name badge and stethoscope — friendly, approachable',
-        "light": "soft diffused overhead lighting mixed with warm window light — bright and clinically warm",
+        "scene": "a clean, modern Indian clinic — a plain beige wall and minimal furnishings, a single small green plant",
+        "props": "if the scene involves a doctor or consultation, a white coat and stethoscope are appropriate",
+        "light": "soft diffused window light with gentle neutral overhead fill — bright and clean",
     },
     "travel": {
-        "scene": "an Indian airport terminal — polished tile floor, yellow-on-black departure boards with Hindi and English signage",
-        "props": "ground staff in dark navy uniform; suitcase and boarding pass as props",
-        "light": "warm golden afternoon light flooding through large terminal windows — bright and airy",
+        "scene": "a calm, modern Indian airport interior — clean floor and large windows, minimal and uncrowded",
+        "props": "if the scene involves travel, a single cabin suitcase or boarding pass is appropriate",
+        "light": "soft afternoon daylight through large windows — bright, airy, mostly neutral tone",
     },
     "home": {
-        "scene": "a warm Indian family home — wooden dining table, steel water bottle, small potted plant",
-        "props": "everyday Indian household details: tablet, cup of chai, cotton furnishings",
-        "light": "soft diffused window light — warm afternoon domestic fill",
+        "scene": "a warm, tidy Indian family home — a wooden table and a single small potted plant, uncluttered",
+        "props": "if the scene calls for it, a cup of chai or a tablet is appropriate",
+        "light": "soft diffused window light — bright, mostly neutral domestic fill",
     },
     "general": {
-        "scene": "a real contemporary Indian setting — office, street, or home that feels lived-in",
-        "props": "authentic everyday Indian props — phone, bag, notebook",
-        "light": "bright clean natural light — warm but not dramatic",
+        "scene": "a real, contemporary Indian setting — a clean, uncluttered home, office or quiet street corner",
+        "props": "",
+        "light": "bright clean natural light — mostly neutral, not dramatic",
     },
 }
+
+# Same discipline rules as generate.html's BACKGROUND_RULE/PROPS_RULE — without
+# these, a product tag's setting/props get force-injected regardless of what
+# the scene text actually describes (the original bug: tagging a football-turf
+# scene as product="health" appended a full hospital-ward-and-doctor backdrop
+# on top of the user's own setting instead of deferring to it).
+BACKGROUND_RULE = (
+    "Keep the background minimal, clean and uncluttered — softly blurred, with only the few "
+    "elements the context genuinely needs. No crowds, no rush, no busy scenery, no extra "
+    "people, props or activity competing for attention."
+)
+PROPS_RULE = (
+    "Only include props, accessories or objects that the scene description explicitly calls "
+    "for. Do not add a phone, bag, tablet, or any other item by default — empty hands are "
+    "correct whenever the scene does not need an object."
+)
 
 NEGATIVE_PROMPT = (
     "posed, stiff, looking at camera, stock photo smile, "
@@ -92,10 +114,12 @@ def build_prompt(scene, moment, product, skin_tone="", region="", age="", life_s
         "Cinematic photorealistic lifestyle photograph, 16:9 widescreen, "
         "shot on 50mm prime lens at f/2.8 to f/4, shallow depth of field.",
         f"A {subject} — {scene}.",
-        f"Setting: {s['scene']}. {s['props']}.",
+        f"Setting: {s['scene']}.",
+        BACKGROUND_RULE,
+        PROPS_RULE + (f" ({s['props']}.)" if s["props"] else ""),
         f"{s['light']}. Warm whites, natural skin tones with slight imperfections "
         "— premium Indian commercial photography style, NOT dark or moody.",
-        f"Expression: {mood}. Background softly blurred real Indian people — busy but not chaotic.",
+        f"Expression: {mood}. One clear subject with room to breathe.",
         "Candid documentary feel, not posed. Realistic skin texture, no heavy makeup. "
         "Middle-class Indian aesthetic, modern but understated. "
         "Slight warm colour grade, gently desaturated, subtle film grain.",
@@ -229,7 +253,21 @@ TOOL = {
                 "type":        "string",
                 "enum":        ["motor", "health", "travel", "home", "general"],
                 "default":     "general",
-                "description": "ACKO product line — sets setting, props, and lighting",
+                "description": (
+                    "Which ACKO insurance vertical's standard backdrop to use. "
+                    "IMPORTANT: this REPLACES the location/setting with that vertical's fixed "
+                    "backdrop (e.g. 'health' sets the scene in a clinic, 'motor' a car service "
+                    "area, 'travel' an airport, 'home' a family dining table) — even though "
+                    "matching props (a doctor's coat, a mechanic's uniform, a suitcase) are only "
+                    "added when the scene text itself calls for them, the location itself still "
+                    "changes. Only choose a specific vertical when the scene is actually set "
+                    "there (e.g. a hospital visit, a car service). Do NOT choose 'health' just "
+                    "because the scene mentions an injury/wound/illness — a kid checking a "
+                    "scraped knee on a football turf is NOT a hospital scene. If the scene "
+                    "already fully describes its own setting (a turf, a street, an office, "
+                    "anywhere not matching one of these four verticals), use 'general' so that "
+                    "setting is respected instead of overridden."
+                ),
             },
             "ratio": {
                 "type":        "string",
