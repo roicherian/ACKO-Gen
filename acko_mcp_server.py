@@ -82,11 +82,22 @@ PROPS_RULE = (
     "for. Do not add a phone, bag, tablet, or any other item by default — empty hands are "
     "correct whenever the scene does not need an object."
 )
+# Added after a real generation produced a third leg on a cross-legged seated
+# child — overlapping/bent-limb poses (sitting cross-legged, kneeling, one
+# knee drawn up) are exactly where models most often add a spare limb.
+ANATOMY_RULE = (
+    "Anatomically correct human body: exactly two arms and two legs, five fingers per hand, "
+    "no extra, duplicated or fused limbs. Pay particular attention to seated, cross-legged, "
+    "kneeling or overlapping-limb poses — they must still resolve to a normal human body with "
+    "no spare arm or leg."
+)
 
 NEGATIVE_PROMPT = (
     "posed, stiff, looking at camera, stock photo smile, "
     "plastic skin, airbrushed complexion, heavy makeup, "
-    "melted hands, wrong finger count, distorted face, "
+    "melted hands, extra fingers, wrong finger count, distorted face, "
+    "extra limbs, extra legs, extra arms, three legs, fused legs, "
+    "malformed limbs, wrong number of legs, disconnected limbs, "
     "Western setting, left-hand drive car, foreign architecture, "
     "dark moody tones, hard shadows, neon colours, oversaturated HDR, "
     "mascot, cartoon, 3D render, CGI, illustration, "
@@ -123,6 +134,7 @@ def build_prompt(scene, moment, product, skin_tone="", region="", age="", life_s
         "Candid documentary feel, not posed. Realistic skin texture, no heavy makeup. "
         "Middle-class Indian aesthetic, modern but understated. "
         "Slight warm colour grade, gently desaturated, subtle film grain.",
+        ANATOMY_RULE,
     ])
 
 
