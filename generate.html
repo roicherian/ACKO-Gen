@@ -1218,6 +1218,10 @@ body:not(.studio-ui):not(.vehicle-mode) .prompt-footer .btn-gen { width: 100%; m
 /* ACTION BUTTONS */
 .action-row { display: flex; gap: 8px; margin-bottom: 14px; justify-content: center; }
 body.imagen-mode .action-row .btn-gen { flex: 0 0 auto; justify-content: center; }
+.daily-usage-note {
+  text-align: center; font-size: 12px; color: var(--muted); margin-top: -6px; margin-bottom: 14px;
+}
+.daily-usage-note.near-limit { color: var(--red, #e11d48); font-weight: 600; }
 .btn-action {
   display: flex; align-items: center; gap: 7px; padding: 8px 14px;
   border: 1px solid var(--border-s); border-radius: var(--r-sm); background: var(--white);
@@ -2500,8 +2504,7 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
                 <select id="numSelect" onchange="syncImagenConfigMeta()">
                   <option value="1">1 image</option>
                   <option value="2">2 images</option>
-                  <option value="3">3 images</option>
-                  <option value="4" selected>4 images</option>
+                  <option value="3" selected>3 images</option>
                 </select>
                 <div class="sel-caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
               </div>
@@ -2714,6 +2717,7 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
         <span id="genBtnLabel">Generate Image</span>
       </button>
     </div>
+    <div class="daily-usage-note" id="dailyUsageNote"></div>
   </main>
 
   <!-- RIGHT PANEL -->
@@ -4462,7 +4466,7 @@ function charHash(id) {
 function charColor(id) {
   return CHAR_AVATAR_COLORS[charHash(id) % CHAR_AVATAR_COLORS.length];
 }
-// Portraits are served directly from Vercel Blob's public URL — no
+// Portraits are served directly from Cloudflare R2's public URL — no
 // missing-file fallback needed (creating a character always requires an
 // image); the card template's onerror handler still covers a genuine load
 // failure with the initials-avatar div.
@@ -7475,6 +7479,7 @@ async function checkSession() {
       hideLoginGate(data.email);
       loadCharacterLibrary();
       refreshHistoryCache();
+      refreshDailyUsage();
       if (location.hash === '#admin') navigateTo('admin'); // no-op if not an Admin
     } else {
       clearSession();
@@ -7485,6 +7490,26 @@ async function checkSession() {
     // Proxy unreachable — fall back to trusting the locally stored session
     // so the UI isn't blocked purely by a transient network hiccup.
     hideLoginGate();
+  }
+}
+
+/** Shows "X / N images today" near the Generate button — refreshed on load
+ * and after each generation completes, so the count stays current without
+ * the user having to reload. Fails silently (just hides the note) since
+ * this is informational, not something that should ever block generating. */
+async function refreshDailyUsage() {
+  const el = document.getElementById('dailyUsageNote');
+  if (!el) return;
+  try {
+    const res = await fetch(proxyUrl('/api/usage/today'), {
+      headers: { 'x-session-token': getSessionToken() },
+    });
+    if (!res.ok) { el.textContent = ''; return; }
+    const data = await res.json();
+    el.textContent = `${data.used} / ${data.limit} images today`;
+    el.classList.toggle('near-limit', data.used >= data.limit);
+  } catch {
+    el.textContent = '';
   }
 }
 
@@ -7587,9 +7612,9 @@ const BACKGROUND_RULE = 'Keep the background minimal, clean and uncluttered — 
 const PROPS_RULE = 'Only include props, accessories or objects that the scene description explicitly calls for. Do not add a phone, bag, tablet, or any other item by default — empty hands are correct whenever the scene does not need an object.';
 
 // Master prompt — technical correctness + brand discipline, appended to every prompt
-const MASTER_SUFFIX = 'Ensure technical correctness in every detail: hands, eyes and fingers are anatomically accurate; phone screens, tablet screens, papers and documents are held at natural, correct angles with clean geometry and no garbled text or signage; no melted features, no repeating patterns, no distorted faces. Keep the execution disciplined, honest, and free of any real or implied brands, logos, hospital names or competitor visuals. The final image must feel warm, bright, disciplined, real, and immediately, unmistakably modern.';
+const MASTER_SUFFIX = 'Ensure technical correctness in every detail: hands, eyes and fingers are anatomically accurate; the body has exactly two arms and two legs with no extra, duplicated or fused limbs — pay particular attention to seated, cross-legged, kneeling or overlapping-limb poses, which must still resolve to a normal human body; phone screens, tablet screens, papers and documents are held at natural, correct angles with clean geometry and no garbled text or signage; no melted features, no repeating patterns, no distorted faces. Keep the execution disciplined, honest, and free of any real or implied brands, logos, hospital names or competitor visuals. The final image must feel warm, bright, disciplined, real, and immediately, unmistakably modern.';
 
-const DEFAULT_NEG = 'cluttered background, busy background, crowded scene, crowd, too many people, background rush, messy background, competing props, visual clutter, tilted phone screen, warped screen, distorted screen, bent or curved documents, wrong-angle paper, garbled text, gibberish signage, extra fingers, deformed hands, melted hands, wrong finger count, distorted face, off eyes, posed, stiff, looking at camera, stock photo smile, plastic skin, airbrushed complexion, heavy makeup, Western setting, left-hand drive car, foreign architecture, dark moody tones, hard shadows, neon colours, oversaturated HDR, mascot, cartoon, 3D render, CGI, illustration, visible brand logos, competitor names, text overlay on scene, fear, panic, blood, gore, distress, plain white background, nsfw, heavy orange colour grading, strong amber cast, golden hour glow, overly warm tone, sepia tint, yellow colour cast';
+const DEFAULT_NEG = 'cluttered background, busy background, crowded scene, crowd, too many people, background rush, messy background, competing props, visual clutter, tilted phone screen, warped screen, distorted screen, bent or curved documents, wrong-angle paper, garbled text, gibberish signage, extra fingers, deformed hands, melted hands, wrong finger count, extra limbs, extra legs, extra arms, three legs, fused legs, malformed limbs, wrong number of legs, disconnected limbs, distorted face, off eyes, posed, stiff, looking at camera, stock photo smile, plastic skin, airbrushed complexion, heavy makeup, Western setting, left-hand drive car, foreign architecture, dark moody tones, hard shadows, neon colours, oversaturated HDR, mascot, cartoon, 3D render, CGI, illustration, visible brand logos, competitor names, text overlay on scene, fear, panic, blood, gore, distress, plain white background, nsfw, heavy orange colour grading, strong amber cast, golden hour glow, overly warm tone, sepia tint, yellow colour cast';
 
 // ─── PROMPT BUILDER ───────────────────────────────────────────────────────────
 function buildPrompt(scene) {
@@ -7959,6 +7984,7 @@ async function generate() {
       if (vehiclePendingGens.some(p => p.id === id)) finishVehicleGalleryPending(id);
     });
     renderVehicleGallery();
+    refreshDailyUsage();
     if (successes) {
       setStatus('done', `${successes} of ${num} completed`);
     } else {

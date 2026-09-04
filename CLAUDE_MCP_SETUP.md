@@ -6,7 +6,7 @@ same Magnific-backed generator as the web app, through a remote MCP server.
 
 ## Step 1: Get access to the app (one-time, skip if you already have an account)
 
-1. Go to `https://web-production-af07c.up.railway.app` in a browser.
+1. Go to `https://acko-gen.onrender.com` in a browser.
 2. Enter your acko.tech email and sign in.
 3. If you're new, you'll see a "request access" screen — submit it.
 4. An Admin needs to approve your request before you can generate images.
@@ -31,7 +31,7 @@ cat > .mcp.json << 'EOF'
   "mcpServers": {
     "acko-image-gen": {
       "type": "http",
-      "url": "https://web-production-af07c.up.railway.app/mcp",
+      "url": "https://acko-gen.onrender.com/mcp",
       "headers": {
         "Authorization": "Bearer YOUR_TOKEN_HERE"
       }
@@ -54,7 +54,7 @@ register the server globally (works in every project, no per-folder file
 needed) instead of creating `.mcp.json`:
 
 ```bash
-claude mcp add acko-image-gen --transport http https://web-production-af07c.up.railway.app/mcp --header "Authorization: Bearer YOUR_TOKEN_HERE" --scope user
+claude mcp add acko-image-gen --transport http https://acko-gen.onrender.com/mcp --header "Authorization: Bearer YOUR_TOKEN_HERE" --scope user
 ```
 
 If you instead see `command not found: claude`, use the `.mcp.json` method

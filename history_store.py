@@ -12,6 +12,7 @@ Mirrors character_store.py's pattern.
 import time
 import uuid
 import json
+import datetime
 
 import db
 
@@ -119,3 +120,24 @@ def delete_history_row(row_id):
         raise ValueError(f"No such history item: {row_id}")
     conn.execute("DELETE FROM history WHERE id = %s", (row_id,))
     conn.commit()
+
+
+def count_today(email):
+    """Count of this email's generations since midnight UTC today — backs the
+    per-person daily generation cap. Reuses the existing history table rather
+    than a separate counter, since every successful generation already lands
+    a row here. Note: a request for N images fires N create-calls that each
+    check this count before any of them finish and get logged, so someone
+    right at the boundary could exceed the cap by up to N-1 in one batch —
+    an acceptable bit of slack for an internal-tool quota, not a hard SLA."""
+    start_of_day_ms = int(
+        datetime.datetime.utcnow()
+        .replace(hour=0, minute=0, second=0, microsecond=0)
+        .timestamp() * 1000
+    )
+    conn = db.get_conn()
+    row = conn.execute(
+        "SELECT COUNT(*) as c FROM history WHERE email = %s AND created_at >= %s",
+        (email, start_of_day_ms),
+    ).fetchone()
+    return row["c"]
