@@ -1030,8 +1030,7 @@ class ProxyHandler(BaseHTTPRequestHandler):
                 "amazonaws.com",
                 "cloudfront.net",
                 "googleusercontent.com",
-                "r2.dev",
-                "r2.cloudflarestorage.com",
+                "backblazeb2.com",
             )
             if not any(host == h or host.endswith("." + h) for h in allowed_hosts):
                 self.send_json(400, {"error": "Host not allowed for image fetch."})

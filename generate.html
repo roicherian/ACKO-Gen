@@ -3467,9 +3467,14 @@ function proxiedImageUrl(remoteUrl) {
 function resolveItemImageSrc(item) {
   if (!item) return '';
   if (item.id && imageSrcCache.has(item.id)) return imageSrcCache.get(item.id);
-  // Prefer durable local disk copies under /generated/
-  const local = item.localUrl
-    || (item.imageData && item.imageData.localUrl)
+  // Prefer durable local disk copies under /generated/ — same-origin, so no
+  // CORS/canvas-taint risk. Must check the path itself, not just truthiness:
+  // localUrl/imageData.localUrl now often hold a cross-origin Backblaze B2
+  // URL (since the move off local disk storage), which needs the same-origin
+  // proxy below instead — treating it as "local" here silently taints any
+  // canvas the image gets drawn into (breaks the Edit feature's toDataURL).
+  const local = (item.localUrl && String(item.localUrl).startsWith('/generated/') ? item.localUrl : '')
+    || (item.imageData && item.imageData.localUrl && String(item.imageData.localUrl).startsWith('/generated/') ? item.imageData.localUrl : '')
     || (item.src && String(item.src).startsWith('/generated/') ? item.src : '');
   if (local) return local;
   if (item.imageData && item.imageData.b64) {
@@ -4476,12 +4481,17 @@ function charHash(id) {
 function charColor(id) {
   return CHAR_AVATAR_COLORS[charHash(id) % CHAR_AVATAR_COLORS.length];
 }
-// Portraits are served directly from Cloudflare R2's public URL — no
+// Portraits live in Backblaze B2 (cross-origin, private bucket — a fresh
+// presigned URL each time). Routed through the same same-origin proxy as
+// history images (proxiedImageUrl/api/fetch-image): plain <img> display
+// works fine with a raw cross-origin URL, but getCharacterReferenceImage()
+// below fetch()'s this same URL and needs CORS either way — the proxy
+// sidesteps needing to configure that on the B2 bucket at all. No
 // missing-file fallback needed (creating a character always requires an
 // image); the card template's onerror handler still covers a genuine load
 // failure with the initials-avatar div.
 function charPhotoUrl(character) {
-  return character.imageUrl;
+  return proxiedImageUrl(character.imageUrl);
 }
 
 let imagenReferences = { style: null, character: null, custom: null };
