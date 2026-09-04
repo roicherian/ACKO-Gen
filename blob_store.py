@@ -1,11 +1,13 @@
 """
-Cloudflare R2 storage helper for ACKO Image Generator.
+Backblaze B2 storage helper for ACKO Image Generator.
 
-R2 is S3-compatible, so this talks to it exactly like real S3 via boto3, just
-pointed at R2's endpoint with SigV4 signing. Replaces Vercel Blob (used
-during a brief detour to Vercel) now that the app runs on Render + Neon + R2
-instead — same public functions (upload_bytes/delete_urls), so nothing else
-in the codebase needed to change for this swap.
+B2 is accessed via boto3's S3-compatible API, the same pattern as Cloudflare
+R2 (which this replaces) — but the bucket is Private, not Public, since B2
+(like R2) requires a payment method on file to enable public bucket access,
+and this deployment intentionally avoids that. Uploads therefore return an
+object key, not a URL; history_store.py and character_store.py persist that
+key and call presigned_url() fresh every time they read a row back, since a
+Private bucket has no permanent public link.
 """
 import os
 import uuid
@@ -13,13 +15,14 @@ import uuid
 import boto3
 from botocore.config import Config
 
-R2_ACCOUNT_ID = os.environ.get("R2_ACCOUNT_ID", "")
-R2_ACCESS_KEY_ID = os.environ.get("R2_ACCESS_KEY_ID", "")
-R2_SECRET_ACCESS_KEY = os.environ.get("R2_SECRET_ACCESS_KEY", "")
-R2_BUCKET = os.environ.get("R2_BUCKET_NAME", "")
-# Public URL base for the bucket — either R2's own r2.dev subdomain (enabled
-# per-bucket in the Cloudflare dashboard) or a custom domain mapped to it.
-R2_PUBLIC_URL_BASE = os.environ.get("R2_PUBLIC_URL_BASE", "")
+B2_ENDPOINT = os.environ.get("B2_ENDPOINT", "")  # e.g. s3.us-east-005.backblazeb2.com
+B2_KEY_ID = os.environ.get("B2_KEY_ID", "")
+B2_APPLICATION_KEY = os.environ.get("B2_APPLICATION_KEY", "")
+B2_BUCKET = os.environ.get("B2_BUCKET_NAME", "")
+# Presigned URLs need to outlive one page view comfortably without being
+# treated as permanent links — the client re-fetches history/characters (and
+# so a fresh URL) on every load anyway.
+PRESIGNED_URL_TTL_SECONDS = 24 * 60 * 60
 
 _client = None
 
@@ -28,50 +31,57 @@ def _get_client():
     global _client
     if _client is not None:
         return _client
-    if not (R2_ACCOUNT_ID and R2_ACCESS_KEY_ID and R2_SECRET_ACCESS_KEY and R2_BUCKET):
+    if not (B2_ENDPOINT and B2_KEY_ID and B2_APPLICATION_KEY and B2_BUCKET):
         raise RuntimeError(
-            "R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, and "
-            "R2_BUCKET_NAME must all be set — create an R2 bucket and API "
-            "token in the Cloudflare dashboard (R2 → Manage API Tokens)."
+            "B2_ENDPOINT, B2_KEY_ID, B2_APPLICATION_KEY, and B2_BUCKET_NAME "
+            "must all be set — create a Backblaze B2 bucket and a scoped "
+            "Application Key (Application Keys → Add a New Application Key, "
+            "restricted to that one bucket)."
         )
+    # B2's S3-compatible endpoint is "s3.<region>.backblazeb2.com" — the
+    # region segment is also what boto3/SigV4 needs as region_name.
+    region = B2_ENDPOINT.split(".")[1] if B2_ENDPOINT.count(".") >= 2 else "us-east-005"
     _client = boto3.client(
         "s3",
-        endpoint_url=f"https://{R2_ACCOUNT_ID}.r2.cloudflarestorage.com",
-        aws_access_key_id=R2_ACCESS_KEY_ID,
-        aws_secret_access_key=R2_SECRET_ACCESS_KEY,
+        endpoint_url=f"https://{B2_ENDPOINT}",
+        aws_access_key_id=B2_KEY_ID,
+        aws_secret_access_key=B2_APPLICATION_KEY,
         config=Config(signature_version="s3v4"),
-        region_name="auto",
+        region_name=region,
     )
     return _client
 
 
 def upload_bytes(data, mime, path_hint):
-    """Uploads bytes to R2 under a key derived from path_hint plus a random
-    suffix (so repeated uploads never collide), returns the public URL."""
-    if not R2_PUBLIC_URL_BASE:
-        raise RuntimeError(
-            "R2_PUBLIC_URL_BASE is not configured — enable public access for "
-            "the bucket (r2.dev subdomain, or a custom domain) and set this "
-            "to that base URL."
-        )
+    """Uploads bytes to the (private) B2 bucket under a key derived from
+    path_hint plus a random suffix (so repeated uploads never collide).
+    Returns the object KEY — callers must persist this and call
+    presigned_url() to get something a browser can actually load."""
     key = f"{path_hint}-{uuid.uuid4().hex[:12]}"
     _get_client().put_object(
-        Bucket=R2_BUCKET, Key=key, Body=data,
+        Bucket=B2_BUCKET, Key=key, Body=data,
         ContentType=mime or "application/octet-stream",
     )
-    return f"{R2_PUBLIC_URL_BASE.rstrip('/')}/{key}"
+    return key
 
 
-def delete_urls(urls):
-    """Best-effort delete of one or more R2 object URLs. Callers should treat
+def presigned_url(key, expires_in=PRESIGNED_URL_TTL_SECONDS):
+    """Generates a fresh, time-limited GET URL for a stored object key.
+    Called every time history/characters are read back, since the bucket is
+    Private and B2's card-free free tier only allows Private buckets."""
+    if not key:
+        return ""
+    return _get_client().generate_presigned_url(
+        "get_object", Params={"Bucket": B2_BUCKET, "Key": key}, ExpiresIn=expires_in,
+    )
+
+
+def delete_keys(keys):
+    """Best-effort delete of one or more B2 object keys. Callers should treat
     failures as non-fatal — a stray orphaned object is a wart, not a bug."""
-    if not urls:
-        return
-    urls = urls if isinstance(urls, list) else [urls]
-    base = R2_PUBLIC_URL_BASE.rstrip("/") + "/"
-    keys = [u[len(base):] for u in urls if u.startswith(base)]
     if not keys:
         return
+    keys = keys if isinstance(keys, list) else [keys]
     _get_client().delete_objects(
-        Bucket=R2_BUCKET, Delete={"Objects": [{"Key": k} for k in keys]}
+        Bucket=B2_BUCKET, Delete={"Objects": [{"Key": k} for k in keys]}
     )

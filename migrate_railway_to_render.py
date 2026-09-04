@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
 One-time migration: copy live data from the Railway deployment into the new
-Postgres (db.py, e.g. Neon) + Cloudflare R2 (blob_store.py) backend, before
+Postgres (db.py, e.g. Neon) + Backblaze B2 (blob_store.py) backend, before
 decommissioning Railway.
 
-Run this AFTER setting DATABASE_URL, R2_ACCOUNT_ID, R2_ACCESS_KEY_ID,
-R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME, R2_PUBLIC_URL_BASE, and SESSION_SECRET
-as real environment variables in your shell — it imports and writes through
-the same store modules (user_store, character_store, history_store) the app
-itself uses, so there's only one place that knows how to talk to Postgres/R2.
+Run this AFTER setting DATABASE_URL, B2_ENDPOINT, B2_KEY_ID,
+B2_APPLICATION_KEY, B2_BUCKET_NAME, and SESSION_SECRET as real environment
+variables in your shell — it imports and writes through the same store
+modules (user_store, character_store, history_store) the app itself uses,
+so there's only one place that knows how to talk to Postgres/B2.
 
 Not migrated: raw API token values — they're hashed at rest and cannot be
 recovered. Every user needs to generate a fresh personal access token from

@@ -7,7 +7,7 @@ process (Render supports this directly — no serverless entrypoint
 restructuring needed).
 
 Persistent state (users, characters, shared history, generated images) lives
-in **Neon Postgres** and **Cloudflare R2**, not local disk — Render's free
+in **Neon Postgres** and **Backblaze B2**, not local disk — Render's free
 tier filesystem is wiped on every restart, redeploy, *and* sleep/wake cycle,
 so nothing here writes anything that needs to survive to local disk.
 
@@ -20,19 +20,27 @@ so nothing here writes anything that needs to survive to local disk.
    and wakes itself instantly on the next query — no manual intervention
    needed, unlike some other free Postgres providers.
 
-## 2. Create the Cloudflare R2 bucket
+## 2. Create the Backblaze B2 bucket
 
-1. In the Cloudflare dashboard: **R2 Object Storage → Create bucket**. Note:
-   Cloudflare's R2 setup flow requires a payment method on file even to stay
-   on the free tier (10 GB storage, no egress fees) — this is a Cloudflare
-   platform requirement, not something this app needs to charge you for.
-2. In the bucket's **Settings**, enable public access via the free `r2.dev`
-   subdomain (or map a custom domain if you have one) — this becomes
-   `R2_PUBLIC_URL_BASE`.
-3. Create an API token (**R2 → Manage API Tokens** → Create API Token, with
-   Object Read & Write permissions) — this gives you `R2_ACCESS_KEY_ID` and
-   `R2_SECRET_ACCESS_KEY`. Your `R2_ACCOUNT_ID` is shown in the R2 dashboard
-   URL/overview page. `R2_BUCKET_NAME` is whatever you named the bucket.
+1. Sign up at [backblaze.com](https://www.backblaze.com/) (no credit card
+   required for the free tier — 10 GB storage, unlike Cloudflare R2, which
+   demands a payment method on file even at $0 usage).
+2. **B2 Cloud Storage → Create a Bucket**. Name it (e.g. `acko-gen-images`),
+   set **Files in Bucket** to **Private** (Public requires a card, same as
+   R2), leave encryption/Object Lock disabled.
+3. **Application Keys → Add a New Application Key** — do NOT use the
+   account's Master Application Key (full account access; a leak of that
+   is far worse than a leak of a bucket-scoped key). Name it, restrict
+   **Allow access to Bucket(s)** to the bucket you just created, Type of
+   Access: Read and Write. This gives you `B2_KEY_ID` and
+   `B2_APPLICATION_KEY` (the `applicationKey` value — shown once).
+4. On the bucket's detail page, note the **Endpoint** (e.g.
+   `s3.us-east-005.backblazeb2.com`) — this is `B2_ENDPOINT`.
+   `B2_BUCKET_NAME` is whatever you named the bucket.
+
+Since the bucket is Private, there's no permanent public image URL —
+`blob_store.py` generates a fresh presigned URL every time history or
+characters are read back (see its module docstring).
 
 ## 3. Create the Render web service
 
@@ -55,11 +63,10 @@ In the service's **Environment** tab, add:
 | Key | Value |
 |---|---|
 | `DATABASE_URL` | your Neon connection string from step 1 |
-| `R2_ACCOUNT_ID` | from the R2 dashboard |
-| `R2_ACCESS_KEY_ID` | from the R2 API token you created |
-| `R2_SECRET_ACCESS_KEY` | from the R2 API token you created |
-| `R2_BUCKET_NAME` | your bucket's name |
-| `R2_PUBLIC_URL_BASE` | your bucket's public URL (r2.dev or custom domain) |
+| `B2_ENDPOINT` | from the bucket's detail page, e.g. `s3.us-east-005.backblazeb2.com` |
+| `B2_KEY_ID` | from the scoped Application Key you created |
+| `B2_APPLICATION_KEY` | from the scoped Application Key you created |
+| `B2_BUCKET_NAME` | your bucket's name |
 | `SESSION_SECRET` | a fixed random value — generate with `python3 -c "import secrets; print(secrets.token_hex(32))"`. **Critical**: without this, the app raises an error at startup rather than silently signing every session with a different secret on every restart. |
 | `MAGNIFIC_KEY` | your Magnific API key |
 | `OPENAI_API_KEY` | your OpenAI API key (GPT Image 1 model) |
@@ -90,6 +97,6 @@ start approving others.
 ## Local development
 
 Run `python3 main.py` from the project root — same as always. You'll need
-`DATABASE_URL` and the `R2_*` variables set locally too now (pointing at the
-same Neon/R2 resources, or your own separate dev ones), since local dev no
+`DATABASE_URL` and the `B2_*` variables set locally too now (pointing at the
+same Neon/B2 resources, or your own separate dev ones), since local dev no
 longer falls back to SQLite/local disk.

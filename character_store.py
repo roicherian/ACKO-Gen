@@ -1,7 +1,7 @@
 """
 Character reference library for ACKO Image Generator.
 
-Postgres-backed metadata (via db.py), portrait images in Cloudflare R2 (via
+Postgres-backed metadata (via db.py), portrait images in Backblaze B2 (via
 blob_store.py) — a content library, not identity/permissions data, hence its
 own module (mirrors catalogue_db.py's separation), but sharing the Postgres
 database user_store.py uses.
@@ -9,7 +9,9 @@ database user_store.py uses.
 Images used to be stored as BLOBs directly in SQLite; on the move off
 Railway's ephemeral disk they moved to object storage instead (consolidating
 with how generated images are stored — see history_store.py / main.py's
-save_generated_bytes()), so this table now holds an image_url, not bytes.
+save_generated_bytes()). The `image_url` column holds a B2 object KEY, not a
+URL — B2's bucket is Private, so _row_to_dict() turns that key into a fresh
+presigned URL on every read rather than storing one permanent link.
 """
 import re
 import datetime
@@ -60,7 +62,7 @@ def _row_to_dict(row):
         "role": row["role"],
         "location": row["location"],
         "age": row["age"],
-        "imageUrl": row["image_url"],
+        "imageUrl": blob_store.presigned_url(row["image_url"]),
         "createdAt": row["created_at"],
         "createdBy": row["created_by"],
     }

@@ -6,7 +6,7 @@ Also gates access behind a simple @acko.tech email login.
 Run: python3 main.py, then open generate.html in any browser.
 Deployed on Render as a normal long-running process (no serverless entry
 point needed). Persistent state lives in Postgres (db.py, e.g. Neon) and
-Cloudflare R2 (blob_store.py) — Render's own filesystem is NOT durable
+Backblaze B2 (blob_store.py) — Render's own filesystem is NOT durable
 across restarts/redeploys/sleep on the free tier, so nothing here writes to
 local disk for anything that needs to survive.
 """
@@ -58,18 +58,22 @@ def _ext_for_mime(mime):
 
 def save_generated_bytes(raw_bytes, mime="image/png", kind="generate", email=""):
     """
-    Persist image bytes to Cloudflare R2 (no durable local disk on Render's free tier).
-    Returns metadata including the blob's public URL.
+    Persist image bytes to Backblaze B2 (no durable local disk on Render's
+    free tier). B2's bucket is Private (no card on file, so no public-access
+    option), so this returns both the object `key` — for callers to persist,
+    e.g. history_store.add_history_row — and a freshly presigned `url` for
+    immediate use in this response.
     """
     if not raw_bytes:
         raise ValueError("No image bytes to save.")
     safe_kind = "".join(c if c.isalnum() or c in "-_" else "-" for c in (kind or "generate"))[:40] or "generate"
     short = uuid.uuid4().hex[:10]
     path_hint = f"generated/{safe_kind}-{short}{_ext_for_mime(mime)}"
-    url = blob_store.upload_bytes(raw_bytes, mime or "image/png", path_hint)
+    key = blob_store.upload_bytes(raw_bytes, mime or "image/png", path_hint)
     return {
         "id": short,
-        "url": url,
+        "key": key,
+        "url": blob_store.presigned_url(key),
         "mime": mime or "image/png",
         "bytes": len(raw_bytes),
     }
@@ -618,7 +622,7 @@ class ProxyHandler(BaseHTTPRequestHandler):
             try:
                 saved = save_generated_bytes(base64.b64decode(b64), mime="image/png", kind="mcp-generate", email=email)
                 history_store.add_history_row(
-                    email, saved["url"], "image/png", kind="mcp-generate",
+                    email, saved["key"], "image/png", kind="mcp-generate",
                     prompt=scene, full_prompt=prompt, model=model,
                     ratio=args.get("ratio", "16:9"), resolution=args.get("resolution", ""),
                     product=str(args.get("product", "general")),
@@ -810,8 +814,9 @@ class ProxyHandler(BaseHTTPRequestHandler):
                 self.end_headers()
             return
 
-        # Generated images now live in Cloudflare R2 (history.image_url points
-        # straight at a public R2 URL) — no /generated/<file> route needed.
+        # Generated images now live in Backblaze B2 (history.image_url holds the
+        # object key; history_store._row_to_dict turns it into a fresh presigned
+        # URL on read, since the bucket is Private) — no /generated/<file> route needed.
 
         # Design-system Skills (tokens, fonts) — read-only static assets.
         if path_no_query.startswith("/Skills/"):
@@ -944,7 +949,7 @@ class ProxyHandler(BaseHTTPRequestHandler):
             self.send_json(200, {"characters": character_store.list_characters()})
             return
 
-        # Character portraits now live in Cloudflare R2 (characters.imageUrl,
+        # Character portraits now live in Backblaze B2 (characters.imageUrl is
         # returned directly by /api/characters) — no separate image route needed.
 
         # Shared generation history — every user's generations, most-recent-first.
@@ -1499,7 +1504,7 @@ class ProxyHandler(BaseHTTPRequestHandler):
                 return
             try:
                 saved["history_id"] = history_store.add_history_row(
-                    email, saved["url"], mime, kind=kind,
+                    email, saved["key"], mime, kind=kind,
                     prompt=hist_prompt, full_prompt=hist_full_prompt,
                     model=hist_model, model_id=hist_model_id,
                     ratio=hist_ratio, resolution=hist_resolution,
@@ -1592,7 +1597,7 @@ class ProxyHandler(BaseHTTPRequestHandler):
             if saved:
                 try:
                     history_id = history_store.add_history_row(
-                        email, saved["url"], "image/png", kind="no-bg",
+                        email, saved["key"], "image/png", kind="no-bg",
                         variant_of=data.get("variant_of") or None,
                         product=str(data.get("product") or ""),
                         vehicle=data.get("vehicle") if isinstance(data.get("vehicle"), dict) else None,
