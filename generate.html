@@ -1216,6 +1216,14 @@ body:not(.studio-ui):not(.vehicle-mode) .prompt-footer .btn-gen { width: 100%; m
 .ptab-btn.active .ptab-label { display: inline; }
 
 /* ACTION BUTTONS */
+/* Sticks the Generate button (+ usage note) to the bottom of the scrollable
+   .center column, so it stays reachable without scrolling past a long
+   prompt/settings form — same trick as a sticky form-submit footer. */
+.gen-dock {
+  position: sticky; bottom: 0; z-index: 5;
+  background: var(--white);
+  margin: 0 -24px; padding: 10px 24px 4px;
+}
 .action-row { display: flex; gap: 8px; margin-bottom: 14px; justify-content: center; }
 body.imagen-mode .action-row .btn-gen { flex: 0 0 auto; justify-content: center; }
 .daily-usage-note {
@@ -2502,9 +2510,9 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
               <label class="form-label">Number of Images</label>
               <div class="sel-wrap">
                 <select id="numSelect" onchange="syncImagenConfigMeta()">
-                  <option value="1">1 image</option>
+                  <option value="1" selected>1 image</option>
                   <option value="2">2 images</option>
-                  <option value="3" selected>3 images</option>
+                  <option value="3">3 images</option>
                 </select>
                 <div class="sel-caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
               </div>
@@ -2711,13 +2719,15 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
     </div>
 
     <!-- Action buttons -->
-    <div class="action-row">
-      <button class="btn-gen" id="genBtn" onclick="handleGenBtnClick()" title="Generate Image" aria-label="Generate Image">
-        <span class="btn-gen-icon" id="genBtnIcon"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="7 4 20 12 7 20"/></svg></span>
-        <span id="genBtnLabel">Generate Image</span>
-      </button>
+    <div class="gen-dock">
+      <div class="action-row">
+        <button class="btn-gen" id="genBtn" onclick="handleGenBtnClick()" title="Generate Image" aria-label="Generate Image">
+          <span class="btn-gen-icon" id="genBtnIcon"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="7 4 20 12 7 20"/></svg></span>
+          <span id="genBtnLabel">Generate Image</span>
+        </button>
+      </div>
+      <div class="daily-usage-note" id="dailyUsageNote"></div>
     </div>
-    <div class="daily-usage-note" id="dailyUsageNote"></div>
   </main>
 
   <!-- RIGHT PANEL -->
