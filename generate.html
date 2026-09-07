@@ -696,12 +696,15 @@ body.vehicle-mode #vgFilterImgTimeWrap { display: none !important; }
     overflow: hidden; height: calc(100vh - 44px);
     min-width: 0;
   }
-  /* Only the settings/prompt area scrolls — the title stays put above it and
-     the Generate button (.gen-dock) stays put below it, since .center itself
-     no longer scrolls as one long unit. */
+  /* Nothing here scrolls as a block — the prompt textarea and the enhanced-
+     prompt box already cap their own height and scroll internally (see
+     .prompt-wrap textarea / .enhanced-body's max-height + overflow-y), so
+     that's the only thing that ever needs to scroll. Everything else
+     (settings, references, advanced settings, the Generate button) stays
+     static and fully visible. */
   body.imagen-mode .gen-panels,
   body.vehicle-mode .gen-panels {
-    flex: 1; min-height: 0; overflow-y: auto;
+    flex: 0 1 auto; min-height: 0; overflow: visible;
   }
   body.imagen-mode .gen-dock,
   body.vehicle-mode .gen-dock {
@@ -2417,11 +2420,11 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
 
     <nav>
       <a class="nav-item active" href="#" data-view="generate" onclick="navigateTo('generate');return false">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
         Imagen
       </a>
       <a class="nav-item" href="#" data-view="vehicle" onclick="navigateTo('vehicle');return false">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14v-5l-1.5-4.5A2 2 0 0 0 15.6 6H8.4a2 2 0 0 0-1.9 1.5L5 12v5Z"/><path d="M5 17H3v-2M21 17h-2v-2"/><circle cx="7.5" cy="17" r="1.5"/><circle cx="16.5" cy="17" r="1.5"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
         Vehiclegen
       </a>
       <a class="nav-item" href="#" data-view="history" onclick="navigateTo('history');return false">
