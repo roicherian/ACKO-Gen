@@ -263,6 +263,35 @@ body.studio-ui .prompt-wrap .vehicle-car-panel {
   z-index: 5;
 }
 body.studio-ui .prompt-wrap .vehicle-car-panel.visible { display: block; }
+/* Contains the prompt/enhance area's scroll within the card's rounded
+   border, and lets Generation Settings/References/Advanced Settings stay
+   static above it on any screen tall enough to fit both. Scoped to
+   imagen-mode only — vehicle-mode's Make/Model combo dropdowns rely on
+   .prompt-wrap's overflow:visible (above) to not get clipped.
+   .gen-panels (below, ≥1200px block) still carries its own overflow-y:auto
+   as a fallback for short screens where even this doesn't fit — better to
+   scroll the whole card there than have content overlap or bleed out. */
+body.imagen-mode .prompt-wrap {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+/* .gen-panel.active{display:block!important} (further down) otherwise wins
+   over .gen-panel-create's display:flex — needed here so prompt-block/
+   prompt-wrap can size against a real flex parent instead of shrink-to-fit. */
+#genPanelCreate.active {
+  display: flex;
+  flex-direction: column;
+}
+body.imagen-mode #imagenConfigPanel {
+  flex: 0 0 auto;
+}
+body.imagen-mode .prompt-scroll-area {
+  flex: 0 0 auto;
+  min-height: 180px;
+  max-height: 280px;
+  overflow-y: auto;
+}
 body.vehicle-mode .prompt-wrap .vg-combo-panel { z-index: 90; }
 body.imagen-mode #imagenConfigPanel.vehicle-car-panel { padding: 22px; }
 body.studio-ui .vehicle-car-panel-head { margin-bottom: 10px; }
@@ -696,15 +725,17 @@ body.vehicle-mode #vgFilterImgTimeWrap { display: none !important; }
     overflow: hidden; height: calc(100vh - 44px);
     min-width: 0;
   }
-  /* Nothing here scrolls as a block — the prompt textarea and the enhanced-
-     prompt box already cap their own height and scroll internally (see
-     .prompt-wrap textarea / .enhanced-body's max-height + overflow-y), so
-     that's the only thing that ever needs to scroll. Everything else
-     (settings, references, advanced settings, the Generate button) stays
-     static and fully visible. */
+  /* On a screen tall enough to fit Generation Settings + References +
+     Advanced Settings + the prompt box together, nothing here scrolls —
+     the prompt textarea and the enhanced-prompt box already cap their own
+     height and scroll internally (.prompt-wrap textarea / .enhanced-body's
+     max-height + overflow-y), so that's the only thing that visibly moves.
+     This overflow-y:auto is a fallback for short screens where even that
+     doesn't fit — scrolling the whole card beats content bleeding out past
+     its rounded border or overlapping the Generate button. */
   body.imagen-mode .gen-panels,
   body.vehicle-mode .gen-panels {
-    flex: 0 1 auto; min-height: 0; overflow: visible;
+    flex: 1 1 auto; min-height: 0; overflow-y: auto;
   }
   body.imagen-mode .gen-dock,
   body.vehicle-mode .gen-dock {
@@ -2688,6 +2719,12 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
             </div>
           </div>
         </div>
+        <!-- Everything below (tab toggle, prompt/enhanced boxes, Enhance Prompt
+             button) scrolls together as its own region if it doesn't fit —
+             Generation Settings / References / Advanced Settings above always
+             stay static. Keeps this contained within .prompt-wrap's rounded
+             border instead of visually overflowing past it on short screens. -->
+        <div class="prompt-scroll-area">
         <!-- Prompt / Enhanced Prompt tab toggle -->
         <div class="prompt-tab-toggle" role="tablist" aria-label="Prompt view">
           <button type="button" class="ptab-btn active" id="ptabPromptBtn" onclick="setPromptTab('prompt')" title="Prompt" aria-selected="true">
@@ -2728,6 +2765,7 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
               </button>
             </div>
           </div>
+        </div>
         </div>
       </div>
       </div>
