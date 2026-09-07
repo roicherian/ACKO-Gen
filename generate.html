@@ -693,8 +693,19 @@ body.vehicle-mode #vgFilterImgTimeWrap { display: none !important; }
     grid-column: 2; grid-row: 1;
     border: 1px solid var(--vg-line); border-radius: 16px;
     background: var(--vg-surface); padding: 20px; margin: 22px 0;
-    overflow-y: auto; height: calc(100vh - 44px);
+    overflow: hidden; height: calc(100vh - 44px);
     min-width: 0;
+  }
+  /* Only the settings/prompt area scrolls — the title stays put above it and
+     the Generate button (.gen-dock) stays put below it, since .center itself
+     no longer scrolls as one long unit. */
+  body.imagen-mode .gen-panels,
+  body.vehicle-mode .gen-panels {
+    flex: 1; min-height: 0; overflow-y: auto;
+  }
+  body.imagen-mode .gen-dock,
+  body.vehicle-mode .gen-dock {
+    flex: 0 0 auto; position: static; margin: 0 -20px; padding: 10px 20px 0;
   }
   body.imagen-mode .right,
   body.vehicle-mode .right {
@@ -2329,11 +2340,11 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
 .gen-panels { display: flex; flex-direction: column; }
 .gen-panel { display: none; }
 .gen-panel.active { display: block; }
 .gen-panel-create { flex: 1; }
-}
 </style>
 </head>
 <body class="studio-ui imagen-mode">
@@ -2716,6 +2727,8 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
           </div>
         </div>
       </div>
+      </div>
+    </div>
     </div>
 
     <!-- Action buttons -->
