@@ -7,9 +7,9 @@ process (Render supports this directly — no serverless entrypoint
 restructuring needed).
 
 Persistent state (users, characters, shared history, generated images) lives
-in **Neon Postgres** and **Backblaze B2**, not local disk — Render's free
-tier filesystem is wiped on every restart, redeploy, *and* sleep/wake cycle,
-so nothing here writes anything that needs to survive to local disk.
+in **Neon Postgres** and **Supabase Storage**, not local disk — Render's
+free tier filesystem is wiped on every restart, redeploy, *and* sleep/wake
+cycle, so nothing here writes anything that needs to survive to local disk.
 
 ## 1. Create the Neon database
 
@@ -20,27 +20,25 @@ so nothing here writes anything that needs to survive to local disk.
    and wakes itself instantly on the next query — no manual intervention
    needed, unlike some other free Postgres providers.
 
-## 2. Create the Backblaze B2 bucket
+## 2. Create the Supabase Storage bucket
 
-1. Sign up at [backblaze.com](https://www.backblaze.com/) (no credit card
-   required for the free tier — 10 GB storage, unlike Cloudflare R2, which
-   demands a payment method on file even at $0 usage).
-2. **B2 Cloud Storage → Create a Bucket**. Name it (e.g. `acko-gen-images`),
-   set **Files in Bucket** to **Private** (Public requires a card, same as
-   R2), leave encryption/Object Lock disabled.
-3. **Application Keys → Add a New Application Key** — do NOT use the
-   account's Master Application Key (full account access; a leak of that
-   is far worse than a leak of a bucket-scoped key). Name it, restrict
-   **Allow access to Bucket(s)** to the bucket you just created, Type of
-   Access: Read and Write. This gives you `B2_KEY_ID` and
-   `B2_APPLICATION_KEY` (the `applicationKey` value — shown once).
-4. On the bucket's detail page, note the **Endpoint** (e.g.
-   `s3.us-east-005.backblazeb2.com`) — this is `B2_ENDPOINT`.
-   `B2_BUCKET_NAME` is whatever you named the bucket.
-
-Since the bucket is Private, there's no permanent public image URL —
-`blob_store.py` generates a fresh presigned URL every time history or
-characters are read back (see its module docstring).
+1. Sign up at [supabase.com](https://supabase.com) (no credit card required)
+   and create a project. Note the project ref from its URL
+   (`https://<project-ref>.supabase.co`) — this is `SUPABASE_PROJECT_URL`
+   (as `https://<project-ref>.supabase.co`).
+2. **Storage → New bucket**. Name it (e.g. `acko-gen-images`), toggle
+   **Public bucket** ON — unlike Cloudflare R2 or Backblaze B2, Supabase
+   lets you do this for free, no payment method required. This also means
+   uploaded images get a permanent public URL instead of needing a
+   presigned URL re-generated on every read.
+3. **Project Settings → Storage → S3 Connection**: note the **Endpoint**
+   (`SUPABASE_S3_ENDPOINT`, looks like
+   `https://<project-ref>.supabase.co/storage/v1/s3`) and **Region**
+   (`SUPABASE_S3_REGION`, e.g. `ap-southeast-1`) shown there.
+4. In that same section, create a new S3 access key (**New access key** →
+   give it a description) — this gives you `SUPABASE_ACCESS_KEY_ID` and
+   `SUPABASE_SECRET_ACCESS_KEY` (the secret is shown once).
+   `SUPABASE_BUCKET_NAME` is whatever you named the bucket in step 2.
 
 ## 3. Create the Render web service
 
@@ -63,10 +61,12 @@ In the service's **Environment** tab, add:
 | Key | Value |
 |---|---|
 | `DATABASE_URL` | your Neon connection string from step 1 |
-| `B2_ENDPOINT` | from the bucket's detail page, e.g. `s3.us-east-005.backblazeb2.com` |
-| `B2_KEY_ID` | from the scoped Application Key you created |
-| `B2_APPLICATION_KEY` | from the scoped Application Key you created |
-| `B2_BUCKET_NAME` | your bucket's name |
+| `SUPABASE_PROJECT_URL` | `https://<project-ref>.supabase.co` |
+| `SUPABASE_S3_ENDPOINT` | from S3 Connection, e.g. `https://<project-ref>.supabase.co/storage/v1/s3` |
+| `SUPABASE_S3_REGION` | from S3 Connection, e.g. `ap-southeast-1` |
+| `SUPABASE_ACCESS_KEY_ID` | from the S3 access key you created |
+| `SUPABASE_SECRET_ACCESS_KEY` | from the S3 access key you created |
+| `SUPABASE_BUCKET_NAME` | your bucket's name |
 | `SESSION_SECRET` | a fixed random value — generate with `python3 -c "import secrets; print(secrets.token_hex(32))"`. **Critical**: without this, the app raises an error at startup rather than silently signing every session with a different secret on every restart. |
 | `MAGNIFIC_KEY` | your Magnific API key |
 | `OPENAI_API_KEY` | your OpenAI API key (GPT Image 1 model) |
@@ -97,6 +97,6 @@ start approving others.
 ## Local development
 
 Run `python3 main.py` from the project root — same as always. You'll need
-`DATABASE_URL` and the `B2_*` variables set locally too now (pointing at the
-same Neon/B2 resources, or your own separate dev ones), since local dev no
-longer falls back to SQLite/local disk.
+`DATABASE_URL` and the `SUPABASE_*` variables set locally too now (pointing
+at the same Neon/Supabase resources, or your own separate dev ones), since
+local dev no longer falls back to SQLite/local disk.

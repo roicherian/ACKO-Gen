@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 """
 One-time migration: copy live data from the Railway deployment into the new
-Postgres (db.py, e.g. Neon) + Backblaze B2 (blob_store.py) backend, before
-decommissioning Railway.
+Postgres (db.py, e.g. Neon) + Supabase Storage (blob_store.py) backend,
+before decommissioning Railway.
 
-Run this AFTER setting DATABASE_URL, B2_ENDPOINT, B2_KEY_ID,
-B2_APPLICATION_KEY, B2_BUCKET_NAME, and SESSION_SECRET as real environment
-variables in your shell — it imports and writes through the same store
-modules (user_store, character_store, history_store) the app itself uses,
-so there's only one place that knows how to talk to Postgres/B2.
+Run this AFTER setting DATABASE_URL, SUPABASE_S3_ENDPOINT,
+SUPABASE_S3_REGION, SUPABASE_ACCESS_KEY_ID, SUPABASE_SECRET_ACCESS_KEY,
+SUPABASE_BUCKET_NAME, SUPABASE_PROJECT_URL, and SESSION_SECRET as real
+environment variables in your shell — it imports and writes through the
+same store modules (user_store, character_store, history_store) the app
+itself uses, so there's only one place that knows how to talk to
+Postgres/Supabase.
 
 Not migrated: raw API token values — they're hashed at rest and cannot be
 recovered. Every user needs to generate a fresh personal access token from
