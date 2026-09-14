@@ -53,7 +53,10 @@ def _ext_for_mime(mime):
         "image/jpg": ".jpg",
         "image/webp": ".webp",
         "image/gif": ".gif",
-    }.get(mime, ".png")
+        "video/mp4": ".mp4",
+        "video/webm": ".webm",
+        "video/quicktime": ".mov",
+    }.get(mime, ".png" if mime.startswith("image/") else ".mp4" if mime.startswith("video/") else ".png")
 
 
 def save_generated_bytes(raw_bytes, mime="image/png", kind="generate", email=""):
@@ -364,6 +367,12 @@ MCP_RATE_LIMIT_PER_HOUR = int(os.environ.get("MCP_RATE_LIMIT_PER_HOUR", "20"))
 # in-memory counter, so it survives restarts and isn't per-instance like the
 # MCP hourly limiter above.
 DAILY_GENERATION_LIMIT = int(os.environ.get("DAILY_GENERATION_LIMIT", "100"))
+
+# Separate, tighter daily cap on "Animate" (image-to-video) generations —
+# video API calls cost meaningfully more than image ones, so they're tracked
+# against their own budget (history_store.count_today(email, kind="animate"))
+# rather than sharing DAILY_GENERATION_LIMIT above.
+DAILY_VIDEO_LIMIT = int(os.environ.get("DAILY_VIDEO_LIMIT", "15"))
 
 
 def init_mcp_rate_table():
@@ -984,6 +993,19 @@ class ProxyHandler(BaseHTTPRequestHandler):
                 self.send_json(401, {"error": "Not signed in. Please sign in with your acko.tech email."})
                 return
             self.send_json(200, {"used": history_store.count_today(email), "limit": DAILY_GENERATION_LIMIT})
+            return
+
+        # Same as /api/usage/today above, but for the separate "Animate"
+        # (image-to-video) daily cap.
+        if path_no_query == "/api/usage/video-today":
+            ok, email = verify_session(self.headers.get("x-session-token", ""))
+            if not ok:
+                self.send_json(401, {"error": "Not signed in. Please sign in with your acko.tech email."})
+                return
+            self.send_json(200, {
+                "used": history_store.count_today(email, kind="animate"),
+                "limit": DAILY_VIDEO_LIMIT,
+            })
             return
 
         # ── Vehicle catalogue (new, sourced relational data — separate from the
@@ -1631,15 +1653,31 @@ class ProxyHandler(BaseHTTPRequestHandler):
             self.send_json(403, perm_err)
             return
 
-        used_today = history_store.count_today(email)
-        if used_today >= DAILY_GENERATION_LIMIT:
-            self.send_json(429, {
-                "error": f"Daily image generation limit reached ({DAILY_GENERATION_LIMIT}/day). "
-                         "Try again tomorrow.",
-                "used": used_today,
-                "limit": DAILY_GENERATION_LIMIT,
-            })
-            return
+        # "Animate" (image-to-video) submissions route through this same
+        # generic proxy — give them their own, tighter daily cap instead of
+        # sharing DAILY_GENERATION_LIMIT, since video costs meaningfully more
+        # per call. Detected by path shape (/v1/ai/image-to-video/<model>),
+        # not by an explicit flag, since this proxy is a thin pass-through.
+        if "/image-to-video/" in self.path:
+            used_today = history_store.count_today(email, kind="animate")
+            if used_today >= DAILY_VIDEO_LIMIT:
+                self.send_json(429, {
+                    "error": f"Daily video generation limit reached ({DAILY_VIDEO_LIMIT}/day). "
+                             "Try again tomorrow.",
+                    "used": used_today,
+                    "limit": DAILY_VIDEO_LIMIT,
+                })
+                return
+        else:
+            used_today = history_store.count_today(email)
+            if used_today >= DAILY_GENERATION_LIMIT:
+                self.send_json(429, {
+                    "error": f"Daily image generation limit reached ({DAILY_GENERATION_LIMIT}/day). "
+                             "Try again tomorrow.",
+                    "used": used_today,
+                    "limit": DAILY_GENERATION_LIMIT,
+                })
+                return
 
         length = int(self.headers.get("Content-Length", 0))
         body_in = self.rfile.read(length)

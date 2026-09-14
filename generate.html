@@ -839,7 +839,7 @@ body.vehicle-mode .vehicle-car-panel-head {
 .gen-card.ratio-4-5 { aspect-ratio: 4/5; }
 .gen-card.ratio-3-2 { aspect-ratio: 3/2; }
 .gen-card.ratio-2-1 { aspect-ratio: 2/1; }
-.gen-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.gen-card img, .gen-card video { width: 100%; height: 100%; object-fit: cover; display: block; }
 .gen-card.has-alpha { background: repeating-conic-gradient(#1c1c22 0% 25%, #131317 0% 50%) 50% / 16px 16px; }
 .gen-card.has-alpha img { object-fit: contain; }
 .gen-card-overlay {
@@ -1767,7 +1767,7 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
 }
 .gcard:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,.10); }
 .gcard:hover .img-zoom-hint { opacity: 1; }
-.gcard img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.gcard img, .gcard video { width: 100%; height: 100%; object-fit: cover; display: block; }
 .gcard-removed { cursor: default; }
 .gcard-removed-inner {
   height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -1932,6 +1932,10 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
   max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain;
   display: block; transform-origin: center center;
   will-change: transform; pointer-events: none; /* pan/zoom handled on wrap */
+}
+.lb-img-wrap video {
+  max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain;
+  display: block;
 }
 .lb-theme-toggle {
   position: absolute; right: 12px; top: 12px; z-index: 3;
@@ -3058,6 +3062,7 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
           </button>
         </div>
         <img id="lbImg" src="" alt="Generated image" draggable="false">
+        <video id="lbVideo" class="hidden" src="" controls loop playsinline></video>
         <div class="lb-stage-tools lb-ui" aria-label="Image tools" onclick="event.stopPropagation()">
           <button type="button" class="lb-tool" id="lbEdit" title="Edit" onclick="event.stopPropagation(); openEditModal()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
@@ -3074,6 +3079,10 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
           <button type="button" class="lb-tool" id="lbRemoveBg" title="Remove background" onclick="event.stopPropagation(); lbRemoveBackground()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16"/><path d="M7 7V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/><path d="M9 11v6"/><path d="M15 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/></svg>
             <span>Remove BG</span>
+          </button>
+          <button type="button" class="lb-tool" id="lbAnimate" title="Animate this image" onclick="event.stopPropagation(); openAnimateModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+            <span>Animate</span>
           </button>
         </div>
         <div class="lb-zoom-controls lb-ui" aria-label="Zoom controls">
@@ -3161,6 +3170,52 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
           <span class="btn-gen-icon" id="editApplyIcon"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="7 4 20 12 7 20"/></svg></span>
           <span id="editApplyLabel">Apply Edit</span>
         </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ANIMATE (IMAGE-TO-VIDEO) MODAL -->
+<div class="edit-overlay" id="animateOverlay" onclick="if(event.target===this)closeAnimateModal()">
+  <div class="edit-modal">
+    <div class="edit-modal-head">
+      <div class="adv-modal-title">Animate Image</div>
+      <button class="btn-close" onclick="closeAnimateModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="edit-modal-body">
+      <div class="edit-canvas-col">
+        <div class="edit-canvas-wrap" id="animateCanvasWrap">
+          <img id="animatePreviewImg" src="" alt="Image to animate">
+        </div>
+        <div class="edit-brush-hint">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <span>Turns this still image into a short AI-generated video clip. Takes roughly 30–90 seconds depending on the model.</span>
+        </div>
+      </div>
+      <div class="edit-fields">
+        <label class="adv-label">Model</label>
+        <div class="sel-wrap" style="margin-bottom:10px">
+          <select id="animateModelSelect" onchange="populateAnimateDurations()">
+            <option value="wan-2-7" selected>WAN 2.7 — Faster</option>
+            <option value="kling-o1-pro">Kling O1 Pro — Higher quality</option>
+          </select>
+          <div class="sel-caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </div>
+        <label class="adv-label">Duration</label>
+        <div class="sel-wrap" style="margin-bottom:10px">
+          <select id="animateDurationSelect"></select>
+          <div class="sel-caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </div>
+        <label class="adv-label">What should move? (optional)</label>
+        <textarea id="animatePrompt" class="edit-textarea" placeholder="e.g. Gentle steam rises from the cup, a light breeze moves his shirt…"></textarea>
+        <div class="edit-note" id="animateNote"></div>
+        <button class="adv-save" id="animateApplyBtn" onclick="submitAnimate()">
+          <span class="btn-gen-icon" id="animateApplyIcon"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="7 4 20 12 7 20"/></svg></span>
+          <span id="animateApplyLabel">Generate Video</span>
+        </button>
+        <div class="daily-usage-note" id="animateUsageNote"></div>
       </div>
     </div>
   </div>
@@ -4063,11 +4118,19 @@ function buildImagenGridCard(item) {
   card.dataset.itemId = item.id;
   card.onclick = () => openLightbox(item.id, 'history');
 
-  const img = document.createElement('img');
-  img.src = src;
-  img.alt = item.prompt || 'Generated image';
-  img.onerror = () => { removeHistoryItemById(item.id); if (card.parentNode) card.remove(); renderVehicleGallery(); };
-  card.appendChild(img);
+  const isVideo = isVideoItem(item);
+  const media = document.createElement(isVideo ? 'video' : 'img');
+  media.src = src;
+  if (isVideo) {
+    media.muted = true;
+    media.loop = true;
+    media.playsInline = true;
+    media.preload = 'metadata';
+  } else {
+    media.alt = item.prompt || 'Generated image';
+  }
+  media.onerror = () => { removeHistoryItemById(item.id); if (card.parentNode) card.remove(); renderVehicleGallery(); };
+  card.appendChild(media);
 
   const overlay = document.createElement('div');
   overlay.className = 'gen-card-overlay';
@@ -5599,12 +5662,14 @@ function mapServerHistoryItem(row) {
   const isMirror = row.kind === 'mirror';
   const isEdit = row.kind === 'edit';
   const isCutout = row.kind === 'no-bg';
-  const badge = isMirror ? 'Mirrored' : isEdit ? 'Edited' : isCutout ? 'No BG' : 'Original';
+  const isAnimate = row.kind === 'animate';
+  const badge = isMirror ? 'Mirrored' : isEdit ? 'Edited' : isCutout ? 'No BG' : isAnimate ? 'Animated' : 'Original';
   return {
     id: row.id,
     src: row.imageUrl,
     localUrl: row.imageUrl,
     sourceUrl: row.imageUrl,
+    mime: row.mime || 'image/png',
     imageData: { url: row.imageUrl, mime: row.mime || 'image/png', localUrl: row.imageUrl },
     prompt: row.prompt || '',
     fullPrompt: row.fullPrompt || row.prompt || '',
@@ -5619,10 +5684,11 @@ function mapServerHistoryItem(row) {
     ts: row.ts,
     email: row.email || '',
     badge,
-    isMirror, isEdit, isCutout,
+    isMirror, isEdit, isCutout, isAnimate,
     mirrorOf: isMirror ? row.variantOf : undefined,
     editedFrom: isEdit ? row.variantOf : undefined,
     cutoutOf: isCutout ? row.variantOf : undefined,
+    animatedFrom: isAnimate ? row.variantOf : undefined,
     variantOf: row.variantOf || undefined,
     rootId: row.variantOf || undefined,
   };
@@ -5812,8 +5878,11 @@ function renderGallery(kind) {
     const coll = inStore('collections', it.id);
     const tags = deriveTags(it).slice(0, 3);
     const creator = displayNameFromEmail(it.email);
+    const mediaTag = isVideoItem(it)
+      ? `<video src="${it.src}" muted loop playsinline preload="metadata"></video>`
+      : `<img src="${it.src}" alt="Generated image" loading="lazy">`;
     return `<div class="gcard" onclick="openLightbox('${it.id}','${kind}')">
-      <img src="${it.src}" alt="Generated image" loading="lazy">
+      ${mediaTag}
       <div class="img-zoom-hint">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
       </div>
@@ -6255,12 +6324,30 @@ function applyLbStageTheme(theme) {
   if (lightBtn) lightBtn.classList.toggle('on', mode === 'light');
 }
 
+function isVideoItem(item) {
+  return !!(item && (item.isAnimate || String(item.mime || '').startsWith('video/')));
+}
+
 function openLightbox(id, fromView) {
   const item = findItem(id);
   if (!item) return;
   lbItem = item;
   lbFromView = fromView || 'generate';
-  document.getElementById('lbImg').src = resolveItemImageSrc(item) || item.src || '';
+  const lbImg = document.getElementById('lbImg');
+  const lbVideo = document.getElementById('lbVideo');
+  const src = resolveItemImageSrc(item) || item.src || '';
+  if (isVideoItem(item)) {
+    lbImg.classList.add('hidden');
+    lbVideo.classList.remove('hidden');
+    lbVideo.src = src;
+    lbImg.src = '';
+  } else {
+    lbVideo.pause();
+    lbVideo.src = '';
+    lbVideo.classList.add('hidden');
+    lbImg.classList.remove('hidden');
+    lbImg.src = src;
+  }
   setupLbPromptClamp(item.fullPrompt || item.prompt || '—');
   populateLbPills(item);
   const bits = [];
@@ -6275,12 +6362,21 @@ function openLightbox(id, fromView) {
   renderLbVersions(item);
   syncLbButtons();
   applyLbStageTheme(getLbStageTheme());
-  wireLbPanZoom();
-  resetLbZoom();
+  const zoomControls = document.querySelector('.lb-zoom-controls');
+  const zoomHint = document.getElementById('lbZoomHint');
+  const isVideo = isVideoItem(item);
+  if (zoomControls) zoomControls.classList.toggle('hidden', isVideo);
+  if (zoomHint) zoomHint.classList.toggle('hidden', isVideo);
+  if (!isVideo) {
+    wireLbPanZoom();
+    resetLbZoom();
+  }
   document.getElementById('lightbox').classList.add('open');
 }
 function closeLightbox() {
   document.getElementById('lightbox').classList.remove('open');
+  const lbVideo = document.getElementById('lbVideo');
+  if (lbVideo) { lbVideo.pause(); lbVideo.src = ''; }
   lbItem = null;
   lbPromptExpanded = false;
   resetLbZoom();
@@ -6465,9 +6561,11 @@ function syncLbButtons() {
   const rmBtn = document.getElementById('lbRemoveBg');
   const mirrorBtn = document.getElementById('lbMirror');
   const isCutoutView = !!(lbItem.badge === 'No BG' || lbItem.isCutout);
-  // Edit / Mirror / Regen / Remove BG apply only to Original + Mirrored
-  if (tools) tools.classList.toggle('hidden', isCutoutView);
-  if (isCutoutView) return;
+  // Edit / Mirror / Regen / Remove BG / Animate apply only to still images —
+  // none of them make sense once you're looking at a generated video.
+  const isVideoView = isVideoItem(lbItem);
+  if (tools) tools.classList.toggle('hidden', isCutoutView || isVideoView);
+  if (isCutoutView || isVideoView) return;
 
   if (rmBtn) {
     // Remove BG is a Vehiclegen-only tool (studio cutouts) — Imagen images never show it.
@@ -7199,6 +7297,157 @@ function closeEditModal() {
   editItem = null;
   resetEditCanvas();
   hideEditBrushCursor();
+}
+
+// ─── ANIMATE (IMAGE-TO-VIDEO) ───────────────────────────────────────────────
+// Same async submit-then-poll pattern as doAsync() (nano-banana-2 etc.), but
+// image-to-video has its own request shape per model (Magnific/Freepik's
+// video endpoints aren't uniform the way the image ones are — the field that
+// carries the source image differs per model), so this is a standalone flow
+// rather than a variant of doAsync.
+const VIDEO_MODELS = {
+  'wan-2-7': {
+    path: '/v1/ai/image-to-video/wan-2-7',
+    label: 'WAN 2.7',
+    imageField: 'start_image_url',
+    durations: [5],
+  },
+  'kling-o1-pro': {
+    path: '/v1/ai/image-to-video/kling-o1-pro',
+    label: 'Kling O1 Pro',
+    imageField: 'first_frame',
+    durations: [5, 10],
+  },
+};
+
+let animateItem = null;
+let isAnimatingImage = false;
+
+function populateAnimateDurations() {
+  const model = VIDEO_MODELS[document.getElementById('animateModelSelect').value];
+  const sel = document.getElementById('animateDurationSelect');
+  sel.innerHTML = model.durations.map(d => `<option value="${d}">${d}s</option>`).join('');
+}
+
+async function refreshVideoUsage() {
+  const el = document.getElementById('animateUsageNote');
+  if (!el) return;
+  try {
+    const res = await fetch('/api/usage/video-today', { headers: { 'x-session-token': getSessionToken() } });
+    if (!res.ok) { el.textContent = ''; return; }
+    const data = await res.json();
+    el.textContent = `${data.used} / ${data.limit} videos today`;
+    el.classList.toggle('near-limit', data.used >= data.limit);
+  } catch {
+    el.textContent = '';
+  }
+}
+
+function openAnimateModal() {
+  if (!lbItem) return;
+  if (isVideoItem(lbItem)) return; // Animate applies to still images only
+  const srcUrl = lbItem.src || '';
+  if (!/^https?:\/\//i.test(srcUrl)) {
+    alert('This image is still saving — try Animate again in a moment.');
+    return;
+  }
+  animateItem = lbItem;
+  document.getElementById('animatePreviewImg').src = resolveItemImageSrc(animateItem) || srcUrl;
+  document.getElementById('animatePrompt').value = '';
+  document.getElementById('animateModelSelect').value = 'wan-2-7';
+  populateAnimateDurations();
+  refreshVideoUsage();
+  isAnimatingImage = false;
+  const btn = document.getElementById('animateApplyBtn');
+  btn.disabled = false;
+  btn.classList.remove('stopping');
+  document.getElementById('animateApplyIcon').innerHTML = GEN_ICON;
+  document.getElementById('animateApplyLabel').textContent = 'Generate Video';
+  document.getElementById('animateNote').textContent = '';
+  document.getElementById('animateOverlay').classList.add('open');
+}
+function closeAnimateModal() {
+  if (isAnimatingImage) return; // don't let the source image get orphaned mid-poll
+  document.getElementById('animateOverlay').classList.remove('open');
+  animateItem = null;
+}
+
+async function submitAnimate() {
+  if (!animateItem || isAnimatingImage) return;
+  const modelId = document.getElementById('animateModelSelect').value;
+  const model = VIDEO_MODELS[modelId];
+  const prompt = document.getElementById('animatePrompt').value.trim();
+  const duration = Number(document.getElementById('animateDurationSelect').value) || model.durations[0];
+  const srcUrl = animateItem.src;
+  const noteEl = document.getElementById('animateNote');
+  const label = document.getElementById('animateApplyLabel');
+  const btn = document.getElementById('animateApplyBtn');
+
+  isAnimatingImage = true;
+  btn.disabled = true;
+  noteEl.textContent = '';
+
+  try {
+    const body = { [model.imageField]: srcUrl, duration };
+    if (prompt) body.prompt = prompt;
+    label.textContent = 'Starting…';
+    const createRes = await fetch(apiUrl('magnific', model.path), {
+      method: 'POST',
+      headers: apiAuthHeaders(),
+      body: JSON.stringify(body),
+    });
+    if (!createRes.ok) throw new Error(parseApiError(createRes.status, await createRes.text()));
+    const created = await createRes.json();
+    const taskId = (created.data || {}).task_id;
+    if (!taskId) throw new Error('No task_id in response.');
+
+    const pollUrl = apiUrl('magnific', model.path + '/' + taskId);
+    const pollHeaders = apiAuthHeaders();
+    delete pollHeaders['Content-Type'];
+
+    let videoUrl = null;
+    for (let i = 0; i < 60; i++) {
+      await sleep(3000);
+      label.textContent = `Animating… ${(i + 1) * 3}s`;
+      const pr = await fetch(pollUrl, { headers: pollHeaders });
+      if (!pr.ok) continue;
+      const result = await pr.json();
+      const status = (result.data || {}).status;
+      if (status === 'COMPLETED') {
+        videoUrl = ((result.data || {}).generated || [])[0];
+        break;
+      }
+      if (status === 'FAILED') throw new Error('Video generation failed on server.');
+    }
+    if (!videoUrl) throw new Error('Timed out waiting for the video (3 min).');
+
+    label.textContent = 'Saving…';
+    const saveRes = await fetch('/api/generated/save', {
+      method: 'POST',
+      headers: apiAuthHeaders(),
+      body: JSON.stringify({
+        kind: 'animate',
+        mime: 'video/mp4',
+        image_url: videoUrl,
+        prompt,
+        model: model.label,
+        model_id: modelId,
+        variant_of: animateItem.id || null,
+      }),
+    });
+    if (!saveRes.ok) throw new Error(parseApiError(saveRes.status, await saveRes.text()));
+
+    isAnimatingImage = false;
+    document.getElementById('animateOverlay').classList.remove('open');
+    animateItem = null;
+    await refreshHistoryCache();
+    refreshOpenView();
+  } catch (e) {
+    noteEl.textContent = 'Animate failed: ' + e.message;
+    isAnimatingImage = false;
+    btn.disabled = false;
+    label.textContent = 'Generate Video';
+  }
 }
 
 function ratioValueFromLabel(label) {

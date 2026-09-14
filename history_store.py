@@ -123,22 +123,32 @@ def delete_history_row(row_id):
     conn.commit()
 
 
-def count_today(email):
+def count_today(email, kind=None):
     """Count of this email's generations since midnight UTC today — backs the
     per-person daily generation cap. Reuses the existing history table rather
     than a separate counter, since every successful generation already lands
     a row here. Note: a request for N images fires N create-calls that each
     check this count before any of them finish and get logged, so someone
     right at the boundary could exceed the cap by up to N-1 in one batch —
-    an acceptable bit of slack for an internal-tool quota, not a hard SLA."""
+    an acceptable bit of slack for an internal-tool quota, not a hard SLA.
+
+    `kind`, if given, restricts the count to that history kind (e.g.
+    "animate" — video generations get their own separate daily cap from
+    image generations, since they cost meaningfully more per call)."""
     start_of_day_ms = int(
         datetime.datetime.utcnow()
         .replace(hour=0, minute=0, second=0, microsecond=0)
         .timestamp() * 1000
     )
     conn = db.get_conn()
-    row = conn.execute(
-        "SELECT COUNT(*) as c FROM history WHERE email = %s AND created_at >= %s",
-        (email, start_of_day_ms),
-    ).fetchone()
+    if kind:
+        row = conn.execute(
+            "SELECT COUNT(*) as c FROM history WHERE email = %s AND created_at >= %s AND kind = %s",
+            (email, start_of_day_ms, kind),
+        ).fetchone()
+    else:
+        row = conn.execute(
+            "SELECT COUNT(*) as c FROM history WHERE email = %s AND created_at >= %s",
+            (email, start_of_day_ms),
+        ).fetchone()
     return row["c"]
