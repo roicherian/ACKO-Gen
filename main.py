@@ -33,6 +33,7 @@ import catalogue_prompt_builder
 import acko_mcp_server
 import character_store
 import history_store
+import feedback_store
 
 PORT = int(os.environ.get("PORT", 3458))
 MAGNIFIC_BASE = "https://api.magnific.com"
@@ -409,6 +410,7 @@ if _bootstrap_admin_emails:
 catalogue_db.init_db()
 character_store.init_db()
 history_store.init_db()
+feedback_store.init_db()
 init_mcp_rate_table()
 
 SESSION_SECRET = os.environ.get("SESSION_SECRET", "")
@@ -943,6 +945,15 @@ class ProxyHandler(BaseHTTPRequestHandler):
             self.send_json(200, {"tokens": user_store.list_all_api_tokens()})
             return
 
+        # Admin-only: every piece of feedback ever submitted, newest first.
+        if self.path == "/admin/feedback":
+            ok, _email = require_admin(self.headers.get("x-session-token", ""))
+            if not ok:
+                self.send_json(403, {"error": "Admin access required."})
+                return
+            self.send_json(200, {"feedback": feedback_store.list_feedback()})
+            return
+
         # Character reference library — list (metadata only, no image bytes).
         if path_no_query == "/api/characters":
             ok, email = verify_session(self.headers.get("x-session-token", ""))
@@ -1446,6 +1457,72 @@ class ProxyHandler(BaseHTTPRequestHandler):
                 return
             try:
                 history_store.delete_history_row(hist_id)
+            except ValueError as e:
+                self.send_json(400, {"error": str(e)})
+                return
+            self.send_json(200, {"ok": True})
+            return
+
+        # Any signed-in user can send feedback — not gated by IMAGE_GEN_ALLOWED,
+        # since reporting a problem (e.g. "I can't get access") shouldn't require
+        # the access this is about. Every Admin sees the shared list below.
+        if self.path == "/api/feedback/create":
+            ok, email = verify_session(self.headers.get("x-session-token", ""))
+            if not ok:
+                self.send_json(401, {"error": "Not signed in. Please sign in with your acko.tech email."})
+                return
+            length = int(self.headers.get("Content-Length", 0))
+            try:
+                data = json.loads(self.rfile.read(length) or b"{}")
+            except Exception:
+                self.send_json(400, {"error": "Invalid request body."})
+                return
+            try:
+                feedback_store.create_feedback(
+                    email,
+                    str(data.get("message", "")),
+                    category=str(data.get("category", "other")),
+                )
+            except ValueError as e:
+                self.send_json(400, {"error": str(e)})
+                return
+            self.send_json(200, {"ok": True})
+            return
+
+        # Admin-only: mark a feedback item reviewed/unreviewed, to keep the list manageable.
+        if self.path == "/admin/feedback/resolve":
+            ok, _admin_email = require_admin(self.headers.get("x-session-token", ""))
+            if not ok:
+                self.send_json(403, {"error": "Admin access required."})
+                return
+            length = int(self.headers.get("Content-Length", 0))
+            try:
+                data = json.loads(self.rfile.read(length) or b"{}")
+            except Exception:
+                self.send_json(400, {"error": "Invalid request body."})
+                return
+            try:
+                feedback_store.set_resolved(str(data.get("id", "")).strip(), bool(data.get("resolved", True)))
+            except ValueError as e:
+                self.send_json(400, {"error": str(e)})
+                return
+            self.send_json(200, {"ok": True})
+            return
+
+        # Admin-only: permanently remove a feedback item.
+        if self.path == "/admin/feedback/delete":
+            ok, _admin_email = require_admin(self.headers.get("x-session-token", ""))
+            if not ok:
+                self.send_json(403, {"error": "Admin access required."})
+                return
+            length = int(self.headers.get("Content-Length", 0))
+            try:
+                data = json.loads(self.rfile.read(length) or b"{}")
+            except Exception:
+                self.send_json(400, {"error": "Invalid request body."})
+                return
+            try:
+                feedback_store.delete_feedback(str(data.get("id", "")).strip())
             except ValueError as e:
                 self.send_json(400, {"error": str(e)})
                 return

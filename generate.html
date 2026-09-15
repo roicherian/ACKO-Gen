@@ -2475,6 +2475,10 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         Favourites
       </a>
+      <a class="nav-item" href="#" onclick="openFeedbackModal();return false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        Feedback
+      </a>
       <a class="nav-item" href="#" data-view="tokens" onclick="navigateTo('tokens');return false">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
         API Tokens
@@ -3016,6 +3020,7 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
       <div class="admin-tabs">
         <button class="admin-tab active" id="adminTabBtn-pending" onclick="switchAdminTab('pending')">Pending Requests</button>
         <button class="admin-tab" id="adminTabBtn-users" onclick="switchAdminTab('users')">All Users</button>
+        <button class="admin-tab" id="adminTabBtn-feedback" onclick="switchAdminTab('feedback')">Feedback</button>
       </div>
     </div>
 
@@ -3036,6 +3041,14 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
       <table class="admin-table" id="adminUsersTable">
         <thead><tr><th>Email</th><th>Permission</th><th>Requested</th><th>Granted</th><th>Granted by</th><th></th></tr></thead>
         <tbody id="adminUsersBody"></tbody>
+      </table>
+    </div>
+
+    <div id="adminPanel-feedback" class="hidden">
+      <div class="admin-empty hidden" id="adminFeedbackEmpty">No feedback yet.</div>
+      <table class="admin-table hidden" id="adminFeedbackTable">
+        <thead><tr><th>From</th><th>Category</th><th>Message</th><th>Sent</th><th></th><th></th></tr></thead>
+        <tbody id="adminFeedbackBody"></tbody>
       </table>
     </div>
   </div>
@@ -3397,6 +3410,34 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
     </div>
 
     <button class="adv-save" onclick="closeAdv()">Save Settings</button>
+  </div>
+</div>
+
+<!-- FEEDBACK MODAL -->
+<div class="adv-overlay" id="feedbackOverlay" onclick="if(event.target===this)closeFeedbackModal()">
+  <div class="adv-modal">
+    <div class="adv-modal-head">
+      <div class="adv-modal-title">Send Feedback</div>
+      <button class="btn-close" onclick="closeFeedbackModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="adv-section">
+      <div class="adv-sec-title">What's this about?</div>
+      <div class="pills-row" id="feedbackCategoryPills">
+        <div class="apill on" data-val="bug" onclick="selectFeedbackCategory(this)">Bug</div>
+        <div class="apill" data-val="idea" onclick="selectFeedbackCategory(this)">Idea</div>
+        <div class="apill" data-val="other" onclick="selectFeedbackCategory(this)">Other</div>
+      </div>
+    </div>
+    <div class="adv-section">
+      <label class="adv-label">Your feedback</label>
+      <textarea id="feedbackMessage" class="edit-textarea" style="min-height:140px" placeholder="What's working, what's broken, what would help — this goes straight to the Admins."></textarea>
+      <div class="edit-note" id="feedbackNote"></div>
+      <button class="adv-save" id="feedbackSubmitBtn" onclick="submitFeedback()">
+        <span id="feedbackSubmitLabel">Send Feedback</span>
+      </button>
+    </div>
   </div>
 </div>
 
@@ -5927,8 +5968,10 @@ const PERMISSION_LEVELS = ['No access', 'Full access', 'Imagen access', 'Icongen
 function switchAdminTab(tab) {
   document.getElementById('adminTabBtn-pending').classList.toggle('active', tab === 'pending');
   document.getElementById('adminTabBtn-users').classList.toggle('active', tab === 'users');
+  document.getElementById('adminTabBtn-feedback').classList.toggle('active', tab === 'feedback');
   document.getElementById('adminPanel-pending').classList.toggle('hidden', tab !== 'pending');
   document.getElementById('adminPanel-users').classList.toggle('hidden', tab !== 'users');
+  document.getElementById('adminPanel-feedback').classList.toggle('hidden', tab !== 'feedback');
 }
 
 async function adminFetch(path, options) {
@@ -5947,16 +5990,126 @@ async function loadAdminData() {
     addPermSelect.innerHTML = permissionOptions('Full access');
   }
   try {
-    const [{ pending }, { users }] = await Promise.all([
+    const [{ pending }, { users }, { feedback }] = await Promise.all([
       adminFetch('/admin/pending'),
       adminFetch('/admin/users'),
+      adminFetch('/admin/feedback'),
     ]);
     renderAdminPending(pending);
     renderAdminUsers(users);
+    renderAdminFeedback(feedback);
   } catch (e) {
     document.getElementById('adminPendingBody').innerHTML = '';
     document.getElementById('adminUsersBody').innerHTML = '';
+    document.getElementById('adminFeedbackBody').innerHTML = '';
     alert('Could not load admin data: ' + e.message);
+  }
+}
+
+const FEEDBACK_CATEGORY_LABEL = { bug: 'Bug', idea: 'Idea', other: 'Other' };
+
+function renderAdminFeedback(feedback) {
+  const empty = document.getElementById('adminFeedbackEmpty');
+  const table = document.getElementById('adminFeedbackTable');
+  const body = document.getElementById('adminFeedbackBody');
+  if (!feedback || !feedback.length) {
+    empty.classList.remove('hidden');
+    table.classList.add('hidden');
+    body.innerHTML = '';
+    return;
+  }
+  empty.classList.add('hidden');
+  table.classList.remove('hidden');
+  body.innerHTML = feedback.map(f => `
+    <tr style="${f.resolved ? 'opacity:.55' : ''}">
+      <td class="admin-email-muted">${esc(f.email)}</td>
+      <td>${esc(FEEDBACK_CATEGORY_LABEL[f.category] || 'Other')}</td>
+      <td style="white-space:pre-wrap;max-width:420px">${esc(f.message)}</td>
+      <td class="admin-email-muted">${fmtDate(f.createdAt)}</td>
+      <td><button class="admin-grant-btn" onclick="toggleFeedbackResolved('${f.id}', ${!f.resolved})">${f.resolved ? 'Reopen' : 'Mark reviewed'}</button></td>
+      <td><button class="admin-delete-btn" title="Delete" onclick="deleteFeedbackAdmin('${f.id}', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      </button></td>
+    </tr>
+  `).join('');
+}
+
+async function toggleFeedbackResolved(id, resolved) {
+  try {
+    await adminFetch('/admin/feedback/resolve', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, resolved }),
+    });
+    const { feedback } = await adminFetch('/admin/feedback');
+    renderAdminFeedback(feedback);
+  } catch (e) {
+    alert('Could not update feedback: ' + e.message);
+  }
+}
+
+async function deleteFeedbackAdmin(id, btn) {
+  if (!confirm('Delete this feedback permanently?')) return;
+  btn.disabled = true;
+  try {
+    await adminFetch('/admin/feedback/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    });
+    const { feedback } = await adminFetch('/admin/feedback');
+    renderAdminFeedback(feedback);
+  } catch (e) {
+    alert('Could not delete feedback: ' + e.message);
+    btn.disabled = false;
+  }
+}
+
+// ─── FEEDBACK (self-service — any signed-in user) ──────────────────────────────
+let feedbackCategory = 'bug';
+
+function openFeedbackModal() {
+  document.getElementById('feedbackOverlay').classList.add('open');
+  document.getElementById('feedbackNote').textContent = '';
+}
+function closeFeedbackModal() {
+  document.getElementById('feedbackOverlay').classList.remove('open');
+}
+function selectFeedbackCategory(el) {
+  el.parentElement.querySelectorAll('.apill').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+  feedbackCategory = el.dataset.val;
+}
+
+async function submitFeedback() {
+  const textarea = document.getElementById('feedbackMessage');
+  const note = document.getElementById('feedbackNote');
+  const btn = document.getElementById('feedbackSubmitBtn');
+  const message = textarea.value.trim();
+  if (!message) {
+    note.textContent = 'Please write something before sending.';
+    return;
+  }
+  btn.disabled = true;
+  const label = document.getElementById('feedbackSubmitLabel');
+  const prevLabel = label.textContent;
+  label.textContent = 'Sending…';
+  try {
+    const res = await fetch('/api/feedback/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-session-token': getSessionToken() },
+      body: JSON.stringify({ message, category: feedbackCategory }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
+    textarea.value = '';
+    note.textContent = 'Sent — thanks! It’s visible to the Admins now.';
+    setTimeout(closeFeedbackModal, 1400);
+  } catch (e) {
+    note.textContent = 'Could not send: ' + e.message;
+  } finally {
+    btn.disabled = false;
+    label.textContent = prevLabel;
   }
 }
 
