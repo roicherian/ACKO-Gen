@@ -4673,17 +4673,18 @@ function charImgError(imgEl, charId) {
   div.textContent = c ? charInitials(c.name) : '?';
   wrap.replaceWith(div);
 }
-// Portraits live in Supabase Storage (a public bucket, so this is a
-// permanent URL, but still cross-origin). Routed through the same
-// same-origin proxy as history images (proxiedImageUrl/api/fetch-image):
-// plain <img> display works fine with a raw cross-origin URL, but
-// getCharacterReferenceImage() below fetch()'s this same URL and needs
-// CORS either way — the proxy sidesteps needing to rely on Supabase's own
-// CORS headers at all. No missing-file fallback needed (creating a
-// character always requires an image); the card template's onerror handler
-// still covers a genuine load failure with the initials-avatar div.
+// Portraits live in Supabase Storage — a Public bucket that already sends
+// proper CORS headers (confirmed: a direct cross-origin fetch() reads the
+// body fine), so unlike history/generated images there is no tainted-canvas
+// risk here — getCharacterReferenceImage() only ever fetch()+blob()s this
+// URL, it never draws it onto a canvas. Routing it through the app's own
+// /api/fetch-image proxy anyway added a same-origin round trip plus a DB
+// permission check on every single photo; with the Characters modal loading
+// ~24 of these at once, that serialized into the whole grid taking 20+
+// seconds to render (one image measured at 733ms direct vs 22.6s proxied).
+// Serve the raw Supabase URL directly instead.
 function charPhotoUrl(character) {
-  return proxiedImageUrl(character.imageUrl);
+  return character.imageUrl;
 }
 
 let imagenReferences = { style: null, character: null, custom: null };
