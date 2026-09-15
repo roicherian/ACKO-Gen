@@ -1468,6 +1468,15 @@ body.imagen-mode .action-row .btn-gen { flex: 0 0 auto; justify-content: center;
 .btn-close:hover { background: var(--bg); color: var(--text); }
 .btn-close svg { width: 14px; height: 14px; }
 .btn-close i[class^="cil-"] { font-size: 14px; line-height: 1; }
+.feedback-success {
+  position: relative; display: flex; flex-direction: column; align-items: center;
+  text-align: center; padding: 28px 8px 8px;
+}
+.feedback-success-close { position: absolute; top: -8px; right: -8px; }
+.feedback-success-icon { width: 72px; height: 72px; margin-bottom: 18px; }
+.feedback-success-title { font-size: 26px; font-weight: 800; color: var(--ink); }
+.feedback-success-sub { font-size: 15px; color: var(--muted); margin-top: 6px; margin-bottom: 24px; }
+.feedback-success .adv-save { max-width: 320px; }
 .adv-section { margin-bottom: 18px; }
 .adv-sec-title { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
 .adv-sec-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
@@ -3416,27 +3425,49 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
 <!-- FEEDBACK MODAL -->
 <div class="adv-overlay" id="feedbackOverlay" onclick="if(event.target===this)closeFeedbackModal()">
   <div class="adv-modal">
-    <div class="adv-modal-head">
-      <div class="adv-modal-title">Send Feedback</div>
-      <button class="btn-close" onclick="closeFeedbackModal()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-    <div class="adv-section">
-      <div class="adv-sec-title">What's this about?</div>
-      <div class="pills-row" id="feedbackCategoryPills">
-        <div class="apill on" data-val="bug" onclick="selectFeedbackCategory(this)">Bug</div>
-        <div class="apill" data-val="idea" onclick="selectFeedbackCategory(this)">Idea</div>
-        <div class="apill" data-val="other" onclick="selectFeedbackCategory(this)">Other</div>
+    <div id="feedbackFormView">
+      <div class="adv-modal-head">
+        <div class="adv-modal-title">Send Feedback</div>
+        <button class="btn-close" onclick="closeFeedbackModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="adv-section">
+        <div class="adv-sec-title">What's this about?</div>
+        <div class="pills-row" id="feedbackCategoryPills">
+          <div class="apill on" data-val="bug" onclick="selectFeedbackCategory(this)">Bug</div>
+          <div class="apill" data-val="idea" onclick="selectFeedbackCategory(this)">Idea</div>
+          <div class="apill" data-val="other" onclick="selectFeedbackCategory(this)">Other</div>
+        </div>
+      </div>
+      <div class="adv-section">
+        <label class="adv-label">Your feedback</label>
+        <textarea id="feedbackMessage" class="edit-textarea" style="min-height:140px" placeholder="What's working, what's broken, what would help — this goes straight to the Admins."></textarea>
+        <div class="edit-note" id="feedbackNote"></div>
+        <button class="adv-save" id="feedbackSubmitBtn" onclick="submitFeedback()">
+          <span id="feedbackSubmitLabel">Send Feedback</span>
+        </button>
       </div>
     </div>
-    <div class="adv-section">
-      <label class="adv-label">Your feedback</label>
-      <textarea id="feedbackMessage" class="edit-textarea" style="min-height:140px" placeholder="What's working, what's broken, what would help — this goes straight to the Admins."></textarea>
-      <div class="edit-note" id="feedbackNote"></div>
-      <button class="adv-save" id="feedbackSubmitBtn" onclick="submitFeedback()">
-        <span id="feedbackSubmitLabel">Send Feedback</span>
+    <div id="feedbackSuccessView" class="feedback-success hidden">
+      <button class="btn-close feedback-success-close" onclick="closeFeedbackModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
+      <svg class="feedback-success-icon" viewBox="0 0 64 64" fill="none">
+        <g stroke="#8b7cf6" stroke-width="3" stroke-linecap="round">
+          <line x1="4" y1="32" x2="12" y2="32"/>
+          <line x1="52" y1="32" x2="60" y2="32"/>
+          <line x1="11" y1="11" x2="17" y2="17"/>
+          <line x1="47" y1="17" x2="53" y2="11"/>
+          <line x1="11" y1="53" x2="17" y2="47"/>
+          <line x1="47" y1="47" x2="53" y2="53"/>
+        </g>
+        <circle cx="32" cy="32" r="19" stroke="#4ADE80" stroke-width="3"/>
+        <path d="M24 33l5.5 5.5L41 26" stroke="#4ADE80" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div class="feedback-success-title">Thanks,</div>
+      <div class="feedback-success-sub">Your feedback sent.</div>
+      <button class="adv-save" onclick="closeFeedbackModal()">Got it</button>
     </div>
   </div>
 </div>
@@ -6071,6 +6102,8 @@ let feedbackCategory = 'bug';
 function openFeedbackModal() {
   document.getElementById('feedbackOverlay').classList.add('open');
   document.getElementById('feedbackNote').textContent = '';
+  document.getElementById('feedbackFormView').classList.remove('hidden');
+  document.getElementById('feedbackSuccessView').classList.add('hidden');
 }
 function closeFeedbackModal() {
   document.getElementById('feedbackOverlay').classList.remove('open');
@@ -6103,8 +6136,8 @@ async function submitFeedback() {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
     textarea.value = '';
-    note.textContent = 'Sent — thanks! It’s visible to the Admins now.';
-    setTimeout(closeFeedbackModal, 1400);
+    document.getElementById('feedbackFormView').classList.add('hidden');
+    document.getElementById('feedbackSuccessView').classList.remove('hidden');
   } catch (e) {
     note.textContent = 'Could not send: ' + e.message;
   } finally {
