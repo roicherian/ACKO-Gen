@@ -3577,29 +3577,30 @@ function proxiedImageUrl(remoteUrl) {
 function resolveItemImageSrc(item) {
   if (!item) return '';
   if (item.id && imageSrcCache.has(item.id)) return imageSrcCache.get(item.id);
-  // Prefer durable local disk copies under /generated/ — same-origin, so no
-  // CORS/canvas-taint risk. Must check the path itself, not just truthiness:
-  // localUrl/imageData.localUrl now often hold a cross-origin Supabase
-  // Storage URL (since the move off local disk storage), which needs the
-  // same-origin proxy below instead — treating it as "local" here silently
-  // taints any canvas the image gets drawn into (breaks Edit's toDataURL).
-  const local = (item.localUrl && String(item.localUrl).startsWith('/generated/') ? item.localUrl : '')
-    || (item.imageData && item.imageData.localUrl && String(item.imageData.localUrl).startsWith('/generated/') ? item.imageData.localUrl : '')
-    || (item.src && String(item.src).startsWith('/generated/') ? item.src : '');
-  if (local) return local;
+  // /generated/<file> was the old local-disk serving route from before the
+  // move to Supabase Storage — main.py no longer serves it at all (see the
+  // comment at main.py's GET handler), so any item whose only known URL is
+  // under /generated/ is permanently unloadable. These are pre-migration
+  // history rows; there is no bytes to fall back to. Treating them as "local"
+  // here (as this used to) meant every one of them 404s in an <img> tag,
+  // which triggers its onerror handler, which used to force a full gallery
+  // re-render per image — with dozens of these in one account's history,
+  // that cascade of re-renders could peg the tab's JS thread hard enough to
+  // make the whole page (including an in-flight generation) look frozen.
+  const isDeadLocalPath = (v) => typeof v === 'string' && v.startsWith('/generated/');
   if (item.imageData && item.imageData.b64) {
     return `data:${item.imageData.mime || 'image/png'};base64,${item.imageData.b64}`;
   }
   if (item.src && String(item.src).startsWith('data:')) return item.src;
-  if (item.src && String(item.src).startsWith('/')) return item.src;
+  if (item.src && String(item.src).startsWith('/') && !isDeadLocalPath(item.src)) return item.src;
   // Temp Magnific URLs — serve via same-origin proxy (img + fetch both work)
   const remote = (item.src && /^https?:\/\//i.test(item.src))
     ? item.src
     : (item.sourceUrl && /^https?:\/\//i.test(item.sourceUrl) ? item.sourceUrl : '');
   if (remote) return proxiedImageUrl(remote);
-  if (item.imageData && item.imageData.url) {
+  if (item.imageData && item.imageData.url && !isDeadLocalPath(item.imageData.url)) {
     const u = item.imageData.url;
-    if (String(u).startsWith('/generated/')) return u;
+    if (String(u).startsWith('/')) return u;
     return proxiedImageUrl(u);
   }
   return '';
@@ -3977,10 +3978,11 @@ function buildVehicleGalleryCard(item) {
   img.src = src;
   img.alt = cardTitle;
   img.onerror = () => {
-    // Expired / corrupt — drop the card and purge history
+    // Expired / corrupt — drop the card and purge history. No full
+    // renderVehicleGallery() here — see the matching note in
+    // buildImagenGridCard's onerror for why that cascades badly.
     removeHistoryItemById(item.id);
     if (wrap.parentNode) wrap.remove();
-    renderVehicleGallery();
   };
   thumb.appendChild(img);
   wrap.appendChild(thumb);
@@ -4129,7 +4131,13 @@ function buildImagenGridCard(item) {
   } else {
     media.alt = item.prompt || 'Generated image';
   }
-  media.onerror = () => { removeHistoryItemById(item.id); if (card.parentNode) card.remove(); renderVehicleGallery(); };
+  // Drop just this one card — no full renderVehicleGallery() here. That used
+  // to force a whole-gallery rebuild per broken image; with several broken
+  // images in one history (expired temp URLs, or the old pre-Supabase
+  // /generated/ rows), each rebuild recreated fresh <img> tags for the ones
+  // that hadn't errored yet, which could re-trigger more rebuilds — enough of
+  // that can peg the tab's JS thread and make the whole page look frozen.
+  media.onerror = () => { removeHistoryItemById(item.id); if (card.parentNode) card.remove(); };
   card.appendChild(media);
 
   const overlay = document.createElement('div');
