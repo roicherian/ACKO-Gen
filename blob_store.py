@@ -45,7 +45,11 @@ def _get_client():
         endpoint_url=SUPABASE_S3_ENDPOINT,
         aws_access_key_id=SUPABASE_ACCESS_KEY_ID,
         aws_secret_access_key=SUPABASE_SECRET_ACCESS_KEY,
-        config=Config(signature_version="s3v4"),
+        # Bounded timeouts: an unreachable/slow Supabase endpoint would otherwise
+        # hang put_object/delete_object with no error, which from the browser
+        # looks identical to a frozen "Generating…" spinner.
+        config=Config(signature_version="s3v4", connect_timeout=10, read_timeout=30,
+                      retries={"max_attempts": 2}),
         region_name=SUPABASE_S3_REGION,
     )
     return _client

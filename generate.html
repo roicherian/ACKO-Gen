@@ -8405,6 +8405,22 @@ function parseApiError(status, errText) {
   return message;
 }
 
+// Every network call in the generate pipeline used to have no client-side
+// timeout at all — if the server (or a downstream dependency like the DB or
+// Supabase) ever stalled instead of erroring, the browser's fetch() would
+// just hang forever with no signal, which looked exactly like a frozen
+// "Generating…" spinner. This wraps fetch with a hard deadline so every call
+// eventually rejects with a clear, catchable error instead.
+function fetchWithTimeout(url, opts = {}, ms = 45000) {
+  const signal = typeof AbortSignal.timeout === 'function' ? AbortSignal.timeout(ms) : undefined;
+  return fetch(url, signal ? { ...opts, signal } : opts).catch(e => {
+    if (e && (e.name === 'AbortError' || e.name === 'TimeoutError')) {
+      throw new Error(`Request timed out after ${Math.round(ms / 1000)}s — the server took too long to respond. Try again.`);
+    }
+    throw e;
+  });
+}
+
 async function doSync(model, prompt, negPrompt, ratio, guidance, seed) {
   const body = {
     prompt,
@@ -8416,11 +8432,11 @@ async function doSync(model, prompt, negPrompt, ratio, guidance, seed) {
   };
   if (seed !== undefined) body.seed = seed;
 
-  const res = await fetch(apiUrl('magnific', model.path), {
+  const res = await fetchWithTimeout(apiUrl('magnific', model.path), {
     method: 'POST',
     headers: apiAuthHeaders(),
     body: JSON.stringify(body),
-  });
+  }, 60000);
   if (!res.ok) throw new Error(parseApiError(res.status, await res.text()));
   const data = await res.json();
   const images = data.data || [];
@@ -8452,11 +8468,11 @@ async function doAsync(model, prompt, negPrompt, ratio, res, guidance, seed, idx
     delete headers['x-acko-vehicle-view'];
   }
 
-  const createRes = await fetch(apiUrl('magnific', model.path), {
+  const createRes = await fetchWithTimeout(apiUrl('magnific', model.path), {
     method: 'POST',
     headers,
     body: JSON.stringify(body),
-  });
+  }, 60000);
   if (!createRes.ok) {
     throw new Error(parseApiError(createRes.status, await createRes.text()));
   }
@@ -8472,7 +8488,7 @@ async function doAsync(model, prompt, negPrompt, ratio, res, guidance, seed, idx
   for (let i = 0; i < 90; i++) {
     if (state.cancelRequested) throw new Error('Cancelled.');
     await sleep(2000);
-    const pr = await fetch(pollUrl, { headers: hdrs });
+    const pr = await fetchWithTimeout(pollUrl, { headers: hdrs }, 20000);
     if (!pr.ok) continue;
     const result = await pr.json();
     const status = (result.data || {}).status;
@@ -8516,14 +8532,14 @@ async function saveGeneratedToLocalDisk({ b64, mime, url, kind, meta }) {
   else if (url) body.image_url = url;
   else return null;
   if (meta) Object.assign(body, meta);
-  const res = await fetch('/api/generated/save', {
+  const res = await fetchWithTimeout('/api/generated/save', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'x-session-token': getSessionToken(),
     },
     body: JSON.stringify(body),
-  });
+  }, 45000);
   if (!res.ok) throw new Error(parseApiError(res.status, await res.text()));
   return await res.json();
 }
@@ -8545,7 +8561,7 @@ async function persistImageDataForHistory(imageData, opts = {}) {
 
     // 1) Direct fetch (works when CDN sends CORS)
     try {
-      const r = await fetch(url);
+      const r = await fetchWithTimeout(url, {}, 15000);
       if (r.ok) persisted = await blobToPersisted(await r.blob(), url);
     } catch (e) {
       console.warn('Direct image fetch failed, trying proxy…', e);
@@ -8554,9 +8570,9 @@ async function persistImageDataForHistory(imageData, opts = {}) {
     // 2) Same-origin proxy (fixes CORS) — this is why gens were vanishing
     if (!persisted) {
       try {
-        const r = await fetch(proxiedImageUrl(url), {
+        const r = await fetchWithTimeout(proxiedImageUrl(url), {
           headers: { 'x-session-token': getSessionToken() },
-        });
+        }, 20000);
         if (!r.ok) throw new Error('proxy fetch ' + r.status);
         persisted = await blobToPersisted(await r.blob(), url);
       } catch (e) {

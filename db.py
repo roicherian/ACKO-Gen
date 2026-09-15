@@ -51,7 +51,18 @@ def get_conn():
         )
     wrapped = getattr(_local, "conn", None)
     if wrapped is None or wrapped._conn.closed:
-        raw = psycopg2.connect(DATABASE_URL, cursor_factory=psycopg2.extras.RealDictCursor)
+        # connect_timeout + statement_timeout: without these, a stalled/unreachable
+        # Postgres (e.g. a paused Neon endpoint, exhausted connection limit) hangs
+        # this thread's connect() or query indefinitely — the request just never
+        # returns, which from the browser looks exactly like a frozen "Generating…"
+        # spinner with no error. Bounding both turns that into a clear failure in
+        # well under a minute instead.
+        raw = psycopg2.connect(
+            DATABASE_URL,
+            cursor_factory=psycopg2.extras.RealDictCursor,
+            connect_timeout=10,
+            options="-c statement_timeout=15000",
+        )
         wrapped = _ConnWrapper(raw)
         _local.conn = wrapped
     return wrapped
