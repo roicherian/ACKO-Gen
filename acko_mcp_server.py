@@ -95,6 +95,8 @@ ANATOMY_RULE = (
 NEGATIVE_PROMPT = (
     "posed, stiff, looking at camera, stock photo smile, "
     "plastic skin, airbrushed complexion, heavy makeup, "
+    "acne, pimples, blemishes, skin breakouts, spots on face, blotchy skin, "
+    "skin discoloration, scars on face, "
     "melted hands, extra fingers, wrong finger count, distorted face, "
     "extra limbs, extra legs, extra arms, three legs, fused legs, "
     "malformed limbs, wrong number of legs, disconnected limbs, "
@@ -128,7 +130,7 @@ def build_prompt(scene, moment, product, skin_tone="", region="", age="", life_s
         f"Setting: {s['scene']}.",
         BACKGROUND_RULE,
         PROPS_RULE + (f" ({s['props']}.)" if s["props"] else ""),
-        f"{s['light']}. Warm whites, natural skin tones with slight imperfections "
+        f"{s['light']}. Warm whites, natural skin tones with a clear, healthy complexion "
         "— premium Indian commercial photography style, NOT dark or moody.",
         f"Expression: {mood}. One clear subject with room to breathe.",
         "Candid documentary feel, not posed. Realistic skin texture, no heavy makeup. "
