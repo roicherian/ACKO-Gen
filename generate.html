@@ -3576,7 +3576,17 @@ function proxiedImageUrl(remoteUrl) {
 
 function resolveItemImageSrc(item) {
   if (!item) return '';
-  if (item.id && imageSrcCache.has(item.id)) return imageSrcCache.get(item.id);
+  // imageSrcCache is fed a raw cross-origin Supabase URL straight out of
+  // showImage()/saveToHistory() (and the mirror/edit/cutout equivalents) for
+  // every image generated THIS session — never proxied, since a plain <img>
+  // doesn't care. Drawing that <img> onto a canvas (Edit's brush markup,
+  // mirror, etc.) taints the canvas though: the browser only skips tainting
+  // a cross-origin image if crossOrigin was requested up front, which none
+  // of these <img> tags do — so toDataURL() throws "Tainted canvases may not
+  // be exported" the moment someone opens Edit on something they just
+  // generated. Route every cached value through the same-origin proxy too;
+  // it's a no-op for anything already same-origin/data/proxied.
+  if (item.id && imageSrcCache.has(item.id)) return proxiedImageUrl(imageSrcCache.get(item.id));
   // /generated/<file> was the old local-disk serving route from before the
   // move to Supabase Storage — main.py no longer serves it at all (see the
   // comment at main.py's GET handler), so any item whose only known URL is
