@@ -51,18 +51,25 @@ def get_conn():
         )
     wrapped = getattr(_local, "conn", None)
     if wrapped is None or wrapped._conn.closed:
-        # connect_timeout + statement_timeout: without these, a stalled/unreachable
-        # Postgres (e.g. a paused Neon endpoint, exhausted connection limit) hangs
-        # this thread's connect() or query indefinitely — the request just never
-        # returns, which from the browser looks exactly like a frozen "Generating…"
-        # spinner with no error. Bounding both turns that into a clear failure in
-        # well under a minute instead.
+        # connect_timeout: without it, a stalled/unreachable Postgres (e.g. a
+        # paused Neon endpoint, exhausted connection limit) hangs this thread's
+        # connect() indefinitely — the request just never returns, which from
+        # the browser looks exactly like a frozen "Generating…" spinner with
+        # no error. Bounds that to a clear failure in ~10s instead.
+        #
+        # statement_timeout can't be passed as a connect() "options" startup
+        # parameter — Neon's pooled (PgBouncer) endpoint rejects unknown
+        # startup parameters outright and refuses the connection entirely
+        # ("unsupported startup parameter in options: statement_timeout"),
+        # which took the whole app down. Set it as a plain SQL command after
+        # connecting instead — that works the same over the pooler.
         raw = psycopg2.connect(
             DATABASE_URL,
             cursor_factory=psycopg2.extras.RealDictCursor,
             connect_timeout=10,
-            options="-c statement_timeout=15000",
         )
+        raw.cursor().execute("SET statement_timeout = 15000")
+        raw.commit()
         wrapped = _ConnWrapper(raw)
         _local.conn = wrapped
     return wrapped
