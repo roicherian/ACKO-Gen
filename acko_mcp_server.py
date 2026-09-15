@@ -82,6 +82,19 @@ PROPS_RULE = (
     "for. Do not add a phone, bag, tablet, or any other item by default — empty hands are "
     "correct whenever the scene does not need an object."
 )
+# Mirrors generate.html's PHOTO_REALISM_RULE_PEOPLE — pushes away from the
+# "AI-generated" look (waxy/plastic skin, perfect symmetry, flat rendered
+# bokeh) toward genuine photography, added after real reference photos showed
+# the qualities (skin pores, catchlights, natural bokeh) the tool's output was
+# missing.
+PHOTO_REALISM_RULE = (
+    "This must read as a genuine unretouched photograph captured on a real camera, not CGI or "
+    "a digital render — natural optical bokeh with soft round highlights, a faint natural "
+    "vignette, a genuine catchlight in each eye, visible skin pores and a subtle natural oil "
+    "sheen on forehead and nose, natural asymmetry in pose and expression, real fabric texture "
+    "and wrinkles. Not airbrushed, not waxy, not uncannily smooth or symmetrical."
+)
+
 # Added after a real generation produced a third leg on a cross-legged seated
 # child — overlapping/bent-limb poses (sitting cross-legged, kneeling, one
 # knee drawn up) are exactly where models most often add a spare limb.
@@ -96,7 +109,9 @@ NEGATIVE_PROMPT = (
     "posed, stiff, looking at camera, stock photo smile, "
     "plastic skin, airbrushed complexion, heavy makeup, "
     "acne, pimples, blemishes, skin breakouts, spots on face, blotchy skin, "
-    "skin discoloration, scars on face, "
+    "skin discoloration, scars on face, waxy skin, glassy skin, doll-like face, "
+    "uncanny valley, video game character, unnatural facial symmetry, "
+    "synthetic skin texture, rendered look, flat lighting, no skin pores, overly perfect skin, "
     "melted hands, extra fingers, wrong finger count, distorted face, "
     "extra limbs, extra legs, extra arms, three legs, fused legs, "
     "malformed limbs, wrong number of legs, disconnected limbs, "
@@ -136,6 +151,7 @@ def build_prompt(scene, moment, product, skin_tone="", region="", age="", life_s
         "Candid documentary feel, not posed. Realistic skin texture, no heavy makeup. "
         "Middle-class Indian aesthetic, modern but understated. "
         "Slight warm colour grade, gently desaturated, subtle film grain.",
+        PHOTO_REALISM_RULE,
         ANATOMY_RULE,
     ])
 
