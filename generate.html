@@ -3334,28 +3334,6 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
       </div>
     </div>
 
-    <div class="adv-section" id="momentSection">
-      <div class="adv-sec-title">Insurance Moment</div>
-      <div class="pills-row" id="momentPills">
-        <div class="apill" data-val="pre-purchase" onclick="togglePill(this,'moment')">Pre-purchase</div>
-        <div class="apill on" data-val="care" onclick="togglePill(this,'moment')">Care</div>
-        <div class="apill" data-val="reassurance" onclick="togglePill(this,'moment')">Reassurance</div>
-        <div class="apill" data-val="active-life" onclick="togglePill(this,'moment')">Active Life</div>
-        <div class="apill" data-val="internal-brand" onclick="togglePill(this,'moment')">Internal Brand</div>
-      </div>
-    </div>
-
-    <div class="adv-section">
-      <div class="adv-sec-title">Product Line</div>
-      <div class="pills-row" id="productPills">
-        <div class="apill" data-val="motor" onclick="togglePill(this,'product')">Motor</div>
-        <div class="apill" data-val="health" onclick="togglePill(this,'product')">Health</div>
-        <div class="apill" data-val="travel" onclick="togglePill(this,'product')">Travel</div>
-        <div class="apill" data-val="home" onclick="togglePill(this,'product')">Home</div>
-        <div class="apill on" data-val="general" onclick="togglePill(this,'product')">General</div>
-      </div>
-    </div>
-
     <div class="adv-section" id="diversitySection">
       <div class="adv-sec-title">Diversity Axes</div>
       <div class="adv-grid">
@@ -8165,8 +8143,43 @@ const MASTER_SUFFIX = 'Ensure technical correctness in every detail: hands, eyes
 
 const DEFAULT_NEG = 'cluttered background, busy background, crowded scene, crowd, too many people, background rush, messy background, competing props, visual clutter, tilted phone screen, warped screen, distorted screen, bent or curved documents, wrong-angle paper, garbled text, gibberish signage, extra fingers, deformed hands, melted hands, wrong finger count, extra limbs, extra legs, extra arms, three legs, fused legs, malformed limbs, wrong number of legs, disconnected limbs, distorted face, off eyes, posed, stiff, looking at camera, stock photo smile, plastic skin, airbrushed complexion, heavy makeup, acne, pimples, blemishes, skin breakouts, spots on face, blotchy skin, skin discoloration, scars on face, waxy skin, glassy skin, doll-like face, uncanny valley, video game character, unnatural facial symmetry, synthetic skin texture, rendered look, flat lighting, no skin pores, overly perfect skin, Western setting, left-hand drive car, foreign architecture, dark moody tones, hard shadows, neon colours, oversaturated HDR, mascot, cartoon, 3D render, CGI, illustration, visible brand logos, competitor names, text overlay on scene, fear, panic, blood, gore, distress, plain white background, nsfw, heavy orange colour grading, strong amber cast, golden hour glow, overly warm tone, sepia tint, yellow colour cast';
 
+// ─── AUTO PRODUCT / MOMENT DETECTION ────────────────────────────────────────────
+// Replaces the old manual "Insurance Moment" / "Product Line" pills — the tool
+// now reads these off the scene text itself. Product keys off concrete nouns
+// naming the setting (same caution as the MCP tool's own product param: don't
+// let a passing mention override a scene that already names its own setting),
+// checked in a fixed order so the first clear match wins. Moment is a softer
+// signal and falls back to the same 'care' default the pills used to start on.
+const PRODUCT_KEYWORDS = {
+  motor: ['car', 'vehicle', 'bike', 'motorcycle', 'scooter', 'garage', 'mechanic', 'traffic', 'driving', 'dent', 'windshield', 'windscreen', 'tyre', 'tire', 'service center', 'service centre', 'workshop', 'road trip', 'parking lot', 'car wash'],
+  health: ['hospital', 'doctor', 'clinic', 'nurse', 'patient', 'surgery', 'check-up', 'checkup', 'medicine', 'stethoscope', 'ward', 'physician', 'medical', 'pharmacy'],
+  travel: ['airport', 'flight', 'luggage', 'suitcase', 'passport', 'boarding pass', 'vacation', 'holiday trip', 'tourist', 'trip abroad', 'hotel lobby', 'backpacking'],
+  home: ['living room', 'kitchen', 'apartment', 'house', 'family dinner', 'home appliance', 'sofa', 'balcony', 'dining table'],
+};
+const MOMENT_KEYWORDS = {
+  reassurance: ['after the accident', 'claim', 'recovering', 'relief', 'resolved', 'fixed', 'repaired', 'settled'],
+  'pre-purchase': ['comparing', 'researching', 'browsing plans', 'considering', 'shopping for', 'looking at plans', 'getting a quote'],
+  'internal-brand': ['office meeting', 'colleagues', 'team meeting', 'workplace', 'coworkers', 'employee'],
+  'active-life': ['jogging', 'running', 'playing', 'cycling', 'gym', 'sports', 'hiking', 'commuting', 'walking to'],
+};
+function inferProductAndMoment(sceneText) {
+  const s = String(sceneText || '').toLowerCase();
+  let product = 'general';
+  for (const key of Object.keys(PRODUCT_KEYWORDS)) {
+    if (PRODUCT_KEYWORDS[key].some(w => s.includes(w))) { product = key; break; }
+  }
+  let moment = 'care';
+  for (const key of Object.keys(MOMENT_KEYWORDS)) {
+    if (MOMENT_KEYWORDS[key].some(w => s.includes(w))) { moment = key; break; }
+  }
+  return { product, moment };
+}
+
 // ─── PROMPT BUILDER ───────────────────────────────────────────────────────────
 function buildPrompt(scene) {
+  const inferred = inferProductAndMoment(scene);
+  state.product = inferred.product;
+  state.moment = inferred.moment;
   const s    = SETTINGS[state.product] || SETTINGS.general;
   const cam  = CAMERA_ANGLES[state.cameraAngle] || CAMERA_ANGLES['eye-level'];
 
@@ -8322,8 +8335,6 @@ function togglePill(el, group) {
   const container = el.parentElement;
   container.querySelectorAll('.apill').forEach(p => p.classList.remove('on'));
   el.classList.add('on');
-  if (group === 'moment')   state.moment      = el.dataset.val;
-  if (group === 'product')  state.product     = el.dataset.val;
   if (group === 'submodel') state.subModel    = el.dataset.val;
   if (group === 'camera')   state.cameraAngle = el.dataset.val;
   updatePrompt();
@@ -8333,7 +8344,7 @@ function togglePill(el, group) {
 function toggleNoCharacters() {
   state.noCharacters = document.getElementById('noCharCheckbox').checked;
   document.getElementById('noCharToggleRow').classList.toggle('on', state.noCharacters);
-  ['diversitySection', 'momentSection'].forEach(id => {
+  ['diversitySection'].forEach(id => {
     const el = document.getElementById(id);
     el.style.opacity = state.noCharacters ? '0.4' : '1';
     el.style.pointerEvents = state.noCharacters ? 'none' : '';
