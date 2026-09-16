@@ -23,6 +23,15 @@ import urllib.error
 import urllib.parse
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 import os
+import sys
+
+# On Vercel, this file is imported directly by its absolute path without its
+# own directory being added to sys.path first, so the plain sibling imports
+# below (import db, import blob_store, ...) would otherwise raise
+# ModuleNotFoundError at runtime even though they resolve fine locally and
+# on Render (both invoke this file in a way that already puts api/ on the
+# path). Harmless no-op there since the entry is already present.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import db
 import blob_store
