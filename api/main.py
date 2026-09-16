@@ -406,26 +406,41 @@ def check_mcp_rate_limit(email):
     return True
 
 
-user_store.init_db()
-_bootstrap_admin_emails = [e for e in os.environ.get("ADMIN_EMAILS", "").split(",") if e.strip()]
-if _bootstrap_admin_emails:
-    user_store.bootstrap_admins(_bootstrap_admin_emails)
+_initialized = False
 
-catalogue_db.init_db()
-character_store.init_db()
-history_store.init_db()
-feedback_store.init_db()
-init_mcp_rate_table()
+
+def _ensure_initialized():
+    # Deferred rather than run at import time: on Vercel, this module is
+    # imported during the build itself (to check what it exports), before any
+    # runtime env vars like DATABASE_URL are necessarily available — an
+    # eager DB connection here would crash that import and get misreported as
+    # "doesn't export a handler". Render/local dev call this explicitly at
+    # startup instead (see __main__ below), so behavior there is unchanged.
+    global _initialized
+    if _initialized:
+        return
+    user_store.init_db()
+    bootstrap_admin_emails = [e for e in os.environ.get("ADMIN_EMAILS", "").split(",") if e.strip()]
+    if bootstrap_admin_emails:
+        user_store.bootstrap_admins(bootstrap_admin_emails)
+    catalogue_db.init_db()
+    character_store.init_db()
+    history_store.init_db()
+    feedback_store.init_db()
+    init_mcp_rate_table()
+    if not SESSION_SECRET:
+        # Same import-time-safety reasoning as above: this must not raise until
+        # a real request (or local/Render startup) actually needs it.
+        raise RuntimeError(
+            "SESSION_SECRET is not configured. Set a fixed random value as an "
+            "environment variable (e.g. python3 -c \"import secrets; "
+            "print(secrets.token_hex(32))\" to generate one) — without it, every "
+            "cold start would sign sessions with a different secret and silently "
+            "invalidate every login."
+        )
+    _initialized = True
 
 SESSION_SECRET = os.environ.get("SESSION_SECRET", "")
-if not SESSION_SECRET:
-    raise RuntimeError(
-        "SESSION_SECRET is not configured. Set a fixed random value as an "
-        "environment variable (e.g. python3 -c \"import secrets; "
-        "print(secrets.token_hex(32))\" to generate one) — without it, every "
-        "cold start would sign sessions with a different secret and silently "
-        "invalidate every login."
-    )
 
 
 def make_session(email):
@@ -777,6 +792,7 @@ class ProxyHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         try:
+            _ensure_initialized()
             self._do_GET_inner()
         except Exception as e:
             # Last-resort safety net: whatever broke, make sure this request gets
@@ -1152,6 +1168,7 @@ class ProxyHandler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         try:
+            _ensure_initialized()
             self._do_POST_inner()
         except Exception as e:
             print(f"  ERROR handling POST {self.path}: {e}")
@@ -1897,6 +1914,10 @@ class ProxyHandler(BaseHTTPRequestHandler):
 handler = ProxyHandler
 
 if __name__ == "__main__":
+    # Fail fast here, same as before — unlike the serverless request path,
+    # a persistent process should refuse to start at all if the DB is
+    # unreachable, rather than accept connections it can't actually serve.
+    _ensure_initialized()
     # 0.0.0.0 so this works both locally and on a real host.
     server = ThreadingHTTPServer(("0.0.0.0", PORT), ProxyHandler)
     print(f"\n  ACKO Image Generator proxy running on port {PORT}")
