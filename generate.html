@@ -4371,7 +4371,11 @@ function renderVehicleGallery() {
   }
 
   // Pipeline, or a single make folder inside Collections
-  let list = items;
+  // The pipeline view is a personal workspace — only your own generations show
+  // here; everyone's generations remain visible together in the History tab.
+  let list = (imagen || vehicleGalleryMode === 'pipeline')
+    ? items.filter(item => item.email === getSessionEmail())
+    : items;
   if (!imagen && vehicleGalleryMode === 'collections' && vehicleCollectionOpenMake) {
     list = items.filter(item => {
       const make = ((getItemVehicleMeta(item) || {}).make || '').trim() || 'Unknown make';
