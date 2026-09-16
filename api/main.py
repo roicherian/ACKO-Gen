@@ -519,7 +519,7 @@ def upstream_headers(provider, incoming_headers):
     return {"Content-Type": "application/json"}
 
 
-class ProxyHandler(BaseHTTPRequestHandler):
+class handler(BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):
         print(f"  {args[0]} {args[1]}")
 
@@ -1906,12 +1906,11 @@ class ProxyHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(msg)
 
-
-# Vercel's Python runtime only recognizes a BaseHTTPRequestHandler-based
-# `handler` top-level variable in files under api/ — this is what turns this
-# file into a serverless function there. Harmless for local dev/Render, which
-# both use the ThreadingHTTPServer below instead.
-handler = ProxyHandler
+# The class above is named `handler` (not, say, `ProxyHandler`) specifically
+# because Vercel's Python runtime statically scans api/*.py for a top-level
+# `class handler(BaseHTTPRequestHandler)` definition — a `handler = SomeClass`
+# alias assignment is NOT recognized, only the literal class statement.
+# Harmless for local dev/Render, which use the ThreadingHTTPServer below.
 
 if __name__ == "__main__":
     # Fail fast here, same as before — unlike the serverless request path,
@@ -1919,7 +1918,7 @@ if __name__ == "__main__":
     # unreachable, rather than accept connections it can't actually serve.
     _ensure_initialized()
     # 0.0.0.0 so this works both locally and on a real host.
-    server = ThreadingHTTPServer(("0.0.0.0", PORT), ProxyHandler)
+    server = ThreadingHTTPServer(("0.0.0.0", PORT), handler)
     print(f"\n  ACKO Image Generator proxy running on port {PORT}")
     print(f"  Open in browser → http://localhost:{PORT}/generate.html\n")
     if not MAGNIFIC_KEY:
