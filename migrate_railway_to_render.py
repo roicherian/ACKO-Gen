@@ -22,9 +22,12 @@ Usage:
     python3 migrate_railway_to_render.py
 """
 import json
+import os
+import sys
 import urllib.request
 import urllib.error
 
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "api"))
 import db
 import user_store
 import character_store

@@ -39,10 +39,14 @@ PORT = int(os.environ.get("PORT", 3458))
 MAGNIFIC_BASE = "https://api.magnific.com"
 OPENAI_BASE = "https://api.openai.com"
 REMOVE_BG_API = "https://api.remove.bg/v1.0/removebg"
-HTML_DIR = os.path.dirname(os.path.abspath(__file__))
+# This file lives in api/ (Vercel's Python runtime only recognizes the
+# `handler` convention for files under api/), but generate.html, Skills/,
+# Vehicles-data/, and vehicle_catalog.json/.txt all still live at the
+# project root one level up.
+HTML_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENV_FILE = os.path.join(HTML_DIR, ".env")
-# Only used for local dev now — Render deployments get every var from the
-# dashboard's Environment Variables, not a checked-in-adjacent .env file.
+# Only used for local dev now — Render/Vercel deployments get every var from
+# the dashboard's Environment Variables, not a checked-in-adjacent .env file.
 DATA_DIR = os.environ.get("DATA_DIR", HTML_DIR)
 
 
@@ -1885,6 +1889,12 @@ class ProxyHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(msg)
 
+
+# Vercel's Python runtime only recognizes a BaseHTTPRequestHandler-based
+# `handler` top-level variable in files under api/ — this is what turns this
+# file into a serverless function there. Harmless for local dev/Render, which
+# both use the ThreadingHTTPServer below instead.
+handler = ProxyHandler
 
 if __name__ == "__main__":
     # 0.0.0.0 so this works both locally and on a real host.
