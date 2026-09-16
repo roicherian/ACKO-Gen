@@ -3153,7 +3153,7 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
     <div class="edit-modal-body">
       <div class="edit-canvas-col">
         <div class="edit-canvas-wrap" id="editCanvasWrap">
-          <img id="editPreviewImg" src="" alt="Image to edit">
+          <img id="editPreviewImg" src="" alt="Image to edit" crossorigin="anonymous">
           <canvas id="editMaskCanvas"></canvas>
           <div class="edit-brush-cursor" id="editBrushCursor"></div>
         </div>
@@ -3610,6 +3610,15 @@ function proxiedImageUrl(remoteUrl) {
   const u = String(remoteUrl);
   if (u.startsWith('data:') || u.startsWith('/api/fetch-image')) return u;
   if (!/^https?:\/\//i.test(u)) return u;
+  // Supabase Storage already sends permissive CORS headers (confirmed: a
+  // crossorigin="anonymous" <img> from here draws to canvas without tainting
+  // it), so durable Supabase-hosted images can be loaded directly. Routing
+  // every one of them through /api/fetch-image instead was doubling Render's
+  // egress for every single image view app-wide — the dominant driver behind
+  // exhausting the free bandwidth tier. Only genuinely temporary/foreign URLs
+  // (e.g. a live Magnific generation URL, which can lack CORS and expires)
+  // still need the same-origin proxy.
+  if (/^https?:\/\/[a-z0-9-]+\.supabase\.co\//i.test(u)) return u;
   const token = getSessionToken();
   return `/api/fetch-image?url=${encodeURIComponent(u)}${token ? `&token=${encodeURIComponent(token)}` : ''}`;
 }
