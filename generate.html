@@ -3109,6 +3109,10 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
             <span>Animate</span>
           </button>
+          <button type="button" class="lb-tool" id="lbUpscale" title="Upscale (up to 4K)" onclick="event.stopPropagation(); lbUpscaleImage()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>
+            <span>Upscale</span>
+          </button>
         </div>
         <div class="lb-zoom-controls lb-ui" aria-label="Zoom controls">
           <button type="button" id="lbZoomOutBtn" title="Zoom out" onclick="event.stopPropagation(); lbZoomBy(-0.25)">−</button>
@@ -5872,7 +5876,8 @@ function mapServerHistoryItem(row) {
   const isEdit = row.kind === 'edit';
   const isCutout = row.kind === 'no-bg';
   const isAnimate = row.kind === 'animate';
-  const badge = isMirror ? 'Mirrored' : isEdit ? 'Edited' : isCutout ? 'No BG' : isAnimate ? 'Animated' : 'Original';
+  const isUpscale = row.kind === 'upscale';
+  const badge = isMirror ? 'Mirrored' : isEdit ? 'Edited' : isCutout ? 'No BG' : isAnimate ? 'Animated' : isUpscale ? 'Upscaled' : 'Original';
   return {
     id: row.id,
     src: row.imageUrl,
@@ -5893,11 +5898,12 @@ function mapServerHistoryItem(row) {
     ts: row.ts,
     email: row.email || '',
     badge,
-    isMirror, isEdit, isCutout, isAnimate,
+    isMirror, isEdit, isCutout, isAnimate, isUpscale,
     mirrorOf: isMirror ? row.variantOf : undefined,
     editedFrom: isEdit ? row.variantOf : undefined,
     cutoutOf: isCutout ? row.variantOf : undefined,
     animatedFrom: isAnimate ? row.variantOf : undefined,
+    upscaleOf: isUpscale ? row.variantOf : undefined,
     variantOf: row.variantOf || undefined,
     rootId: row.variantOf || undefined,
   };
@@ -6919,6 +6925,20 @@ function syncLbButtons() {
         : (hasMirror ? 'Replace' : 'Mirror');
     }
   }
+  const upscaleBtn = document.getElementById('lbUpscale');
+  if (upscaleBtn) {
+    // Already viewing the upscaled (capped-at-4K) result — nothing further to do.
+    const isUpscaleView = !!(lbItem.isUpscale || lbItem.badge === 'Upscaled');
+    upscaleBtn.classList.toggle('hidden', isUpscaleView);
+    if (!isUpscaleView) {
+      const family = getLbVersionFamily(lbItem);
+      const hasUpscale = family.some(v => v.label === 'Upscaled');
+      upscaleBtn.disabled = false;
+      upscaleBtn.classList.toggle('on', hasUpscale);
+      const span = upscaleBtn.querySelector('span');
+      if (span) span.textContent = hasUpscale ? 'Replace' : 'Upscale';
+    }
+  }
 }
 
 function getSelectedLbDownloadFormat() {
@@ -6935,9 +6955,9 @@ function getLbRootItem(item) {
   const hist = storeGet('history');
   let cur = item;
   for (let i = 0; i < 6; i++) {
-    const parentId = cur.rootId || cur.mirrorOf || cur.cutoutOf || cur.editedFrom
-      || ((cur.isMirror || cur.isEdit || cur.isCutout
-        || cur.badge === 'Mirrored' || cur.badge === 'Edited' || cur.badge === 'No BG')
+    const parentId = cur.rootId || cur.mirrorOf || cur.cutoutOf || cur.editedFrom || cur.upscaleOf
+      || ((cur.isMirror || cur.isEdit || cur.isCutout || cur.isUpscale
+        || cur.badge === 'Mirrored' || cur.badge === 'Edited' || cur.badge === 'No BG' || cur.badge === 'Upscaled')
         ? cur.variantOf : null);
     if (!parentId || parentId === cur.id) break;
     const parent = hist.find(x => x.id === parentId) || findItem(parentId);
@@ -6962,6 +6982,9 @@ function getLbVersionFamily(item) {
       && (x.isCutout || x.badge === 'No BG')
     );
   if (cutout) versions.push({ item: cutout, label: 'No BG' });
+  const upscale = (root.upscaleId && (hist.find(x => x.id === root.upscaleId) || findItem(root.upscaleId)))
+    || hist.find(x => x.upscaleOf === root.id && (x.isUpscale || x.badge === 'Upscaled'));
+  if (upscale) versions.push({ item: upscale, label: 'Upscaled' });
   const edits = hist
     .filter(x => (x.editedFrom === root.id || (x.rootId === root.id && x.isEdit)) && (x.isEdit || x.badge === 'Edited'))
     .sort((a, b) => (a.ts || 0) - (b.ts || 0));
@@ -7353,6 +7376,129 @@ async function lbRemoveBackground() {
     syncLbButtons();
   } catch (e) {
     alert('Remove BG failed: ' + e.message);
+    label.textContent = origLabel;
+    btn.disabled = false;
+  }
+}
+
+// Upscale — sends the currently-viewed image through Magnific's upscaler,
+// capped at ~4K on the long edge (the API only offers discrete multipliers,
+// not a target resolution, so we pick 2x/4x based on the source's current
+// pixel size rather than always maxing out to the API's real ceiling of 16K).
+async function lbUpscaleImage() {
+  if (!lbItem) return;
+  const root = getLbRootItem(lbItem) || lbItem;
+  const family = getLbVersionFamily(root);
+  const existing = (family.find(v => v.label === 'Upscaled') || {}).item;
+  if (existing) {
+    const replace = confirm('An upscaled version already exists. Replace it using the currently selected image?');
+    if (!replace) {
+      selectLbVersion(existing.id);
+      return;
+    }
+    removeHistoryItemById(existing.id);
+    linkVariantOnRoot(root.id, { upscaleId: undefined });
+    delete root.upscaleId;
+  }
+
+  const source = lbItem;
+  const lbImgEl = document.getElementById('lbImg');
+  const longEdge = Math.max(lbImgEl.naturalWidth || 0, lbImgEl.naturalHeight || 0);
+  const TARGET_LONG_EDGE = 3840; // 4K UHD
+  if (longEdge && longEdge >= TARGET_LONG_EDGE * 0.95) {
+    alert('This image is already at (or very near) 4K resolution — nothing to upscale.');
+    return;
+  }
+  const scaleFactor = (longEdge && longEdge >= 1920) ? '2x' : '4x';
+
+  const btn = document.getElementById('lbUpscale');
+  const label = btn.querySelector('span');
+  const origLabel = label.textContent;
+  btn.disabled = true;
+  label.textContent = 'Starting…';
+  try {
+    const imageB64 = await resolveItemDataUri(source);
+    if (!imageB64) throw new Error('No image data available to upscale. Re-generate, then try again.');
+
+    const createRes = await fetch(apiUrl('magnific', '/v1/ai/image-upscaler'), {
+      method: 'POST',
+      headers: apiAuthHeaders(),
+      body: JSON.stringify({ image: imageB64, scale_factor: scaleFactor }),
+    });
+    if (!createRes.ok) throw new Error(parseApiError(createRes.status, await createRes.text()));
+    const created = await createRes.json();
+    const taskId = (created.data || {}).task_id;
+    if (!taskId) throw new Error('No task_id in response.');
+
+    const pollUrl = apiUrl('magnific', '/v1/ai/image-upscaler/' + taskId);
+    const pollHeaders = apiAuthHeaders();
+    delete pollHeaders['Content-Type'];
+
+    let upscaledUrl = null;
+    for (let i = 0; i < 60; i++) {
+      await sleep(3000);
+      label.textContent = `Upscaling… ${(i + 1) * 3}s`;
+      const pr = await fetch(pollUrl, { headers: pollHeaders });
+      if (!pr.ok) continue;
+      const result = await pr.json();
+      const status = (result.data || {}).status;
+      if (status === 'COMPLETED') {
+        upscaledUrl = ((result.data || {}).generated || [])[0];
+        break;
+      }
+      if (status === 'FAILED') throw new Error('Upscale failed on server.');
+    }
+    if (!upscaledUrl) throw new Error('Timed out waiting for the upscale (3 min).');
+
+    label.textContent = 'Saving…';
+    const persisted = await persistImageDataForHistory({ url: upscaledUrl }, {
+      kind: 'upscale',
+      meta: {
+        prompt: `${root.prompt || ''} — upscaled (${scaleFactor})`,
+        full_prompt: root.fullPrompt || root.prompt || '',
+        model: root.model, model_id: root.modelId, ratio: root.ratio, resolution: root.res || '',
+        variant_of: root.id, product: root.product || 'general',
+        vehicle: root.vehicle || null,
+      },
+    });
+    if (!persisted) throw new Error('Could not save the upscaled image.');
+
+    const upscaleItem = {
+      id: persisted.historyId || newItemId(),
+      src: persisted.src,
+      localUrl: persisted.localUrl || '',
+      sourceUrl: persisted.sourceUrl || upscaledUrl,
+      imageData: persisted.imageData,
+      prompt: `${root.prompt || ''} — upscaled (${scaleFactor})`,
+      fullPrompt: root.fullPrompt || root.prompt || '',
+      model: root.model,
+      modelId: root.modelId,
+      provider: root.provider,
+      ratio: root.ratio,
+      kind: root.kind || (root.vehicle ? 'vehicle' : 'generate'),
+      vehicle: root.vehicle ? { ...root.vehicle } : null,
+      product: root.product || 'general',
+      ts: Date.now(),
+      badge: 'Upscaled',
+      isUpscale: true,
+      upscaleOf: root.id,
+      variantOf: root.id,
+      rootId: root.id,
+    };
+    imageSrcCache.set(upscaleItem.id, upscaleItem.src);
+    saveToHistory(upscaleItem);
+    linkVariantOnRoot(root.id, { upscaleId: upscaleItem.id });
+    root.upscaleId = upscaleItem.id;
+    root.badge = root.badge || 'Original';
+
+    refreshOpenView();
+    openLightbox(root.id, lbFromView || 'history');
+    selectLbVersion(upscaleItem.id);
+    label.textContent = origLabel;
+    btn.disabled = false;
+    syncLbButtons();
+  } catch (e) {
+    alert('Upscale failed: ' + e.message);
     label.textContent = origLabel;
     btn.disabled = false;
   }
@@ -9163,6 +9309,23 @@ function appendResultThumbnail(item) {
   renderVehicleGallery();
 }
 
+// Prefer in-memory / data URI bytes (works after Magnific temp URLs expire).
+async function resolveItemDataUri(item) {
+  const resolved = resolveItemImageSrc(item) || item.src || '';
+  if (resolved.startsWith('data:')) return resolved;
+  if (item.imageData && item.imageData.b64) {
+    return `data:${item.imageData.mime || 'image/png'};base64,${item.imageData.b64}`;
+  }
+  if (item.id && imageSrcCache.has(item.id)) {
+    const cached = imageSrcCache.get(item.id);
+    if (cached && String(cached).startsWith('data:')) return cached;
+  }
+  if (resolved) {
+    try { return await getItemAsDataUri(item); } catch (_) { /* fall through */ }
+  }
+  return '';
+}
+
 async function removeBackgroundForItem(item, opts = {}) {
   const root = opts.root || getLbRootItem(item) || item;
   if (!root) throw new Error('Could not resolve the original image for no-BG.');
@@ -9171,20 +9334,8 @@ async function removeBackgroundForItem(item, opts = {}) {
     if (existing) throw new Error('A no-BG version already exists — use Replace no-BG from the lightbox.');
   }
 
-  // Prefer in-memory / data URI bytes (works after Magnific temp URLs expire)
-  let imageB64 = '';
+  const imageB64 = await resolveItemDataUri(item);
   const resolved = resolveItemImageSrc(item) || item.src || '';
-  if (resolved.startsWith('data:')) {
-    imageB64 = resolved;
-  } else if (item.imageData && item.imageData.b64) {
-    imageB64 = `data:${item.imageData.mime || 'image/png'};base64,${item.imageData.b64}`;
-  } else if (item.id && imageSrcCache.has(item.id)) {
-    const cached = imageSrcCache.get(item.id);
-    if (cached && String(cached).startsWith('data:')) imageB64 = cached;
-  }
-  if (!imageB64 && resolved) {
-    try { imageB64 = await getItemAsDataUri(item); } catch (_) { /* fall through */ }
-  }
   const imageUrl = item.sourceUrl || (resolved.startsWith('http') ? resolved : '');
   if (!imageUrl && !imageB64) {
     throw new Error('No image data available for remove.bg. Re-generate, then try again.');
