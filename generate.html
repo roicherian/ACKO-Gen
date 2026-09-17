@@ -2611,6 +2611,10 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 <span>Add Reference</span>
               </button>
+              <button type="button" class="ref-pill" id="refGeneratedBtn" onclick="openGeneratedReferencePicker()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>
+                <span>From History</span>
+              </button>
               <input type="file" id="refFileInput" accept="image/png,image/jpeg,image/webp" hidden onchange="onRefFileSelected(event)">
             </div>
             <div class="ref-chips" id="refChips"></div>
@@ -3286,6 +3290,31 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
       </div>
     </div>
     <div class="char-grid" id="charGrid"></div>
+  </div>
+</div>
+
+<div class="char-overlay" id="genRefOverlay" onclick="if(event.target===this)closeGeneratedReferencePicker()">
+  <div class="char-modal">
+    <div class="char-modal-head">
+      <div>
+        <div class="char-modal-title">Use a Generated Image as Reference</div>
+        <div class="char-modal-sub">Pick a past generation to guide the look of your next one</div>
+      </div>
+      <button class="btn-close" onclick="closeGeneratedReferencePicker()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="char-modal-toolbar">
+      <div class="char-tabs">
+        <button type="button" class="char-tab active" id="genRefTabMine" onclick="setGeneratedRefTab('mine')">My Generations</button>
+        <button type="button" class="char-tab" id="genRefTabAll" onclick="setGeneratedRefTab('all')">All History</button>
+      </div>
+      <div class="char-search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="search" id="genRefSearch" placeholder="Search by prompt…" oninput="renderGeneratedRefGrid()">
+      </div>
+    </div>
+    <div class="char-grid" id="genRefGrid"></div>
   </div>
 </div>
 
@@ -4723,7 +4752,8 @@ function charPhotoUrl(character) {
   return character.imageUrl;
 }
 
-let imagenReferences = { style: null, character: null, custom: null };
+let imagenReferences = { style: null, character: null, custom: null, generated: null };
+let generatedRefTab = 'mine'; // 'mine' | 'all' — which History pool the picker browses
 let refPickingKind = null; // 'style' | 'custom' — which slot the hidden file input targets
 let characterTab = 'all';
 let characterFavourites = new Set(JSON.parse(localStorage.getItem('acko_char_favs') || '[]'));
@@ -4772,16 +4802,18 @@ function clearReference(kind) {
 }
 
 function renderRefUI() {
-  const count = ['style', 'character', 'custom'].filter(k => imagenReferences[k]).length;
+  const count = ['style', 'character', 'custom', 'generated'].filter(k => imagenReferences[k]).length;
   const countEl = document.getElementById('refCount');
   if (countEl) countEl.textContent = `${count}/16`;
 
   const styleBtn = document.getElementById('refStyleBtn');
   const charBtn = document.getElementById('refCharacterBtn');
   const addBtn = document.getElementById('refAddBtn');
+  const genBtn = document.getElementById('refGeneratedBtn');
   if (styleBtn) styleBtn.classList.toggle('has-ref', !!imagenReferences.style);
   if (charBtn) charBtn.classList.toggle('has-ref', !!imagenReferences.character);
   if (addBtn) addBtn.classList.toggle('has-ref', !!imagenReferences.custom);
+  if (genBtn) genBtn.classList.toggle('has-ref', !!imagenReferences.generated);
 
   const chips = document.getElementById('refChips');
   if (!chips) return;
@@ -4792,6 +4824,7 @@ function renderRefUI() {
     chips.appendChild(buildRefChip('character', `${c.name} · ${c.role}`, charPhotoUrl(c), c));
   }
   if (imagenReferences.custom) chips.appendChild(buildRefChip('custom', imagenReferences.custom.label, imagenReferences.custom.dataUri));
+  if (imagenReferences.generated) chips.appendChild(buildRefChip('generated', imagenReferences.generated.label, imagenReferences.generated.src));
 }
 
 function buildRefChip(kind, label, thumbSrc, character) {
@@ -4828,6 +4861,52 @@ async function openCharacterLibrary() {
 function closeCharacterLibrary() {
   document.getElementById('charOverlay').classList.remove('open');
   closeAddCharacterForm();
+}
+
+async function openGeneratedReferencePicker() {
+  document.getElementById('genRefOverlay').classList.add('open');
+  if (!HISTORY_CACHE.length) await refreshHistoryCache({ rerender: false });
+  renderGeneratedRefGrid();
+}
+function closeGeneratedReferencePicker() {
+  document.getElementById('genRefOverlay').classList.remove('open');
+}
+function setGeneratedRefTab(tab) {
+  generatedRefTab = tab;
+  document.getElementById('genRefTabMine').classList.toggle('active', tab === 'mine');
+  document.getElementById('genRefTabAll').classList.toggle('active', tab === 'all');
+  renderGeneratedRefGrid();
+}
+function selectGeneratedReference(id) {
+  const it = HISTORY_CACHE.find(x => x.id === id);
+  if (!it) return;
+  imagenReferences.generated = { id: it.id, src: it.src, label: it.prompt || 'Generated image' };
+  renderRefUI();
+  closeGeneratedReferencePicker();
+}
+function renderGeneratedRefGrid() {
+  const grid = document.getElementById('genRefGrid');
+  if (!grid) return;
+  const q = (document.getElementById('genRefSearch').value || '').trim().toLowerCase();
+  const email = getSessionEmail();
+  let list = HISTORY_CACHE.filter(it => it.src);
+  if (generatedRefTab === 'mine') list = list.filter(it => it.email === email);
+  if (q) list = list.filter(it => (it.prompt || '').toLowerCase().includes(q));
+  list = list.slice(0, 60); // keep the grid responsive — HISTORY_CACHE is already newest-first
+  if (!list.length) {
+    grid.innerHTML = `<div class="char-grid-empty">${generatedRefTab === 'mine' ? "You haven't generated any images yet." : 'No generations match your search.'}</div>`;
+    return;
+  }
+  grid.innerHTML = list.map(it => {
+    const isSelected = imagenReferences.generated && imagenReferences.generated.id === it.id;
+    const label = it.prompt || 'Generated image';
+    return `
+      <div class="char-card${isSelected ? ' selected' : ''}" onclick="selectGeneratedReference('${it.id}')">
+        <div class="char-avatar-photo"><img src="${it.src}" alt="${esc(label)}" loading="lazy"></div>
+        <div class="char-name">${esc(label.length > 40 ? label.slice(0, 38) + '…' : label)}</div>
+        <div class="char-meta">${esc(it.model || '')}</div>
+      </div>`;
+  }).join('');
 }
 function openAddCharacterForm() {
   document.getElementById('charAddForm').classList.remove('hidden');
@@ -4986,6 +5065,17 @@ async function getCharacterReferenceImage(character) {
   return ref;
 }
 
+let generatedRefCache = {}; // history item id -> {dataUri, mime}, same reasoning as characterRefCache
+async function getGeneratedReferenceImage(item) {
+  if (generatedRefCache[item.id]) return generatedRefCache[item.id];
+  const rawUri = await urlToDataUri(item.src);
+  const compressed = await compressDataUriForReference(rawUri, 350 * 1024);
+  const mime = normalizeMagnificRefMime(mimeFromDataUri(compressed) || 'image/png');
+  const ref = { dataUri: compressed, mime };
+  generatedRefCache[item.id] = ref;
+  return ref;
+}
+
 async function getImagenReferenceImages() {
   const refs = [];
   if (imagenReferences.style) {
@@ -5006,6 +5096,14 @@ async function getImagenReferenceImages() {
   }
   if (imagenReferences.custom) {
     refs.push({ image: imagenReferences.custom.dataUri, mime_type: imagenReferences.custom.mime, text: 'ADDITIONAL REFERENCE: use this photo as guidance for the requested scene.' });
+  }
+  if (imagenReferences.generated) {
+    try {
+      const genRef = await getGeneratedReferenceImage(imagenReferences.generated);
+      refs.push({ image: genRef.dataUri, mime_type: genRef.mime, text: 'ADDITIONAL REFERENCE: use this previously generated image as guidance for the requested scene.' });
+    } catch (e) {
+      console.warn('Generated reference image failed to load:', e);
+    }
   }
   return refs;
 }
@@ -8358,7 +8456,7 @@ function onModelChange() {
   // dropping references on models that wouldn't apply them.
   const refsSupported = id === 'nano-banana';
   const refTooltip = refsSupported ? '' : 'References aren\'t supported on this model — switch to Nano Banana to use them.';
-  ['refCharacterBtn', 'refAddBtn'].forEach(id => {
+  ['refCharacterBtn', 'refAddBtn', 'refGeneratedBtn'].forEach(id => {
     const btn = document.getElementById(id);
     if (!btn) return;
     btn.disabled = !refsSupported;
