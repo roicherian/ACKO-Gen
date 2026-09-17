@@ -3334,6 +3334,17 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
       </div>
     </div>
 
+    <div class="adv-section" id="momentSection">
+      <div class="adv-sec-title">Insurance Moment</div>
+      <div class="pills-row" id="momentPills">
+        <div class="apill" data-val="pre-purchase" onclick="togglePill(this,'moment')">Pre-purchase</div>
+        <div class="apill on" data-val="care" onclick="togglePill(this,'moment')">Care</div>
+        <div class="apill" data-val="reassurance" onclick="togglePill(this,'moment')">Reassurance</div>
+        <div class="apill" data-val="active-life" onclick="togglePill(this,'moment')">Active Life</div>
+        <div class="apill" data-val="internal-brand" onclick="togglePill(this,'moment')">Internal Brand</div>
+      </div>
+    </div>
+
     <div class="adv-section" id="diversitySection">
       <div class="adv-sec-title">Diversity Axes</div>
       <div class="adv-grid">
@@ -8078,6 +8089,7 @@ const RATIO_COLON = {
 // ─── STATE ────────────────────────────────────────────────────────────────────
 let state = {
   moment: 'care',
+  momentManual: false, // set once the user clicks a Moment pill directly, so auto-detection stops overriding their choice
   product: 'general',
   subModel: 'realism',
   cameraAngle: 'eye-level',
@@ -8193,12 +8205,20 @@ function inferProductAndMoment(sceneText) {
   }
   return { product, moment };
 }
+// Applies an auto-detected moment and reflects it in the pill UI, but only
+// while the user hasn't manually picked one themselves (state.momentManual).
+function syncMomentPill(moment) {
+  state.moment = moment;
+  const container = document.getElementById('momentPills');
+  if (!container) return;
+  container.querySelectorAll('.apill').forEach(p => p.classList.toggle('on', p.dataset.val === moment));
+}
 
 // ─── PROMPT BUILDER ───────────────────────────────────────────────────────────
 function buildPrompt(scene) {
   const inferred = inferProductAndMoment(scene);
   state.product = inferred.product;
-  state.moment = inferred.moment;
+  if (!state.momentManual) syncMomentPill(inferred.moment);
   const s    = SETTINGS[state.product] || SETTINGS.general;
   const cam  = CAMERA_ANGLES[state.cameraAngle] || CAMERA_ANGLES['eye-level'];
 
@@ -8354,6 +8374,7 @@ function togglePill(el, group) {
   const container = el.parentElement;
   container.querySelectorAll('.apill').forEach(p => p.classList.remove('on'));
   el.classList.add('on');
+  if (group === 'moment')   { state.moment = el.dataset.val; state.momentManual = true; }
   if (group === 'submodel') state.subModel    = el.dataset.val;
   if (group === 'camera')   state.cameraAngle = el.dataset.val;
   updatePrompt();
@@ -8363,7 +8384,7 @@ function togglePill(el, group) {
 function toggleNoCharacters() {
   state.noCharacters = document.getElementById('noCharCheckbox').checked;
   document.getElementById('noCharToggleRow').classList.toggle('on', state.noCharacters);
-  ['diversitySection'].forEach(id => {
+  ['diversitySection', 'momentSection'].forEach(id => {
     const el = document.getElementById(id);
     el.style.opacity = state.noCharacters ? '0.4' : '1';
     el.style.pointerEvents = state.noCharacters ? 'none' : '';
