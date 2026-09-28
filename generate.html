@@ -3378,6 +3378,19 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
       </div>
     </div>
 
+    <div class="adv-section" id="lightSection">
+      <div class="adv-sec-title">Light</div>
+      <div class="pills-row" id="lightPills">
+        <div class="apill on" data-val="auto" onclick="setAutoLight(this)">Auto</div>
+        <div class="apill" data-val="morning" onclick="togglePill(this,'light')">Morning</div>
+        <div class="apill" data-val="midday" onclick="togglePill(this,'light')">Midday</div>
+        <div class="apill" data-val="overcast" onclick="togglePill(this,'light')">Overcast</div>
+        <div class="apill" data-val="golden-hour" onclick="togglePill(this,'light')">Golden Hour</div>
+        <div class="apill" data-val="evening" onclick="togglePill(this,'light')">Evening</div>
+        <div class="apill" data-val="night" onclick="togglePill(this,'light')">Night</div>
+      </div>
+    </div>
+
     <div class="adv-section" id="diversitySection">
       <div class="adv-sec-title">Diversity Axes</div>
       <div class="adv-grid">
@@ -8335,6 +8348,8 @@ let state = {
   moment: 'care',
   momentManual: false, // set once the user clicks a Moment pill directly, so auto-detection stops overriding their choice
   product: 'general',
+  light: 'midday',
+  lightManual: false, // set once the user clicks a Light pill directly; otherwise a random one is picked per generation
   subModel: 'realism',
   cameraAngle: 'eye-level',
   noCharacters: false,
@@ -8374,33 +8389,93 @@ const MOODS = {
   'internal-brand': 'warm and professionally confident, at ease in their environment',
 };
 
+// Time-of-day / light — independent of product and moment. "Auto" (the
+// default) picks a random entry per generation, same reasoning as pickScene:
+// always defaulting to the same bright neutral light was a big part of why
+// images in the same category all looked alike. `warm: true` entries need
+// their own color-grading phrasing in buildPrompt() instead of the generic
+// "subtle warmth only" line, since warm/amber tones are the correct look
+// for these, not a mistake to suppress.
+const LIGHT_OPTIONS = {
+  morning:      { label: 'Morning',     light: 'soft early-morning daylight — gentle and slightly cool, long soft shadows', warm: false },
+  midday:       { label: 'Midday',      light: 'bright midday daylight — clean and neutral, minimal shadow', warm: false },
+  overcast:     { label: 'Overcast',    light: 'soft overcast daylight — evenly diffused, no harsh shadows', warm: false },
+  'golden-hour': { label: 'Golden Hour', light: 'warm golden-hour sunlight, low angle — gentle amber glow with long soft shadows', warm: true },
+  evening:      { label: 'Evening',     light: 'warm evening light — indoors, soft lamp glow; outdoors, dusk sky mixing with warm artificial light', warm: true },
+  night:        { label: 'Night',       light: 'night lighting — indoors, warm lamp or overhead light; outdoors, streetlight or shopfront glow mixing with cool ambient light, gentle directional shadow', warm: true },
+};
+const LIGHT_AUTO_POOL = Object.keys(LIGHT_OPTIONS);
+function pickLight() {
+  return LIGHT_AUTO_POOL[Math.floor(Math.random() * LIGHT_AUTO_POOL.length)];
+}
+// Mirrors syncMomentPill: reflects the resolved light in the pill UI, but
+// only while the user hasn't manually picked one themselves.
+function syncLightPill(lightId) {
+  state.light = lightId;
+  const container = document.getElementById('lightPills');
+  if (!container) return;
+  container.querySelectorAll('.apill').forEach(p => p.classList.toggle('on', p.dataset.val === lightId));
+}
+
+// Each product gets several distinct backdrops rather than one fixed scene —
+// picked at random per generation (see pickScene()) so repeated generations
+// in the same category don't all land on the same identical background.
 const SETTINGS = {
   motor: {
-    scene: 'a clean, uncluttered modern Indian car service area — one plain wall, a single tidy tool rack, minimal and calm',
+    scenes: [
+      'a clean, uncluttered modern Indian car service centre — one plain wall, a single tidy tool rack, minimal and calm',
+      'a quiet residential street beside a parked car — tidy pavement, a single gate or compound wall softly blurred behind',
+      'an open-air car wash bay — wet pavement, a coiled hose to one side, minimal clutter',
+      'a modern car dealership showroom floor — one clean glass wall, soft reflections, minimal signage',
+      'a home driveway or covered parking area — plain wall, a single visible pillar, uncluttered',
+    ],
     propsHint: 'if the scene involves a vehicle or mechanic, a plain dark navy work uniform and a single compact Indian hatchback with a state number plate are appropriate',
-    light: 'bright even daylight from a large open shutter — soft natural fill, clean neutral whites',
   },
   health: {
-    scene: 'a clean, modern Indian clinic — a plain beige wall and minimal furnishings, a single small green plant',
+    scenes: [
+      'a clean, modern Indian clinic — a plain beige wall and minimal furnishings, a single small green plant',
+      'a hospital corridor with soft daylight from a side window, plain walls, minimal signage',
+      'a pharmacy counter, clean shelving softly blurred behind, minimal clutter',
+      'a home bedroom during recovery — plain wall, a single bedside table, uncluttered',
+      "a doctor's private consultation room — one bookshelf softly blurred, minimal and calm",
+    ],
     propsHint: 'if the scene involves a doctor or consultation, a white coat and stethoscope are appropriate',
-    light: 'soft diffused window light with gentle neutral overhead fill — bright and clean',
   },
   travel: {
-    scene: 'a calm, modern Indian airport interior — clean floor and large windows, minimal and uncrowded',
+    scenes: [
+      'a calm, modern Indian airport interior — clean floor and large windows, minimal and uncrowded',
+      'a quiet hotel room balcony, soft cityscape blurred behind, minimal furniture',
+      'a train platform with a single bench, clean and uncrowded, soft depth blur',
+      'the back seat of a car mid road-trip, a window view softly blurred outside, minimal interior',
+      'a boarding gate seating area — clean flooring, large windows, uncrowded',
+    ],
     propsHint: 'if the scene involves travel, a single cabin suitcase or boarding pass is appropriate',
-    light: 'soft afternoon daylight through large windows — bright, airy, mostly neutral tone',
   },
   home: {
-    scene: 'a warm, tidy Indian family home — a wooden table and a single small potted plant, uncluttered',
+    scenes: [
+      'a warm, tidy Indian family home — a wooden table and a single small potted plant, uncluttered',
+      'a home kitchen counter, plain tiled backdrop, minimal utensils in soft focus',
+      'a balcony or terrace with a single chair, plants softly blurred, uncluttered',
+      'a living room sofa corner, one lamp, plain wall, minimal decor',
+      'a home study desk, one bookshelf softly blurred, minimal and tidy',
+    ],
     propsHint: 'if the scene calls for it, a cup of chai or a tablet is appropriate',
-    light: 'soft diffused window light — bright, mostly neutral domestic fill',
   },
   general: {
-    scene: 'a real, contemporary Indian setting — a clean, uncluttered home, office or quiet street corner',
+    scenes: [
+      'a real, contemporary Indian home interior — clean, uncluttered, plain wall',
+      'a quiet Indian office desk, minimal decor, soft window light blurred behind',
+      'a quiet street corner, clean pavement, a single building wall softly blurred',
+      'a park bench under a tree, soft foliage blurred behind, minimal and calm',
+      'a café table by a window, minimal decor, a soft street view blurred outside',
+    ],
     propsHint: '',
-    light: 'bright clean natural light — mostly neutral, not dramatic',
   },
 };
+function pickScene(s) {
+  const list = s.scenes || [];
+  return list[Math.floor(Math.random() * list.length)] || list[0] || '';
+}
 
 // Strict background discipline — minimal, clean, only what the context needs
 const BACKGROUND_RULE = 'Keep the background minimal, clean and uncluttered — softly blurred, with only the few elements the context genuinely needs. No crowds, no rush, no busy scenery, no extra people, props or activity competing for attention.';
@@ -8416,7 +8491,14 @@ const PHOTO_REALISM_RULE_OBJECT = 'This must read as a genuine unretouched photo
 // Master prompt — technical correctness + brand discipline, appended to every prompt
 const MASTER_SUFFIX = 'Ensure technical correctness in every detail: hands, eyes and fingers are anatomically accurate; the body has exactly two arms and two legs with no extra, duplicated or fused limbs — pay particular attention to seated, cross-legged, kneeling or overlapping-limb poses, which must still resolve to a normal human body; phone screens, tablet screens, papers and documents are held at natural, correct angles with clean geometry and no garbled text or signage; no melted features, no repeating patterns, no distorted faces. Keep the execution disciplined, honest, and free of any real or implied brands, logos, hospital names or competitor visuals. The final image must feel warm, bright, disciplined, real, and immediately, unmistakably modern.';
 
-const DEFAULT_NEG = 'cluttered background, busy background, crowded scene, crowd, too many people, background rush, messy background, competing props, visual clutter, tilted phone screen, warped screen, distorted screen, bent or curved documents, wrong-angle paper, garbled text, gibberish signage, extra fingers, deformed hands, melted hands, wrong finger count, extra limbs, extra legs, extra arms, three legs, fused legs, malformed limbs, wrong number of legs, disconnected limbs, distorted face, off eyes, posed, stiff, looking at camera, stock photo smile, plastic skin, airbrushed complexion, heavy makeup, acne, pimples, blemishes, skin breakouts, spots on face, blotchy skin, skin discoloration, scars on face, waxy skin, glassy skin, doll-like face, uncanny valley, video game character, unnatural facial symmetry, synthetic skin texture, rendered look, flat lighting, no skin pores, overly perfect skin, Western setting, left-hand drive car, foreign architecture, dark moody tones, hard shadows, neon colours, oversaturated HDR, mascot, cartoon, 3D render, CGI, illustration, visible brand logos, competitor names, text overlay on scene, fear, panic, blood, gore, distress, plain white background, nsfw, heavy orange colour grading, strong amber cast, golden hour glow, overly warm tone, sepia tint, yellow colour cast';
+// Note: this deliberately does NOT ban "dark moody tones", "hard shadows",
+// "golden hour glow", "amber cast", etc. — those used to be banned
+// unconditionally, which fought the Light picker's warm/night options
+// (and any scene text that asked for that look) at the diffusion-guidance
+// level, not just the text-prompt level. Warmth/mood is now steered
+// per-generation through buildPrompt()'s light-dependent colorGrade line
+// instead of blanket-suppressed here.
+const DEFAULT_NEG = 'cluttered background, busy background, crowded scene, crowd, too many people, background rush, messy background, competing props, visual clutter, tilted phone screen, warped screen, distorted screen, bent or curved documents, wrong-angle paper, garbled text, gibberish signage, extra fingers, deformed hands, melted hands, wrong finger count, extra limbs, extra legs, extra arms, three legs, fused legs, malformed limbs, wrong number of legs, disconnected limbs, distorted face, off eyes, posed, stiff, looking at camera, stock photo smile, plastic skin, airbrushed complexion, heavy makeup, acne, pimples, blemishes, skin breakouts, spots on face, blotchy skin, skin discoloration, scars on face, waxy skin, glassy skin, doll-like face, uncanny valley, video game character, unnatural facial symmetry, synthetic skin texture, rendered look, flat lighting, no skin pores, overly perfect skin, Western setting, left-hand drive car, foreign architecture, mascot, cartoon, 3D render, CGI, illustration, visible brand logos, competitor names, text overlay on scene, fear, panic, blood, gore, distress, plain white background, nsfw';
 
 // ─── AUTO PRODUCT / MOMENT DETECTION ────────────────────────────────────────────
 // Replaces the old manual "Insurance Moment" / "Product Line" pills — the tool
@@ -8465,6 +8547,19 @@ function buildPrompt(scene) {
   if (!state.momentManual) syncMomentPill(inferred.moment);
   const s    = SETTINGS[state.product] || SETTINGS.general;
   const cam  = CAMERA_ANGLES[state.cameraAngle] || CAMERA_ANGLES['eye-level'];
+  const scenePick = pickScene(s);
+
+  const lightId  = state.lightManual ? state.light : pickLight();
+  if (!state.lightManual) syncLightPill(lightId);
+  const lightOpt = LIGHT_OPTIONS[lightId] || LIGHT_OPTIONS.midday;
+  // Warm light (golden hour / evening / night) needs to actually be allowed
+  // to look warm — the old fixed "never dark, moody or oversaturated, not
+  // golden hour, not amber" line fought every non-bright choice, and dropped
+  // straight into contradicting itself when the scene text also asked for
+  // one of those looks (see buildPrompt's own light-choice text above it).
+  const colorGrade = lightOpt.warm
+    ? 'Natural, true-to-life color matching the chosen light exactly — the warm cast described above is correct and intentional here, not a mistake to correct.'
+    : 'Clean neutral whites, natural honest tones with only a subtle, true-to-life touch of warmth — no heavy or unintentional color cast.';
 
   // Frame phrase follows the selected aspect ratio
   const ratioOpt   = document.getElementById('ratioSelect').selectedOptions[0];
@@ -8480,12 +8575,11 @@ function buildPrompt(scene) {
     return [
       `Cinematic photorealistic still-life photograph, ${FRAME}, ${cam}, shot on 50mm lens at f/2.8, shallow depth of field.`,
       scene ? `${scene}.` : `An object, product or environment relevant to the ACKO brand context.`,
-      `Setting: ${s.scene}.`,
+      `Setting: ${scenePick}.`,
       BACKGROUND_RULE,
       PROPS_RULE + (s.propsHint ? ` (${s.propsHint}.)` : ''),
-      `${s.light}. Clean neutral whites, natural honest tones — bright modern commercial photography, never dark, moody or oversaturated.`,
+      `${lightOpt.light}. ${colorGrade} Gentle film grain.`,
       'No characters — no people, no human figures, no hands, no faces anywhere in the frame. Object, product or environment only, with room to breathe.',
-      'Soft diffused natural light, mostly neutral true-to-life color, only a subtle 20-30% touch of warmth — not golden hour, not amber or orange, no heavy color cast, gentle film grain.',
       PHOTO_REALISM_RULE_OBJECT,
       MASTER_SUFFIX,
     ].join(' ');
@@ -8507,13 +8601,12 @@ function buildPrompt(scene) {
   return [
     `Cinematic photorealistic lifestyle photograph, ${FRAME}, ${cam}, shot on 50mm lens at f/2.8, shallow depth of field.`,
     scene ? `A ${subject} — ${scene}.` : `A ${subject} in an authentic, contemporary Indian setting.`,
-    `Setting: ${s.scene}.`,
+    `Setting: ${scenePick}.`,
     BACKGROUND_RULE,
     PROPS_RULE + (s.propsHint ? ` (${s.propsHint}.)` : ''),
-    `${s.light}. Clean neutral whites, natural honest skin tones with a clear, healthy complexion — bright modern Indian commercial photography, never dark, moody or oversaturated.`,
+    `${lightOpt.light}. ${colorGrade} Natural honest skin tones with a clear, healthy complexion. Gentle film grain.`,
     `Expression: ${mood}. One clear subject with room to breathe.` + characterClause,
     'Candid documentary feel, not posed. Realistic skin texture, no heavy makeup. Middle-class Indian aesthetic, modern but understated.',
-    'Soft diffused natural light, mostly neutral true-to-life color, only a subtle 20-30% touch of warmth — not golden hour, not amber or orange, no heavy color cast, gentle film grain.',
     PHOTO_REALISM_RULE_PEOPLE,
     MASTER_SUFFIX,
   ].join(' ');
@@ -8619,8 +8712,18 @@ function togglePill(el, group) {
   container.querySelectorAll('.apill').forEach(p => p.classList.remove('on'));
   el.classList.add('on');
   if (group === 'moment')   { state.moment = el.dataset.val; state.momentManual = true; }
+  if (group === 'light')    { state.light = el.dataset.val; state.lightManual = true; }
   if (group === 'submodel') state.subModel    = el.dataset.val;
   if (group === 'camera')   state.cameraAngle = el.dataset.val;
+  updatePrompt();
+}
+
+// Reverts the Light picker to random-per-generation instead of a locked choice.
+function setAutoLight(el) {
+  state.lightManual = false;
+  const container = el.parentElement;
+  container.querySelectorAll('.apill').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
   updatePrompt();
 }
 

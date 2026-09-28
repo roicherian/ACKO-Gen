@@ -9,6 +9,7 @@ Protocol: JSON-RPC 2.0 over stdin/stdout (MCP spec 2024-11-05)
 import sys
 import os
 import json
+import random
 import urllib.request
 import urllib.error
 import time
@@ -37,34 +38,77 @@ MOOD_MAP = {
 # already fixed to avoid forcing an unrelated backdrop into every scene, e.g.
 # a "health" product tag no longer forces a hospital ward onto a scene that's
 # actually set on a football turf — see PROPS_RULE/BACKGROUND_RULE below).
-# Kept in sync: any change to one setting's scene/propsHint/light should be
-# mirrored in the other file's copy of the same entry.
+# "scene" is a list, not a single string, and picked at random per call (see
+# build_prompt) — a single fixed backdrop per vertical meant every motor-tag
+# generation looked identical. Kept in sync: any change to one setting's
+# scene/props list should be mirrored in generate.html's copy of the same
+# entry, and vice versa.
 SETTING_MAP = {
     "motor": {
-        "scene": "a clean, uncluttered modern Indian car service area — one plain wall, a single tidy tool rack, minimal and calm",
+        "scenes": [
+            "a clean, uncluttered modern Indian car service centre — one plain wall, a single tidy tool rack, minimal and calm",
+            "a quiet residential street beside a parked car — tidy pavement, a single gate or compound wall softly blurred behind",
+            "an open-air car wash bay — wet pavement, a coiled hose to one side, minimal clutter",
+            "a modern car dealership showroom floor — one clean glass wall, soft reflections, minimal signage",
+            "a home driveway or covered parking area — plain wall, a single visible pillar, uncluttered",
+        ],
         "props": "if the scene involves a vehicle or mechanic, a plain dark navy work uniform and a single compact Indian hatchback with a state number plate are appropriate",
-        "light": "bright even daylight from a large open shutter — soft natural fill, clean neutral whites",
     },
     "health": {
-        "scene": "a clean, modern Indian clinic — a plain beige wall and minimal furnishings, a single small green plant",
+        "scenes": [
+            "a clean, modern Indian clinic — a plain beige wall and minimal furnishings, a single small green plant",
+            "a hospital corridor with soft daylight from a side window, plain walls, minimal signage",
+            "a pharmacy counter, clean shelving softly blurred behind, minimal clutter",
+            "a home bedroom during recovery — plain wall, a single bedside table, uncluttered",
+            "a doctor's private consultation room — one bookshelf softly blurred, minimal and calm",
+        ],
         "props": "if the scene involves a doctor or consultation, a white coat and stethoscope are appropriate",
-        "light": "soft diffused window light with gentle neutral overhead fill — bright and clean",
     },
     "travel": {
-        "scene": "a calm, modern Indian airport interior — clean floor and large windows, minimal and uncrowded",
+        "scenes": [
+            "a calm, modern Indian airport interior — clean floor and large windows, minimal and uncrowded",
+            "a quiet hotel room balcony, soft cityscape blurred behind, minimal furniture",
+            "a train platform with a single bench, clean and uncrowded, soft depth blur",
+            "the back seat of a car mid road-trip, a window view softly blurred outside, minimal interior",
+            "a boarding gate seating area — clean flooring, large windows, uncrowded",
+        ],
         "props": "if the scene involves travel, a single cabin suitcase or boarding pass is appropriate",
-        "light": "soft afternoon daylight through large windows — bright, airy, mostly neutral tone",
     },
     "home": {
-        "scene": "a warm, tidy Indian family home — a wooden table and a single small potted plant, uncluttered",
+        "scenes": [
+            "a warm, tidy Indian family home — a wooden table and a single small potted plant, uncluttered",
+            "a home kitchen counter, plain tiled backdrop, minimal utensils in soft focus",
+            "a balcony or terrace with a single chair, plants softly blurred, uncluttered",
+            "a living room sofa corner, one lamp, plain wall, minimal decor",
+            "a home study desk, one bookshelf softly blurred, minimal and tidy",
+        ],
         "props": "if the scene calls for it, a cup of chai or a tablet is appropriate",
-        "light": "soft diffused window light — bright, mostly neutral domestic fill",
     },
     "general": {
-        "scene": "a real, contemporary Indian setting — a clean, uncluttered home, office or quiet street corner",
+        "scenes": [
+            "a real, contemporary Indian home interior — clean, uncluttered, plain wall",
+            "a quiet Indian office desk, minimal decor, soft window light blurred behind",
+            "a quiet street corner, clean pavement, a single building wall softly blurred",
+            "a park bench under a tree, soft foliage blurred behind, minimal and calm",
+            "a café table by a window, minimal decor, a soft street view blurred outside",
+        ],
         "props": "",
-        "light": "bright clean natural light — mostly neutral, not dramatic",
     },
+}
+
+# Mirrors generate.html's LIGHT_OPTIONS — independent of product/moment.
+# "auto" (the default) picks a random entry per call for the same reason
+# SETTING_MAP's scenes are now a list: always defaulting to the same bright
+# neutral light was a big part of why images in the same category all looked
+# alike. "warm" entries need the colour-grade line to actually permit warmth
+# instead of fighting it (see build_prompt).
+LIGHT_MAP = {
+    "morning":      {"light": "soft early-morning daylight — gentle and slightly cool, long soft shadows", "warm": False},
+    "midday":       {"light": "bright midday daylight — clean and neutral, minimal shadow", "warm": False},
+    "overcast":     {"light": "soft overcast daylight — evenly diffused, no harsh shadows", "warm": False},
+    "golden-hour":  {"light": "warm golden-hour sunlight, low angle — gentle amber glow with long soft shadows", "warm": True},
+    "evening":      {"light": "warm evening light — indoors, soft lamp glow; outdoors, dusk sky mixing with warm artificial light", "warm": True},
+    "night":        {"light": "night lighting — indoors, warm lamp or overhead light; outdoors, streetlight or shopfront glow mixing with cool ambient light, gentle directional shadow", "warm": True},
 }
 
 # Same discipline rules as generate.html's BACKGROUND_RULE/PROPS_RULE — without
@@ -105,6 +149,11 @@ ANATOMY_RULE = (
     "no spare arm or leg."
 )
 
+# Deliberately does NOT ban "dark moody tones", "hard shadows", "oversaturated
+# HDR" etc. — those used to be banned unconditionally, which fought the
+# light-choice line in build_prompt() (and any scene text asking for that
+# look) at the diffusion-guidance level, not just the text-prompt level.
+# Warmth/mood is steered per-call through that light-dependent line instead.
 NEGATIVE_PROMPT = (
     "posed, stiff, looking at camera, stock photo smile, "
     "plastic skin, airbrushed complexion, heavy makeup, "
@@ -116,7 +165,6 @@ NEGATIVE_PROMPT = (
     "extra limbs, extra legs, extra arms, three legs, fused legs, "
     "malformed limbs, wrong number of legs, disconnected limbs, "
     "Western setting, left-hand drive car, foreign architecture, "
-    "dark moody tones, hard shadows, neon colours, oversaturated HDR, "
     "mascot, cartoon, 3D render, CGI, illustration, "
     "visible brand logos, competitor names, text overlay on scene, "
     "fear, panic, blood, gore, distress, plain white background, nsfw"
@@ -128,9 +176,19 @@ MAGNIFIC_SIZES = {
 }
 
 
-def build_prompt(scene, moment, product, skin_tone="", region="", age="", life_stage=""):
-    mood    = MOOD_MAP.get(moment, MOOD_MAP["care"])
-    s       = SETTING_MAP.get(product, SETTING_MAP["general"])
+def build_prompt(scene, moment, product, skin_tone="", region="", age="", life_stage="", light="auto"):
+    mood     = MOOD_MAP.get(moment, MOOD_MAP["care"])
+    s        = SETTING_MAP.get(product, SETTING_MAP["general"])
+    scene_pick = random.choice(s["scenes"])
+    light_id = light if light in LIGHT_MAP else random.choice(list(LIGHT_MAP.keys()))
+    light_opt = LIGHT_MAP[light_id]
+    color_grade = (
+        "Natural, true-to-life color matching the chosen light exactly — the warm cast "
+        "described above is correct and intentional here, not a mistake to correct."
+        if light_opt["warm"] else
+        "Clean neutral whites, natural honest tones with only a subtle, true-to-life touch "
+        "of warmth — no heavy or unintentional color cast."
+    )
     subject = " ".join(filter(None, [
         skin_tone + "," if skin_tone else "",
         region or "Indian",
@@ -142,15 +200,13 @@ def build_prompt(scene, moment, product, skin_tone="", region="", age="", life_s
         "Cinematic photorealistic lifestyle photograph, 16:9 widescreen, "
         "shot on 50mm prime lens at f/2.8 to f/4, shallow depth of field.",
         f"A {subject} — {scene}.",
-        f"Setting: {s['scene']}.",
+        f"Setting: {scene_pick}.",
         BACKGROUND_RULE,
         PROPS_RULE + (f" ({s['props']}.)" if s["props"] else ""),
-        f"{s['light']}. Warm whites, natural skin tones with a clear, healthy complexion "
-        "— premium Indian commercial photography style, NOT dark or moody.",
+        f"{light_opt['light']}. {color_grade} Natural skin tones with a clear, healthy complexion.",
         f"Expression: {mood}. One clear subject with room to breathe.",
         "Candid documentary feel, not posed. Realistic skin texture, no heavy makeup. "
-        "Middle-class Indian aesthetic, modern but understated. "
-        "Slight warm colour grade, gently desaturated, subtle film grain.",
+        "Middle-class Indian aesthetic, modern but understated. Subtle film grain.",
         PHOTO_REALISM_RULE,
         ANATOMY_RULE,
     ])
@@ -278,6 +334,16 @@ TOOL = {
                 "enum":        ["pre-purchase", "active-life", "care", "reassurance", "internal-brand"],
                 "default":     "care",
                 "description": "Insurance moment — sets mood and expression",
+            },
+            "light": {
+                "type":        "string",
+                "enum":        ["auto", "morning", "midday", "overcast", "golden-hour", "evening", "night"],
+                "default":     "auto",
+                "description": "Time of day / light. 'auto' (default) picks one at random each "
+                               "call, so repeated generations don't all land on the same bright "
+                               "neutral look. Pick a specific value only when the scene text calls "
+                               "for a particular time of day (e.g. 'golden-hour' or 'night' for a "
+                               "scene that explicitly says evening/night).",
             },
             "product": {
                 "type":        "string",
