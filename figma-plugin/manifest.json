@@ -1,5 +1,6 @@
 {
   "name": "ACKO Gen",
+  "id": "acko-gen-figma-plugin-local",
   "api": "1.0.0",
   "main": "code.js",
   "ui": "ui.html",
