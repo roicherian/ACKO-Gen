@@ -232,13 +232,17 @@ body.imagen-mode .enhanced-wrap {
   border: none;
   overflow: visible;
   margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 body.imagen-mode .enhanced-body {
   color: var(--vg-text);
   background: transparent;
   min-height: 120px;
-  max-height: 240px;
   overflow-y: auto;
+  flex: 1 1 auto;
 }
 body.imagen-mode .enhanced-body:empty:before { color: #6d6d7c; }
 
@@ -276,6 +280,13 @@ body.imagen-mode .prompt-wrap {
   flex-direction: column;
   overflow: hidden;
 }
+/* Lets the prompt card grow to fill #genPanelCreate's flex column instead of
+   sizing to its own content — the actual thing that lets the prompt/enhanced
+   textbox stretch down toward the Generate button rather than leaving a gap. */
+body.imagen-mode .prompt-block {
+  flex: 1 1 auto;
+  min-height: 0;
+}
 /* .gen-panel.active{display:block!important} (further down) otherwise wins
    over .gen-panel-create's display:flex — needed here so prompt-block/
    prompt-wrap can size against a real flex parent instead of shrink-to-fit. */
@@ -287,10 +298,21 @@ body.imagen-mode #imagenConfigPanel {
   flex: 0 0 auto;
 }
 body.imagen-mode .prompt-scroll-area {
-  flex: 0 0 auto;
+  flex: 1 1 auto;
   min-height: 180px;
-  max-height: 280px;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+/* Base rule (unscoped) so both tab panels grow to fill .prompt-scroll-area
+   instead of sitting at their natural content height with empty space below —
+   this is what lets the prompt/enhanced box stretch down toward the Generate
+   button rather than stopping at a small fixed cap. */
+.prompt-tab-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 body.vehicle-mode .prompt-wrap .vg-combo-panel { z-index: 90; }
 body.imagen-mode #imagenConfigPanel.vehicle-car-panel { padding: 22px; }
@@ -566,7 +588,7 @@ body.studio-ui .prompt-wrap textarea {
 }
 body.imagen-mode .prompt-wrap textarea {
   min-height: 120px;
-  max-height: 240px;
+  flex: 1 1 auto;
 }
 body.vehicle-mode .prompt-wrap textarea.prompt-locked {
   cursor: default;
@@ -1231,7 +1253,7 @@ svg.sel-icon {
 }
 .btn-icon-sq svg { width: 14px; height: 14px; }
 .btn-icon-sq:hover { border-color: var(--purple); color: var(--purple); }
-.imagen-enhance-row { padding: 0 16px 14px; display: flex; align-items: center; justify-content: flex-start; gap: 10px; }
+.imagen-enhance-row { display: flex; align-items: center; gap: 10px; }
 .btn-enhance { color: var(--purple); border-color: rgba(196,181,253,.4); background: var(--purple-pale, rgba(124,58,237,.08)); }
 /* Legacy non-studio layout only — studio-ui uses Vehiclegen-style footer */
 body:not(.studio-ui):not(.vehicle-mode) .prompt-footer {
@@ -1241,10 +1263,12 @@ body:not(.studio-ui):not(.vehicle-mode) .prompt-footer {
 body:not(.studio-ui):not(.vehicle-mode) .prompt-footer .char-count { align-self: flex-start; }
 body:not(.studio-ui):not(.vehicle-mode) .prompt-footer .btn-gen { width: 100%; margin-top: 2px; }
 
-/* Prompt / Enhanced Prompt tab toggle (segmented pill, list icon vs sparkle icon) */
+/* Prompt / Enhanced Prompt tab toggle (segmented pill, list icon vs sparkle icon),
+   sharing a row with the Enhance Prompt button on the right. */
+.prompt-tab-row { display: flex; align-items: center; justify-content: space-between; margin: 10px 12px 0; gap: 10px; }
 .prompt-tab-toggle {
   display: inline-flex; align-items: center; gap: 2px;
-  padding: 3px; margin: 10px 12px 0;
+  padding: 3px;
   background: rgba(255,255,255,.04); border: 1px solid var(--vg-line, var(--border-s));
   border-radius: 999px; width: fit-content;
 }
@@ -2751,7 +2775,8 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
              stay static. Keeps this contained within .prompt-wrap's rounded
              border instead of visually overflowing past it on short screens. -->
         <div class="prompt-scroll-area">
-        <!-- Prompt / Enhanced Prompt tab toggle -->
+        <!-- Prompt / Enhanced Prompt tab toggle, with Enhance Prompt on the same row -->
+        <div class="prompt-tab-row">
         <div class="prompt-tab-toggle" role="tablist" aria-label="Prompt view">
           <button type="button" class="ptab-btn active" id="ptabPromptBtn" onclick="setPromptTab('prompt')" title="Prompt" aria-selected="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
@@ -2762,6 +2787,13 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
             <span class="ptab-label">Enhanced</span>
           </button>
         </div>
+        <div class="imagen-enhance-row">
+          <button class="btn-action btn-enhance" onclick="enhancePrompt()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6L12 3z"/><path d="M19 14l.8 2.2L22 17l-2.2.8L19 20l-.8-2.2L16 17l2.2-.8L19 14z"/></svg>
+            Enhance Prompt
+          </button>
+        </div>
+        </div>
 
         <div class="prompt-tab-panel" id="promptTabPrompt">
           <textarea id="sceneInput" placeholder="Describe the image you want to generate…" oninput="onSceneInput()" maxlength="3000"></textarea>
@@ -2771,13 +2803,6 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
             </button>
           </div>
-        </div>
-
-        <div class="imagen-enhance-row">
-          <button class="btn-action btn-enhance" onclick="enhancePrompt()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6L12 3z"/><path d="M19 14l.8 2.2L22 17l-2.2.8L19 20l-.8-2.2L16 17l2.2-.8L19 14z"/></svg>
-            Enhance Prompt
-          </button>
         </div>
 
         <!-- Enhanced Prompt (same plain look as the Prompt tab — no separate header/badge) -->
