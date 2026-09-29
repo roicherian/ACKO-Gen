@@ -9,8 +9,10 @@ const PANEL_HEIGHT = 640;
 
 figma.showUI(__html__, { width: PANEL_WIDTH, height: PANEL_HEIGHT });
 
-// Keeps the plugin discoverable from the toolbar with nothing selected.
-figma.root.setRelaunchData({ open: "" });
+// Note: setRelaunchData (the right-click "re-run this" affordance) needs a
+// real plugin id, which this local/unpublished manifest doesn't have yet —
+// deliberately left out rather than guessing an id Figma would reject.
+// Re-add it once this is published to the Acko org and has a real id.
 
 function ratioToSize(ratioLabel) {
   const [w, h] = String(ratioLabel || "16:9").split(":").map(Number);
@@ -43,7 +45,6 @@ async function insertGeneratedImage(base64, ratioLabel, promptText) {
   figma.currentPage.appendChild(rect);
   figma.currentPage.selection = [rect];
   figma.viewport.scrollAndZoomIntoView([rect]);
-  rect.setRelaunchData({ open: "" });
 
   return { width, height };
 }
