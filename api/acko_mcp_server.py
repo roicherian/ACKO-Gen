@@ -182,8 +182,6 @@ NEGATIVE_PROMPT = (
     "extra limbs, extra legs, extra arms, three legs, fused legs, "
     "malformed limbs, wrong number of legs, disconnected limbs, "
     "Western setting, left-hand drive car, foreign architecture, "
-    "non-Indian ethnicity, Western facial features, Caucasian appearance, "
-    "East Asian appearance, Middle Eastern appearance, African appearance, "
     "dark moody tones, hard shadows, neon colours, oversaturated HDR, "
     "mascot, cartoon, 3D render, CGI, illustration, "
     "visible brand logos, competitor names, text overlay on scene, "
@@ -247,9 +245,6 @@ def build_prompt(scene, moment, product, skin_tone="", region="", age="", life_s
         "Cinematic photorealistic lifestyle photograph, 16:9 widescreen, "
         "shot on 50mm prime lens at f/2.8 to f/4, shallow depth of field.",
         f"A {subject} — {scene}.",
-        "STRICTLY Indian ethnicity and appearance only, every person in frame — authentic "
-        "Indian facial features, skin tone, hair and styling. Do not depict any other "
-        "ethnicity or nationality.",
         f"Setting: {scene_pick}.",
         BACKGROUND_RULE,
         PROPS_RULE + (f" ({s['props']}.)" if s["props"] else ""),

@@ -5184,7 +5184,7 @@ async function getGeneratedReferenceImage(item) {
 // per-generation option, matching the same reasoning as pickScene()/
 // pickLight() defaults elsewhere in this file.
 const SKIN_REFERENCE_URLS = Array.from(
-  { length: 15 },
+  { length: 16 },
   (_, i) => `/Skills/skin-reference/${String(i + 1).padStart(2, '0')}.jpg`
 );
 let skinReferenceCache = {};
@@ -8619,7 +8619,7 @@ const PHOTO_REALISM_RULE_OBJECT = 'This must read as a genuine unretouched photo
 // Master prompt — technical correctness + brand discipline, appended to every prompt
 const MASTER_SUFFIX = 'Ensure technical correctness in every detail: hands, eyes and fingers are anatomically accurate; the body has exactly two arms and two legs with no extra, duplicated or fused limbs — pay particular attention to seated, cross-legged, kneeling or overlapping-limb poses, which must still resolve to a normal human body; phone screens, tablet screens, papers and documents are held at natural, correct angles with clean geometry and no garbled text or signage; no melted features, no repeating patterns, no distorted faces. Keep the execution disciplined, honest, and free of any real or implied brands, logos, hospital names or competitor visuals. The final image must feel warm, bright, disciplined, real, and immediately, unmistakably modern.';
 
-const DEFAULT_NEG = 'cluttered background, busy background, crowded scene, crowd, too many people, background rush, messy background, competing props, visual clutter, tilted phone screen, warped screen, distorted screen, bent or curved documents, wrong-angle paper, garbled text, gibberish signage, extra fingers, deformed hands, melted hands, wrong finger count, extra limbs, extra legs, extra arms, three legs, fused legs, malformed limbs, wrong number of legs, disconnected limbs, distorted face, off eyes, posed, stiff, looking at camera, stock photo smile, plastic skin, airbrushed complexion, heavy makeup, acne, pimples, blemishes, skin breakouts, spots on face, blotchy skin, skin discoloration, scars on face, waxy skin, glassy skin, doll-like face, uncanny valley, video game character, unnatural facial symmetry, synthetic skin texture, rendered look, flat lighting, no skin pores, overly perfect skin, Western setting, left-hand drive car, foreign architecture, non-Indian ethnicity, Western facial features, Caucasian appearance, East Asian appearance, Middle Eastern appearance, African appearance, dark moody tones, hard shadows, neon colours, oversaturated HDR, mascot, cartoon, 3D render, CGI, illustration, visible brand logos, competitor names, text overlay on scene, fear, panic, blood, gore, distress, plain white background, nsfw, heavy orange colour grading, strong amber cast, golden hour glow, overly warm tone, sepia tint, yellow colour cast';
+const DEFAULT_NEG = 'cluttered background, busy background, crowded scene, crowd, too many people, background rush, messy background, competing props, visual clutter, tilted phone screen, warped screen, distorted screen, bent or curved documents, wrong-angle paper, garbled text, gibberish signage, extra fingers, deformed hands, melted hands, wrong finger count, extra limbs, extra legs, extra arms, three legs, fused legs, malformed limbs, wrong number of legs, disconnected limbs, distorted face, off eyes, posed, stiff, looking at camera, stock photo smile, plastic skin, airbrushed complexion, heavy makeup, acne, pimples, blemishes, skin breakouts, spots on face, blotchy skin, skin discoloration, scars on face, waxy skin, glassy skin, doll-like face, uncanny valley, video game character, unnatural facial symmetry, synthetic skin texture, rendered look, flat lighting, no skin pores, overly perfect skin, Western setting, left-hand drive car, foreign architecture, dark moody tones, hard shadows, neon colours, oversaturated HDR, mascot, cartoon, 3D render, CGI, illustration, visible brand logos, competitor names, text overlay on scene, fear, panic, blood, gore, distress, plain white background, nsfw, heavy orange colour grading, strong amber cast, golden hour glow, overly warm tone, sepia tint, yellow colour cast';
 
 // ─── AUTO PRODUCT / MOMENT DETECTION ────────────────────────────────────────────
 // Replaces the old manual "Insurance Moment" / "Product Line" pills — the tool
@@ -8711,7 +8711,6 @@ function buildPrompt(scene) {
   return [
     `Cinematic photorealistic lifestyle photograph, ${FRAME}, ${cam}, shot on 50mm lens at f/2.8, shallow depth of field.`,
     scene ? `A ${subject} — ${scene}.` : `A ${subject} in an authentic, contemporary Indian setting.`,
-    'STRICTLY Indian ethnicity and appearance only, every person in frame — authentic Indian facial features, skin tone, hair and styling. Do not depict any other ethnicity or nationality.',
     `Setting: ${scenePick}.`,
     BACKGROUND_RULE,
     PROPS_RULE + (s.propsHint ? ` (${s.propsHint}.)` : ''),
