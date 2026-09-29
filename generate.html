@@ -2615,7 +2615,12 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>
                 <span>From History</span>
               </button>
+              <button type="button" class="ref-pill" id="refPromptFromImageBtn" onclick="openPromptFromImagePicker()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><circle cx="12" cy="12" r="3"/></svg>
+                <span>Prompt from Image</span>
+              </button>
               <input type="file" id="refFileInput" accept="image/png,image/jpeg,image/webp" hidden onchange="onRefFileSelected(event)">
+              <input type="file" id="promptImageFileInput" accept="image/png,image/jpeg,image/webp" hidden onchange="onPromptImageFileSelected(event)">
             </div>
             <div class="ref-chips" id="refChips"></div>
           </div>
@@ -4798,6 +4803,86 @@ async function onRefFileSelected(ev) {
     alert('Could not load reference image: ' + (e && e.message ? e.message : e));
   }
   ev.target.value = '';
+}
+
+function openPromptFromImagePicker() {
+  document.getElementById('promptImageFileInput').click();
+}
+
+async function onPromptImageFileSelected(ev) {
+  const file = ev && ev.target && ev.target.files && ev.target.files[0];
+  ev.target.value = '';
+  if (!file) return;
+  if (!/^image\//i.test(file.type || '')) {
+    alert('Please choose an image file (PNG, JPEG, or WebP).');
+    return;
+  }
+  if (file.size > 12 * 1024 * 1024) {
+    alert('Image is too large (max 12 MB). Try a smaller photo.');
+    return;
+  }
+  const btn = document.getElementById('refPromptFromImageBtn');
+  const label = btn.querySelector('span');
+  const origLabel = label.textContent;
+  btn.disabled = true;
+  label.textContent = 'Analysing…';
+  try {
+    const rawUri = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ''));
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+    const compressed = await compressDataUriForReference(rawUri, 900 * 1024);
+    const scene = await analyzeImageForScene(compressed);
+    const sceneEl = document.getElementById('sceneInput');
+    sceneEl.value = scene;
+    onSceneInput();
+    updatePrompt();
+  } catch (e) {
+    alert('Could not analyse image: ' + (e && e.message ? e.message : e));
+  } finally {
+    btn.disabled = false;
+    label.textContent = origLabel;
+  }
+}
+
+// Vision-model call — turns a reference photo into plain scene text for the
+// prompt box. Deliberately describes the SITUATION (setting/action/props),
+// not a specific person's likeness — identity consistency is what the
+// Character/From History reference slots are for, not this.
+async function analyzeImageForScene(dataUri) {
+  const res = await fetch(apiUrl('openai', '/v1/chat/completions'), {
+    method: 'POST',
+    headers: apiAuthHeaders(),
+    body: JSON.stringify({
+      model: 'gpt-4o-mini',
+      max_tokens: 300,
+      messages: [
+        {
+          role: 'system',
+          content: 'You describe photos so someone can recreate the SITUATION (not the exact photo) '
+            + 'as a new AI-generated image. Write 1-3 plain sentences: who is present and what they are '
+            + 'doing, the setting/location, and any notable props or action. Describe people generically '
+            + 'by role/age/gender only (e.g. "a young man", "an elderly woman") — never guess or describe '
+            + 'a specific real identity, likeness, or name. Do not mention camera settings, lighting, or '
+            + 'that this is a photo/image/AI — just describe the scene itself, ready to paste into a text box.',
+        },
+        {
+          role: 'user',
+          content: [
+            { type: 'text', text: 'Describe this scene.' },
+            { type: 'image_url', image_url: { url: dataUri } },
+          ],
+        },
+      ],
+    }),
+  });
+  if (!res.ok) throw new Error(parseApiError(res.status, await res.text()));
+  const data = await res.json();
+  const text = (((data.choices || [])[0] || {}).message || {}).content;
+  if (!text) throw new Error('No description returned.');
+  return text.trim();
 }
 
 function clearReference(kind) {

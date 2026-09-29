@@ -1775,6 +1775,11 @@ class handler(BaseHTTPRequestHandler):
                     "limit": DAILY_VIDEO_LIMIT,
                 })
                 return
+        elif provider == "openai" and "/chat/completions" in self.path:
+            # "Prompt from Image" analysis call — describes a reference photo
+            # into scene text, it doesn't generate an image, so it shouldn't
+            # burn a slot from the daily image-generation quota.
+            pass
         else:
             used_today = history_store.count_today(email)
             if used_today >= DAILY_GENERATION_LIMIT:
