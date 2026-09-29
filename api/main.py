@@ -373,7 +373,7 @@ SESSION_TTL_SECONDS = 12 * 60 * 60  # 12 hours
 # /mcp cost guardrail — a sliding-window limit, not an audit record
 # (last_used_at on the token already covers that). Postgres-backed: an
 # in-memory dict wouldn't survive between separate serverless invocations.
-MCP_RATE_LIMIT_PER_HOUR = int(os.environ.get("MCP_RATE_LIMIT_PER_HOUR", "20"))
+MCP_RATE_LIMIT_PER_HOUR = int(os.environ.get("MCP_RATE_LIMIT_PER_HOUR", "100"))
 
 # Per-person daily cap on actual image generations (web app + MCP alike, since
 # both ultimately call history_store.add_history_row on success) — backed by
