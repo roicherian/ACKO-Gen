@@ -113,7 +113,6 @@ body {
 body.vehicle-mode #numImagesGroup,
 body.vehicle-mode #resRatioRow,
 body.vehicle-mode #modelNumRow,
-body.vehicle-mode .imagen-enhance-row,
 body.vehicle-mode .enhanced-wrap,
 body.vehicle-mode .prompt-tab-toggle,
 body.vehicle-mode #promptTabPrompt,
@@ -218,9 +217,6 @@ body.imagen-mode .btn-action {
   color: #cfcfd8;
   border-radius: 999px;
   box-shadow: none;
-}
-body.imagen-mode .btn-action.btn-enhance {
-  color: #c4b5fd; border-color: rgba(196,181,253,.4); background: rgba(124,58,237,.14);
 }
 body.imagen-mode .btn-action:hover {
   border-color: rgba(196,181,253,.45);
@@ -1253,8 +1249,6 @@ svg.sel-icon {
 }
 .btn-icon-sq svg { width: 14px; height: 14px; }
 .btn-icon-sq:hover { border-color: var(--purple); color: var(--purple); }
-.imagen-enhance-row { display: flex; align-items: center; gap: 10px; }
-.btn-enhance { color: var(--purple); border-color: rgba(196,181,253,.4); background: var(--purple-pale, rgba(124,58,237,.08)); }
 /* Legacy non-studio layout only — studio-ui uses Vehiclegen-style footer */
 body:not(.studio-ui):not(.vehicle-mode) .prompt-footer {
   flex-direction: column;
@@ -1263,12 +1257,10 @@ body:not(.studio-ui):not(.vehicle-mode) .prompt-footer {
 body:not(.studio-ui):not(.vehicle-mode) .prompt-footer .char-count { align-self: flex-start; }
 body:not(.studio-ui):not(.vehicle-mode) .prompt-footer .btn-gen { width: 100%; margin-top: 2px; }
 
-/* Prompt / Enhanced Prompt tab toggle (segmented pill, list icon vs sparkle icon),
-   sharing a row with the Enhance Prompt button right beside it. */
-.prompt-tab-row { display: flex; align-items: center; justify-content: flex-start; margin: 10px 12px 0; gap: 10px; }
+/* Prompt / Enhanced Prompt tab toggle (segmented pill, list icon vs sparkle icon) */
 .prompt-tab-toggle {
   display: inline-flex; align-items: center; gap: 2px;
-  padding: 3px;
+  padding: 3px; margin: 10px 12px 0;
   background: rgba(255,255,255,.04); border: 1px solid var(--vg-line, var(--border-s));
   border-radius: 999px; width: fit-content;
 }
@@ -2775,8 +2767,8 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
              stay static. Keeps this contained within .prompt-wrap's rounded
              border instead of visually overflowing past it on short screens. -->
         <div class="prompt-scroll-area">
-        <!-- Prompt / Enhanced Prompt tab toggle, with Enhance Prompt on the same row -->
-        <div class="prompt-tab-row">
+        <!-- Prompt / Enhanced Prompt tab toggle — switching to Enhanced builds
+             the enhanced prompt itself, no separate "Enhance Prompt" button. -->
         <div class="prompt-tab-toggle" role="tablist" aria-label="Prompt view">
           <button type="button" class="ptab-btn active" id="ptabPromptBtn" onclick="setPromptTab('prompt')" title="Prompt" aria-selected="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
@@ -2786,13 +2778,6 @@ body.studio-ui .btn-gen.stopping { background: linear-gradient(135deg, #ef4444, 
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
             <span class="ptab-label">Enhanced</span>
           </button>
-        </div>
-        <div class="imagen-enhance-row">
-          <button class="btn-action btn-enhance" onclick="enhancePrompt()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6L12 3z"/><path d="M19 14l.8 2.2L22 17l-2.2.8L19 20l-.8-2.2L16 17l2.2-.8L19 14z"/></svg>
-            Enhance Prompt
-          </button>
-        </div>
         </div>
 
         <div class="prompt-tab-panel" id="promptTabPrompt">
@@ -8708,32 +8693,24 @@ function buildPrompt(scene) {
 // pill/dropdown changes (which call updatePrompt) don't clobber a manual edit.
 let enhancedUserEdited = false;
 
+// Switching to the Enhanced tab builds the enhanced prompt itself — no
+// separate "Enhance Prompt" button. A manual edit (enhancedUserEdited) is
+// left alone rather than overwritten on every switch.
 function setPromptTab(tab) {
   const promptPanel = document.getElementById('promptTabPrompt');
   const enhancedPanel = document.getElementById('promptTabEnhanced');
   const promptBtn = document.getElementById('ptabPromptBtn');
   const enhancedBtn = document.getElementById('ptabEnhancedBtn');
-  const enhanceRow = document.querySelector('.imagen-enhance-row');
   if (!promptPanel || !enhancedPanel) return;
   const isEnhanced = tab === 'enhanced';
+  if (isEnhanced && genMode !== 'vehicle' && !enhancedUserEdited) {
+    const scene = document.getElementById('sceneInput').value.trim();
+    document.getElementById('enhancedBody').textContent = scene ? buildPrompt(scene) : '';
+  }
   promptPanel.style.display = isEnhanced ? 'none' : '';
   enhancedPanel.style.display = isEnhanced ? '' : 'none';
-  if (enhanceRow) enhanceRow.style.display = isEnhanced ? 'none' : '';
   if (promptBtn) { promptBtn.classList.toggle('active', !isEnhanced); promptBtn.setAttribute('aria-selected', String(!isEnhanced)); }
   if (enhancedBtn) { enhancedBtn.classList.toggle('active', isEnhanced); enhancedBtn.setAttribute('aria-selected', String(isEnhanced)); }
-}
-
-function enhancePrompt() {
-  if (genMode === 'vehicle') return; // Vehicle Image Gen uses the scene prompt as-is
-  const scene = document.getElementById('sceneInput').value.trim();
-  if (!scene) {
-    alert('Please describe a scene first.');
-    return;
-  }
-  const body = document.getElementById('enhancedBody');
-  body.textContent = buildPrompt(scene);
-  enhancedUserEdited = false;
-  setPromptTab('enhanced');
 }
 
 function updatePrompt() {
