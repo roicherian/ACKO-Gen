@@ -5175,10 +5175,46 @@ async function getGeneratedReferenceImage(item) {
   return ref;
 }
 
+// Curated real-photo references for candid, natural skin texture and
+// realism — attached automatically to every people-generation (one at
+// random per call) so output consistently reads as genuine photography
+// instead of the flat, over-smooth "AI" look, rather than needing an
+// unpicked/manual reference to get there. Not a manual reference slot —
+// no chip, no clear button — since it's a baseline quality choice, not a
+// per-generation option, matching the same reasoning as pickScene()/
+// pickLight() defaults elsewhere in this file.
+const SKIN_REFERENCE_URLS = Array.from(
+  { length: 16 },
+  (_, i) => `/Skills/skin-reference/${String(i + 1).padStart(2, '0')}.jpg`
+);
+let skinReferenceCache = {};
+async function getSkinReferenceImage() {
+  const url = SKIN_REFERENCE_URLS[Math.floor(Math.random() * SKIN_REFERENCE_URLS.length)];
+  if (skinReferenceCache[url]) return skinReferenceCache[url];
+  const rawUri = await urlToDataUri(url);
+  const compressed = await compressDataUriForReference(rawUri, 350 * 1024);
+  const mime = normalizeMagnificRefMime(mimeFromDataUri(compressed) || 'image/jpeg');
+  const ref = { dataUri: compressed, mime };
+  skinReferenceCache[url] = ref;
+  return ref;
+}
+
 async function getImagenReferenceImages() {
   const refs = [];
   if (imagenReferences.style) {
     refs.push({ image: imagenReferences.style.dataUri, mime_type: imagenReferences.style.mime, text: 'STYLE REFERENCE: match the lighting, color grading and overall visual mood of this photo.' });
+  }
+  if (!state.noCharacters) {
+    try {
+      const skinRef = await getSkinReferenceImage();
+      refs.push({
+        image: skinRef.dataUri,
+        mime_type: skinRef.mime,
+        text: "SKIN & REALISM REFERENCE: match the genuine, candid, natural skin texture and authentic camera realism shown in this photo — visible pores, natural oil sheen, real un-retouched skin, genuine unposed expression. Do NOT copy this specific person's identity, outfit, or setting — only the skin/realism quality.",
+      });
+    } catch (e) {
+      console.warn('Skin reference image failed to load:', e);
+    }
   }
   if (imagenReferences.character) {
     const c = imagenReferences.character;

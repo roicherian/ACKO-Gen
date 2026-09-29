@@ -638,9 +638,11 @@ class handler(BaseHTTPRequestHandler):
                     # (doesn't freeze other users), but a calling MCP client
                     # with a shorter tool-call timeout may see this fail even
                     # though generation succeeds server-side. Accepted tradeoff.
+                    skin_ref = acko_mcp_server.get_skin_reference_image()
                     b64, _meta = acko_mcp_server.generate_nano_banana(
                         prompt, args.get("ratio", "16:9"), args.get("resolution", "2K"),
                         api_key=MAGNIFIC_KEY,
+                        reference_images=[skin_ref] if skin_ref else None,
                     )
                 else:
                     b64, _meta = acko_mcp_server.generate_magnific(
@@ -856,7 +858,10 @@ class handler(BaseHTTPRequestHandler):
         # holds the permanent public URL directly) — no /generated/<file>
         # route needed.
 
-        # Design-system Skills (tokens, fonts) — read-only static assets.
+        # Design-system Skills (tokens, fonts) and other read-only static
+        # assets checked into the repo (e.g. the curated skin/realism
+        # reference photos under Skills/skin-reference/, used as style
+        # reference images — see SKIN_REFERENCE_URLS in generate.html).
         if path_no_query.startswith("/Skills/"):
             rel = path_no_query[len("/Skills/"):]
             if ".." in rel or rel.startswith("/"):
@@ -879,6 +884,12 @@ class handler(BaseHTTPRequestHandler):
                 ctype = "font/woff"
             elif rel.endswith(".mdc"):
                 ctype = "text/plain; charset=utf-8"
+            elif rel.endswith(".jpg") or rel.endswith(".jpeg"):
+                ctype = "image/jpeg"
+            elif rel.endswith(".png"):
+                ctype = "image/png"
+            elif rel.endswith(".webp"):
+                ctype = "image/webp"
             else:
                 ctype = "application/octet-stream"
             self.send_response(200)
