@@ -1,0 +1,238 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  :root { color-scheme: light dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 16px;
+    font: 12px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: #1e1e1e; background: #fff;
+  }
+  h1 { font-size: 13px; margin: 0 0 4px; }
+  .sub { color: #666; margin: 0 0 14px; }
+  label { display: block; font-weight: 600; margin: 12px 0 4px; }
+  input[type="text"], input[type="password"], textarea, select {
+    width: 100%; padding: 6px 8px; font: inherit; border: 1px solid #d9d9d9;
+    border-radius: 4px; background: #fff; color: inherit;
+  }
+  textarea { resize: vertical; min-height: 64px; }
+  .row { display: flex; gap: 8px; }
+  .row > * { flex: 1; }
+  button {
+    width: 100%; padding: 8px 10px; margin-top: 14px; font: 600 12px/1 inherit;
+    border: none; border-radius: 6px; background: #18a0fb; color: #fff; cursor: pointer;
+  }
+  button:disabled { background: #b3b3b3; cursor: default; }
+  button.secondary { background: transparent; color: #18a0fb; border: 1px solid #18a0fb; }
+  .status { margin-top: 10px; min-height: 16px; color: #666; }
+  .status.error { color: #d1372c; }
+  .status.success { color: #1a7f37; }
+  details { margin-top: 16px; border-top: 1px solid #eee; padding-top: 10px; }
+  summary { cursor: pointer; font-weight: 600; color: #666; }
+  .hint { color: #999; font-size: 11px; margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<h1>ACKO Gen</h1>
+<p class="sub">Generate a brand-compliant image and drop it onto the canvas.</p>
+
+<div id="tokenGate">
+  <label for="tokenInput">Personal access token</label>
+  <input type="password" id="tokenInput" placeholder="acko_pat_...">
+  <div class="hint">From the ACKO Gen web app's <strong>API Tokens</strong> panel. Stored only in this Figma account's local plugin storage — never shared with collaborators.</div>
+  <button id="saveTokenBtn">Save token</button>
+  <div class="status" id="tokenStatus"></div>
+</div>
+
+<div id="genForm" style="display:none">
+  <label for="sceneInput">Scene</label>
+  <textarea id="sceneInput" placeholder="A woman reviewing her insurance policy on her phone at a cafe"></textarea>
+
+  <div class="row">
+    <div>
+      <label for="modelSelect">Model</label>
+      <select id="modelSelect">
+        <option value="magnific" selected>Magnific (fast)</option>
+        <option value="nano_banana_2">Nano Banana 2 (slower)</option>
+      </select>
+    </div>
+    <div>
+      <label for="ratioSelect">Ratio</label>
+      <select id="ratioSelect">
+        <option value="16:9" selected>16:9</option>
+        <option value="4:5">4:5</option>
+        <option value="9:16">9:16</option>
+        <option value="1:1">1:1</option>
+        <option value="4:3">4:3</option>
+        <option value="3:4">3:4</option>
+        <option value="3:2">3:2</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="row">
+    <div>
+      <label for="momentSelect">Moment</label>
+      <select id="momentSelect">
+        <option value="care" selected>Care</option>
+        <option value="pre-purchase">Pre-purchase</option>
+        <option value="reassurance">Reassurance</option>
+        <option value="active-life">Active Life</option>
+        <option value="internal-brand">Internal Brand</option>
+      </select>
+    </div>
+    <div>
+      <label for="productSelect">Product</label>
+      <select id="productSelect">
+        <option value="general" selected>General</option>
+        <option value="motor">Motor</option>
+        <option value="health">Health</option>
+        <option value="travel">Travel</option>
+        <option value="home">Home</option>
+      </select>
+    </div>
+  </div>
+  <div class="hint" id="nanoBananaHint" style="display:none">Nano Banana 2 can take 30–90s and may time out on the deployment's free tier — Magnific is the reliable default.</div>
+
+  <button id="generateBtn">Generate image</button>
+  <div class="status" id="genStatus"></div>
+
+  <details>
+    <summary>Change token</summary>
+    <input type="password" id="tokenInputInline" placeholder="acko_pat_...">
+    <button class="secondary" id="saveTokenInlineBtn">Save</button>
+  </details>
+</div>
+
+<script>
+  const API_BASE = 'https://acko-gen.vercel.app';
+  const post = (message) => parent.postMessage({ pluginMessage: message }, '*');
+
+  let currentToken = '';
+
+  const tokenGate = document.getElementById('tokenGate');
+  const genForm = document.getElementById('genForm');
+  const tokenInput = document.getElementById('tokenInput');
+  const tokenInputInline = document.getElementById('tokenInputInline');
+  const tokenStatus = document.getElementById('tokenStatus');
+  const genStatus = document.getElementById('genStatus');
+  const generateBtn = document.getElementById('generateBtn');
+  const modelSelect = document.getElementById('modelSelect');
+  const nanoBananaHint = document.getElementById('nanoBananaHint');
+
+  function setStatus(el, text, kind) {
+    el.textContent = text || '';
+    el.className = 'status' + (kind ? ' ' + kind : '');
+  }
+
+  function showForm(hasToken) {
+    tokenGate.style.display = hasToken ? 'none' : '';
+    genForm.style.display = hasToken ? '' : 'none';
+    resize();
+  }
+
+  function resize() {
+    post({ type: 'resize', height: document.body.scrollHeight });
+  }
+
+  modelSelect.addEventListener('change', () => {
+    nanoBananaHint.style.display = modelSelect.value === 'nano_banana_2' ? '' : 'none';
+  });
+
+  document.getElementById('saveTokenBtn').addEventListener('click', () => {
+    const token = tokenInput.value.trim();
+    if (!token) { setStatus(tokenStatus, 'Paste a token first.', 'error'); return; }
+    post({ type: 'save-token', token });
+  });
+
+  document.getElementById('saveTokenInlineBtn').addEventListener('click', () => {
+    const token = tokenInputInline.value.trim();
+    if (!token) return;
+    post({ type: 'save-token', token });
+  });
+
+  generateBtn.addEventListener('click', async () => {
+    const scene = document.getElementById('sceneInput').value.trim();
+    if (!scene) { setStatus(genStatus, 'Describe a scene first.', 'error'); return; }
+    if (!currentToken) { setStatus(genStatus, 'Save a personal access token first.', 'error'); return; }
+
+    const model = modelSelect.value;
+    const ratio = document.getElementById('ratioSelect').value;
+    const moment = document.getElementById('momentSelect').value;
+    const product = document.getElementById('productSelect').value;
+
+    generateBtn.disabled = true;
+    setStatus(genStatus, model === 'nano_banana_2' ? 'Generating… this can take up to 90s.' : 'Generating…');
+
+    try {
+      const res = await fetch(`${API_BASE}/mcp`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${currentToken}`,
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: Date.now(),
+          method: 'tools/call',
+          params: {
+            name: 'generate_acko_image',
+            arguments: { scene, model, ratio, moment, product },
+          },
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`Request failed (HTTP ${res.status}). Check your token and try again.`);
+      }
+      const data = await res.json();
+      if (data.error) {
+        throw new Error(data.error.message || 'Request failed.');
+      }
+      const content = (data.result && data.result.content) || [];
+      if (data.result && data.result.isError) {
+        const textItem = content.find((c) => c.type === 'text');
+        throw new Error((textItem && textItem.text) || 'Generation failed.');
+      }
+      const imageItem = content.find((c) => c.type === 'image');
+      if (!imageItem || !imageItem.data) {
+        throw new Error('No image returned.');
+      }
+
+      setStatus(genStatus, 'Adding to canvas…');
+      post({ type: 'insert-image', base64: imageItem.data, ratio, prompt: scene });
+    } catch (err) {
+      setStatus(genStatus, err.message || String(err), 'error');
+      generateBtn.disabled = false;
+    }
+  });
+
+  window.onmessage = (event) => {
+    const message = event.data.pluginMessage;
+    if (!message) return;
+
+    if (message.type === 'token') {
+      currentToken = message.token || '';
+      showForm(!!currentToken);
+    } else if (message.type === 'token-saved') {
+      tokenInput.value = '';
+      tokenInputInline.value = '';
+      setStatus(tokenStatus, 'Saved.', 'success');
+      post({ type: 'request-token' });
+    } else if (message.type === 'inserted') {
+      setStatus(genStatus, 'Added to canvas.', 'success');
+      generateBtn.disabled = false;
+    } else if (message.type === 'error') {
+      setStatus(genStatus, message.message, 'error');
+      generateBtn.disabled = false;
+    }
+  };
+
+  post({ type: 'request-token' });
+  resize();
+</script>
+</body>
+</html>
