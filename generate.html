@@ -8487,66 +8487,101 @@ const MOODS = {
 // Each product gets several distinct backdrops rather than one fixed scene —
 // picked at random per generation (see pickScene()) so repeated generations
 // in the same category don't all land on the same identical background.
+// Each scene entry carries `match` keywords — if the user's own scene text
+// names a specific location (e.g. "show room", "car wash"), that backdrop is
+// used instead of a random one. Random picking only kicks in when nothing in
+// the scene text points to a specific one of these, so an unspecified prompt
+// still gets variety, but an explicit one is never overridden/contradicted.
 const SETTINGS = {
   motor: {
     scenes: [
-      'a clean, uncluttered modern Indian car service centre — one plain wall, a single tidy tool rack, minimal and calm',
-      'a quiet residential street beside a parked car — tidy pavement, a single gate or compound wall softly blurred behind',
-      'an open-air car wash bay — wet pavement, a coiled hose to one side, minimal clutter',
-      'a modern car dealership showroom floor — one clean glass wall, soft reflections, minimal signage',
-      'a home driveway or covered parking area — plain wall, a single visible pillar, uncluttered',
+      { text: 'a clean, uncluttered modern Indian car service centre — one plain wall, a single tidy tool rack, minimal and calm',
+        match: ['service centre', 'service center', 'servicing', 'mechanic', 'workshop', 'repair shop'] },
+      { text: 'a quiet residential street beside a parked car — tidy pavement, a single gate or compound wall softly blurred behind',
+        match: ['residential street', 'parked outside', 'outside the house', 'on the street'] },
+      { text: 'an open-air car wash bay — wet pavement, a coiled hose to one side, minimal clutter',
+        match: ['car wash', 'wash bay', 'washing the car', 'washing his car', 'washing her car'] },
+      { text: 'a modern car dealership showroom floor — one clean glass wall, soft reflections, minimal signage',
+        match: ['showroom', 'show room', 'dealership', 'car delivery', 'new car delivery', 'delivery day', 'picking up the car', 'picking up his car', 'picking up her car', 'picking up their car'] },
+      { text: 'a home driveway or covered parking area — plain wall, a single visible pillar, uncluttered',
+        match: ['driveway', 'parking area', 'home garage', 'home parking'] },
     ],
     propsHint: 'if the scene involves a vehicle or mechanic, a plain dark navy work uniform and a single compact Indian hatchback with a state number plate are appropriate',
     light: 'bright even daylight from a large open shutter — soft natural fill, clean neutral whites',
   },
   health: {
     scenes: [
-      'a clean, modern Indian clinic — a plain beige wall and minimal furnishings, a single small green plant',
-      'a hospital corridor with soft daylight from a side window, plain walls, minimal signage',
-      'a pharmacy counter, clean shelving softly blurred behind, minimal clutter',
-      'a home bedroom during recovery — plain wall, a single bedside table, uncluttered',
-      "a doctor's private consultation room — one bookshelf softly blurred, minimal and calm",
+      { text: 'a clean, modern Indian clinic — a plain beige wall and minimal furnishings, a single small green plant',
+        match: ['clinic', 'doctor visit', "doctor's office"] },
+      { text: 'a hospital corridor with soft daylight from a side window, plain walls, minimal signage',
+        match: ['hospital', 'hospital corridor', 'hospital ward', 'admitted'] },
+      { text: 'a pharmacy counter, clean shelving softly blurred behind, minimal clutter',
+        match: ['pharmacy', 'chemist', 'medicine store', 'medical store'] },
+      { text: 'a home bedroom during recovery — plain wall, a single bedside table, uncluttered',
+        match: ['recovering at home', 'bed rest', 'recovery at home', 'convalescing', 'resting at home'] },
+      { text: "a doctor's private consultation room — one bookshelf softly blurred, minimal and calm",
+        match: ['consultation', "doctor's room", 'checkup', 'check-up', 'appointment with'] },
     ],
     propsHint: 'if the scene involves a doctor or consultation, a white coat and stethoscope are appropriate',
     light: 'soft diffused window light with gentle neutral overhead fill — bright and clean',
   },
   travel: {
     scenes: [
-      'a calm, modern Indian airport interior — clean floor and large windows, minimal and uncrowded',
-      'a quiet hotel room balcony, soft cityscape blurred behind, minimal furniture',
-      'a train platform with a single bench, clean and uncrowded, soft depth blur',
-      'the back seat of a car mid road-trip, a window view softly blurred outside, minimal interior',
-      'a boarding gate seating area — clean flooring, large windows, uncrowded',
+      { text: 'a calm, modern Indian airport interior — clean floor and large windows, minimal and uncrowded',
+        match: ['airport'] },
+      { text: 'a quiet hotel room balcony, soft cityscape blurred behind, minimal furniture',
+        match: ['hotel', 'hotel room', 'hotel balcony'] },
+      { text: 'a train platform with a single bench, clean and uncrowded, soft depth blur',
+        match: ['train', 'railway station', 'platform'] },
+      { text: 'the back seat of a car mid road-trip, a window view softly blurred outside, minimal interior',
+        match: ['road trip', 'road-trip', 'car ride', 'driving to'] },
+      { text: 'a boarding gate seating area — clean flooring, large windows, uncrowded',
+        match: ['boarding gate', 'boarding pass', 'departure gate', 'waiting for the flight'] },
     ],
     propsHint: 'if the scene involves travel, a single cabin suitcase or boarding pass is appropriate',
     light: 'soft afternoon daylight through large windows — bright, airy, mostly neutral tone',
   },
   home: {
     scenes: [
-      'a warm, tidy Indian family home — a wooden table and a single small potted plant, uncluttered',
-      'a home kitchen counter, plain tiled backdrop, minimal utensils in soft focus',
-      'a balcony or terrace with a single chair, plants softly blurred, uncluttered',
-      'a living room sofa corner, one lamp, plain wall, minimal decor',
-      'a home study desk, one bookshelf softly blurred, minimal and tidy',
+      { text: 'a warm, tidy Indian family home — a wooden table and a single small potted plant, uncluttered',
+        match: ['dining table', 'family home', 'dinner table'] },
+      { text: 'a home kitchen counter, plain tiled backdrop, minimal utensils in soft focus',
+        match: ['kitchen', 'cooking'] },
+      { text: 'a balcony or terrace with a single chair, plants softly blurred, uncluttered',
+        match: ['balcony', 'terrace'] },
+      { text: 'a living room sofa corner, one lamp, plain wall, minimal decor',
+        match: ['living room', 'sofa', 'couch'] },
+      { text: 'a home study desk, one bookshelf softly blurred, minimal and tidy',
+        match: ['study desk', 'work from home', 'home office', 'at his desk', 'at her desk'] },
     ],
     propsHint: 'if the scene calls for it, a cup of chai or a tablet is appropriate',
     light: 'soft diffused window light — bright, mostly neutral domestic fill',
   },
   general: {
     scenes: [
-      'a real, contemporary Indian home interior — clean, uncluttered, plain wall',
-      'a quiet Indian office desk, minimal decor, soft window light blurred behind',
-      'a quiet street corner, clean pavement, a single building wall softly blurred',
-      'a park bench under a tree, soft foliage blurred behind, minimal and calm',
-      'a café table by a window, minimal decor, a soft street view blurred outside',
+      { text: 'a real, contemporary Indian home interior — clean, uncluttered, plain wall',
+        match: ['at home', 'home interior'] },
+      { text: 'a quiet Indian office desk, minimal decor, soft window light blurred behind',
+        match: ['office', 'workplace', 'at work'] },
+      { text: 'a quiet street corner, clean pavement, a single building wall softly blurred',
+        match: ['street corner', 'sidewalk', 'pavement'] },
+      { text: 'a park bench under a tree, soft foliage blurred behind, minimal and calm',
+        match: ['park bench', 'in the park', 'garden'] },
+      { text: 'a café table by a window, minimal decor, a soft street view blurred outside',
+        match: ['café', 'cafe', 'coffee shop', 'restaurant'] },
     ],
     propsHint: '',
     light: 'bright clean natural light — mostly neutral, not dramatic',
   },
 };
-function pickScene(s) {
+function pickScene(s, sceneText) {
   const list = s.scenes || [];
-  return list[Math.floor(Math.random() * list.length)] || list[0] || '';
+  if (!list.length) return '';
+  const text = String(sceneText || '').toLowerCase();
+  const matched = list.find(entry => (entry.match || []).some(k => text.includes(k)));
+  if (matched) return matched.text;
+  const pick = list[Math.floor(Math.random() * list.length)] || list[0];
+  return pick.text;
 }
 
 // Strict background discipline — minimal, clean, only what the context needs
@@ -8612,7 +8647,7 @@ function buildPrompt(scene) {
   if (!state.momentManual) syncMomentPill(inferred.moment);
   const s    = SETTINGS[state.product] || SETTINGS.general;
   const cam  = CAMERA_ANGLES[state.cameraAngle] || CAMERA_ANGLES['eye-level'];
-  const scenePick = pickScene(s);
+  const scenePick = pickScene(s, scene);
 
   // Frame phrase follows the selected aspect ratio
   const ratioOpt   = document.getElementById('ratioSelect').selectedOptions[0];

@@ -38,63 +38,94 @@ MOOD_MAP = {
 # already fixed to avoid forcing an unrelated backdrop into every scene, e.g.
 # a "health" product tag no longer forces a hospital ward onto a scene that's
 # actually set on a football turf — see PROPS_RULE/BACKGROUND_RULE below).
-# "scene" is a list, not a single string, and picked at random per call (see
-# build_prompt) — a single fixed backdrop per vertical meant every motor-tag
-# generation looked identical. Kept in sync: any change to one setting's
-# scene/props list should be mirrored in generate.html's copy of the same
-# entry, and vice versa.
+# Each scene entry carries "match" keywords — if the caller's own scene text
+# names a specific location (e.g. "show room", "car wash"), that backdrop is
+# used instead of a random one (see pick_scene). Random picking only kicks in
+# when nothing in the scene text points to a specific one of these, so an
+# unspecified scene still gets variety, but an explicit one is never
+# overridden/contradicted (the original bug: "car delivery from car show
+# room" kept landing on a car SERVICE CENTRE backdrop since scene picking was
+# pure random, ignoring the scene text entirely). Kept in sync: any change to
+# one setting's scene/props list should be mirrored in generate.html's copy
+# of the same entry, and vice versa.
 SETTING_MAP = {
     "motor": {
         "scenes": [
-            "a clean, uncluttered modern Indian car service centre — one plain wall, a single tidy tool rack, minimal and calm",
-            "a quiet residential street beside a parked car — tidy pavement, a single gate or compound wall softly blurred behind",
-            "an open-air car wash bay — wet pavement, a coiled hose to one side, minimal clutter",
-            "a modern car dealership showroom floor — one clean glass wall, soft reflections, minimal signage",
-            "a home driveway or covered parking area — plain wall, a single visible pillar, uncluttered",
+            {"text": "a clean, uncluttered modern Indian car service centre — one plain wall, a single tidy tool rack, minimal and calm",
+             "match": ["service centre", "service center", "servicing", "mechanic", "workshop", "repair shop"]},
+            {"text": "a quiet residential street beside a parked car — tidy pavement, a single gate or compound wall softly blurred behind",
+             "match": ["residential street", "parked outside", "outside the house", "on the street"]},
+            {"text": "an open-air car wash bay — wet pavement, a coiled hose to one side, minimal clutter",
+             "match": ["car wash", "wash bay", "washing the car", "washing his car", "washing her car"]},
+            {"text": "a modern car dealership showroom floor — one clean glass wall, soft reflections, minimal signage",
+             "match": ["showroom", "show room", "dealership", "car delivery", "new car delivery", "delivery day",
+                       "picking up the car", "picking up his car", "picking up her car", "picking up their car"]},
+            {"text": "a home driveway or covered parking area — plain wall, a single visible pillar, uncluttered",
+             "match": ["driveway", "parking area", "home garage", "home parking"]},
         ],
         "props": "if the scene involves a vehicle or mechanic, a plain dark navy work uniform and a single compact Indian hatchback with a state number plate are appropriate",
         "light": "bright even daylight from a large open shutter — soft natural fill, clean neutral whites",
     },
     "health": {
         "scenes": [
-            "a clean, modern Indian clinic — a plain beige wall and minimal furnishings, a single small green plant",
-            "a hospital corridor with soft daylight from a side window, plain walls, minimal signage",
-            "a pharmacy counter, clean shelving softly blurred behind, minimal clutter",
-            "a home bedroom during recovery — plain wall, a single bedside table, uncluttered",
-            "a doctor's private consultation room — one bookshelf softly blurred, minimal and calm",
+            {"text": "a clean, modern Indian clinic — a plain beige wall and minimal furnishings, a single small green plant",
+             "match": ["clinic", "doctor visit", "doctor's office"]},
+            {"text": "a hospital corridor with soft daylight from a side window, plain walls, minimal signage",
+             "match": ["hospital", "hospital corridor", "hospital ward", "admitted"]},
+            {"text": "a pharmacy counter, clean shelving softly blurred behind, minimal clutter",
+             "match": ["pharmacy", "chemist", "medicine store", "medical store"]},
+            {"text": "a home bedroom during recovery — plain wall, a single bedside table, uncluttered",
+             "match": ["recovering at home", "bed rest", "recovery at home", "convalescing", "resting at home"]},
+            {"text": "a doctor's private consultation room — one bookshelf softly blurred, minimal and calm",
+             "match": ["consultation", "doctor's room", "checkup", "check-up", "appointment with"]},
         ],
         "props": "if the scene involves a doctor or consultation, a white coat and stethoscope are appropriate",
         "light": "soft diffused window light with gentle neutral overhead fill — bright and clean",
     },
     "travel": {
         "scenes": [
-            "a calm, modern Indian airport interior — clean floor and large windows, minimal and uncrowded",
-            "a quiet hotel room balcony, soft cityscape blurred behind, minimal furniture",
-            "a train platform with a single bench, clean and uncrowded, soft depth blur",
-            "the back seat of a car mid road-trip, a window view softly blurred outside, minimal interior",
-            "a boarding gate seating area — clean flooring, large windows, uncrowded",
+            {"text": "a calm, modern Indian airport interior — clean floor and large windows, minimal and uncrowded",
+             "match": ["airport"]},
+            {"text": "a quiet hotel room balcony, soft cityscape blurred behind, minimal furniture",
+             "match": ["hotel", "hotel room", "hotel balcony"]},
+            {"text": "a train platform with a single bench, clean and uncrowded, soft depth blur",
+             "match": ["train", "railway station", "platform"]},
+            {"text": "the back seat of a car mid road-trip, a window view softly blurred outside, minimal interior",
+             "match": ["road trip", "road-trip", "car ride", "driving to"]},
+            {"text": "a boarding gate seating area — clean flooring, large windows, uncrowded",
+             "match": ["boarding gate", "boarding pass", "departure gate", "waiting for the flight"]},
         ],
         "props": "if the scene involves travel, a single cabin suitcase or boarding pass is appropriate",
         "light": "soft afternoon daylight through large windows — bright, airy, mostly neutral tone",
     },
     "home": {
         "scenes": [
-            "a warm, tidy Indian family home — a wooden table and a single small potted plant, uncluttered",
-            "a home kitchen counter, plain tiled backdrop, minimal utensils in soft focus",
-            "a balcony or terrace with a single chair, plants softly blurred, uncluttered",
-            "a living room sofa corner, one lamp, plain wall, minimal decor",
-            "a home study desk, one bookshelf softly blurred, minimal and tidy",
+            {"text": "a warm, tidy Indian family home — a wooden table and a single small potted plant, uncluttered",
+             "match": ["dining table", "family home", "dinner table"]},
+            {"text": "a home kitchen counter, plain tiled backdrop, minimal utensils in soft focus",
+             "match": ["kitchen", "cooking"]},
+            {"text": "a balcony or terrace with a single chair, plants softly blurred, uncluttered",
+             "match": ["balcony", "terrace"]},
+            {"text": "a living room sofa corner, one lamp, plain wall, minimal decor",
+             "match": ["living room", "sofa", "couch"]},
+            {"text": "a home study desk, one bookshelf softly blurred, minimal and tidy",
+             "match": ["study desk", "work from home", "home office", "at his desk", "at her desk"]},
         ],
         "props": "if the scene calls for it, a cup of chai or a tablet is appropriate",
         "light": "soft diffused window light — bright, mostly neutral domestic fill",
     },
     "general": {
         "scenes": [
-            "a real, contemporary Indian home interior — clean, uncluttered, plain wall",
-            "a quiet Indian office desk, minimal decor, soft window light blurred behind",
-            "a quiet street corner, clean pavement, a single building wall softly blurred",
-            "a park bench under a tree, soft foliage blurred behind, minimal and calm",
-            "a café table by a window, minimal decor, a soft street view blurred outside",
+            {"text": "a real, contemporary Indian home interior — clean, uncluttered, plain wall",
+             "match": ["at home", "home interior"]},
+            {"text": "a quiet Indian office desk, minimal decor, soft window light blurred behind",
+             "match": ["office", "workplace", "at work"]},
+            {"text": "a quiet street corner, clean pavement, a single building wall softly blurred",
+             "match": ["street corner", "sidewalk", "pavement"]},
+            {"text": "a park bench under a tree, soft foliage blurred behind, minimal and calm",
+             "match": ["park bench", "in the park", "garden"]},
+            {"text": "a café table by a window, minimal decor, a soft street view blurred outside",
+             "match": ["café", "cafe", "coffee shop", "restaurant"]},
         ],
         "props": "",
         "light": "bright clean natural light — mostly neutral, not dramatic",
@@ -162,10 +193,19 @@ MAGNIFIC_SIZES = {
 }
 
 
+def pick_scene(s, scene_text):
+    scenes = s["scenes"]
+    text = (scene_text or "").lower()
+    for entry in scenes:
+        if any(k in text for k in entry["match"]):
+            return entry["text"]
+    return random.choice(scenes)["text"]
+
+
 def build_prompt(scene, moment, product, skin_tone="", region="", age="", life_stage=""):
     mood     = MOOD_MAP.get(moment, MOOD_MAP["care"])
     s        = SETTING_MAP.get(product, SETTING_MAP["general"])
-    scene_pick = random.choice(s["scenes"])
+    scene_pick = pick_scene(s, scene)
     subject = " ".join(filter(None, [
         skin_tone + "," if skin_tone else "",
         region or "Indian",
