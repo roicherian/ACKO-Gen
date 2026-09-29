@@ -629,7 +629,7 @@ class handler(BaseHTTPRequestHandler):
             prompt = acko_mcp_server.build_prompt(
                 scene, args.get("moment", "care"), args.get("product", "general"),
                 args.get("skin_tone", ""), args.get("region", ""), args.get("age", ""),
-                args.get("life_stage", ""), args.get("light", "auto"),
+                args.get("life_stage", ""),
             )
             try:
                 if model == "nano_banana_2":
