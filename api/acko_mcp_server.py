@@ -14,7 +14,6 @@ import urllib.request
 import urllib.error
 import time
 import base64
-from pathlib import Path
 
 # ── CONFIG ────────────────────────────────────────────────────────────────────
 # Only used when this file is run standalone (see ACKO_MCP_TOKEN relay mode at
@@ -193,33 +192,6 @@ MAGNIFIC_SIZES = {
     "1:1": "square_1_1", "4:3": "classic_4_3", "3:4": "traditional_3_4", "3:2": "standard_3_2",
 }
 
-# Mirrors generate.html's SKIN_REFERENCE_URLS/getSkinReferenceImage() — the
-# same curated real-photo set, read directly from disk (this file and
-# main.py are deployed together) rather than over HTTP. Every MCP-triggered
-# generate_acko_image call always depicts a person (the tool has no
-# "no characters" mode), so this is attached unconditionally, unlike the web
-# UI's check against state.noCharacters.
-SKIN_REFERENCE_DIR = Path(__file__).resolve().parent.parent / "Skills" / "skin-reference"
-SKIN_REFERENCE_TEXT = (
-    "SKIN & REALISM REFERENCE: match the genuine, candid, natural skin texture and "
-    "authentic camera realism shown in this photo — visible pores, natural oil sheen, "
-    "real un-retouched skin, genuine unposed expression. Do NOT copy this specific "
-    "person's identity, outfit, or setting — only the skin/realism quality."
-)
-
-
-def get_skin_reference_image():
-    files = sorted(SKIN_REFERENCE_DIR.glob("*.jpg"))
-    if not files:
-        return None
-    path = random.choice(files)
-    b64 = base64.b64encode(path.read_bytes()).decode()
-    return {
-        "image": f"data:image/jpeg;base64,{b64}",
-        "mime_type": "image/jpeg",
-        "text": SKIN_REFERENCE_TEXT,
-    }
-
 
 def pick_scene(s, scene_text):
     scenes = s["scenes"]
@@ -304,7 +276,7 @@ def generate_magnific(prompt, ratio, guidance=1.2, seed=None, api_key=None):
 
 
 # ── NANO BANANA 2 via Magnific (async, returns URL) ───────────────────────────
-def generate_nano_banana(prompt, ratio, resolution="2K", api_key=None, reference_images=None):
+def generate_nano_banana(prompt, ratio, resolution="2K", api_key=None):
     headers = {
         "Content-Type":       "application/json",
         "x-magnific-api-key": api_key or MAGNIFIC_KEY,
@@ -315,8 +287,6 @@ def generate_nano_banana(prompt, ratio, resolution="2K", api_key=None, reference
         "resolution":             resolution,
         "use_google_search_tool": False,
     }
-    if reference_images:
-        body["reference_images"] = reference_images
     created = http_post(NANO_BANANA_URL, body, headers)
     task_id = (created.get("data") or {}).get("task_id")
     if not task_id:
