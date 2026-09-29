@@ -55,7 +55,15 @@ def get_conn():
         # paused Neon endpoint, exhausted connection limit) hangs this thread's
         # connect() indefinitely — the request just never returns, which from
         # the browser looks exactly like a frozen "Generating…" spinner with
-        # no error. Bounds that to a clear failure in ~10s instead.
+        # no error. Bounds that to a clear failure instead.
+        #
+        # Kept under Vercel Hobby's 10s hard function limit (both used to be
+        # 10s/15s — LONGER than that cap) so our own timeout, with an actual
+        # error message, has a chance to fire before Vercel's platform-level
+        # kill does. When it loses that race anyway (Vercel just kills the
+        # function outright), the caller sees an opaque network failure with
+        # no CORS headers, not a clean JSON error — this narrows how often
+        # that happens, on a cold Neon endpoint especially.
         #
         # statement_timeout can't be passed as a connect() "options" startup
         # parameter — Neon's pooled (PgBouncer) endpoint rejects unknown
@@ -66,9 +74,9 @@ def get_conn():
         raw = psycopg2.connect(
             DATABASE_URL,
             cursor_factory=psycopg2.extras.RealDictCursor,
-            connect_timeout=10,
+            connect_timeout=6,
         )
-        raw.cursor().execute("SET statement_timeout = 15000")
+        raw.cursor().execute("SET statement_timeout = 6000")
         raw.commit()
         wrapped = _ConnWrapper(raw)
         _local.conn = wrapped
