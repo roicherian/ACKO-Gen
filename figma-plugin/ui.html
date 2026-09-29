@@ -108,8 +108,12 @@
 </div>
 
 <script>
+  console.log('[ACKO Gen] ui.html script starting');
   const API_BASE = 'https://acko-gen.vercel.app';
-  const post = (message) => parent.postMessage({ pluginMessage: message }, '*');
+  const post = (message) => {
+    console.log('[ACKO Gen] posting to plugin:', message);
+    parent.postMessage({ pluginMessage: message }, '*');
+  };
 
   let currentToken = '';
 
@@ -143,8 +147,10 @@
   });
 
   document.getElementById('saveTokenBtn').addEventListener('click', () => {
+    console.log('[ACKO Gen] Save token clicked');
     const token = tokenInput.value.trim();
     if (!token) { setStatus(tokenStatus, 'Paste a token first.', 'error'); return; }
+    setStatus(tokenStatus, 'Saving…');
     post({ type: 'save-token', token });
   });
 
@@ -210,9 +216,19 @@
     }
   });
 
+  // Routes an error to whichever status line is actually visible right now —
+  // a bug had this always target genStatus, which is inside #genForm and
+  // still display:none during the token-gate step, so a failure while
+  // saving the token was silently written into a hidden element.
+  function showError(msg) {
+    const target = tokenGate.style.display !== 'none' ? tokenStatus : genStatus;
+    setStatus(target, msg, 'error');
+  }
+
   window.onmessage = (event) => {
     const message = event.data.pluginMessage;
     if (!message) return;
+    console.log('[ACKO Gen] received from plugin:', message);
 
     if (message.type === 'token') {
       currentToken = message.token || '';
@@ -226,7 +242,7 @@
       setStatus(genStatus, 'Added to canvas.', 'success');
       generateBtn.disabled = false;
     } else if (message.type === 'error') {
-      setStatus(genStatus, message.message, 'error');
+      showError(message.message);
       generateBtn.disabled = false;
     }
   };

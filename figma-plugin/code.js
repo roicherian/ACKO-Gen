@@ -50,6 +50,7 @@ async function insertGeneratedImage(base64, ratioLabel, promptText) {
 }
 
 figma.ui.onmessage = async (message) => {
+  console.log("[ACKO Gen] received from ui:", message.type);
   try {
     if (message.type === "resize") {
       figma.ui.resize(
@@ -81,9 +82,8 @@ figma.ui.onmessage = async (message) => {
       return;
     }
   } catch (err) {
-    figma.ui.postMessage({
-      type: "error",
-      message: err && err.message ? err.message : String(err),
-    });
+    const errMessage = err && err.message ? err.message : String(err);
+    console.log("[ACKO Gen] error handling", message.type, ":", errMessage);
+    figma.ui.postMessage({ type: "error", message: errMessage });
   }
 };
