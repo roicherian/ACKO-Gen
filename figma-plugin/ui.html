@@ -13,7 +13,7 @@
   h1 { font-size: 13px; margin: 0 0 4px; }
   .sub { color: #666; margin: 0 0 14px; }
   label { display: block; font-weight: 600; margin: 12px 0 4px; }
-  input[type="text"], input[type="password"], textarea, select {
+  input[type="text"], input[type="password"], input[type="email"], textarea, select {
     width: 100%; padding: 6px 8px; font: inherit; border: 1px solid #d9d9d9;
     border-radius: 4px; background: #fff; color: inherit;
   }
@@ -40,11 +40,17 @@
 <p class="sub">Generate a brand-compliant image and drop it onto the canvas.</p>
 
 <div id="tokenGate">
-  <label for="tokenInput">Personal access token</label>
-  <input type="password" id="tokenInput" placeholder="acko_pat_...">
-  <div class="hint">From the ACKO Gen web app's <strong>API Tokens</strong> panel. Stored only in this Figma account's local plugin storage — never shared with collaborators.</div>
-  <button id="saveTokenBtn">Save token</button>
+  <label for="emailInput">Sign in with your acko.tech email</label>
+  <input type="email" id="emailInput" placeholder="you@acko.tech">
+  <div class="hint">No password needed. We'll sign you in and create a plugin token automatically — stored only in this Figma account's local plugin storage, never shared with collaborators.</div>
+  <button id="loginBtn">Sign in</button>
   <div class="status" id="tokenStatus"></div>
+
+  <details>
+    <summary>Already have a token? Paste it instead</summary>
+    <input type="password" id="tokenInput" placeholder="acko_pat_...">
+    <button class="secondary" id="saveTokenBtn">Save token</button>
+  </details>
 </div>
 
 <div id="genForm" style="display:none">
@@ -101,9 +107,14 @@
   <div class="status" id="genStatus"></div>
 
   <details>
-    <summary>Change token</summary>
+    <summary>Switch account or change token</summary>
+    <label for="emailInputInline">Sign in with a different acko.tech email</label>
+    <input type="email" id="emailInputInline" placeholder="you@acko.tech">
+    <button class="secondary" id="loginInlineBtn">Sign in</button>
+    <label for="tokenInputInline">Or paste a token directly</label>
     <input type="password" id="tokenInputInline" placeholder="acko_pat_...">
     <button class="secondary" id="saveTokenInlineBtn">Save</button>
+    <div class="status" id="inlineStatus"></div>
   </details>
 </div>
 
@@ -119,13 +130,53 @@
 
   const tokenGate = document.getElementById('tokenGate');
   const genForm = document.getElementById('genForm');
+  const emailInput = document.getElementById('emailInput');
+  const emailInputInline = document.getElementById('emailInputInline');
   const tokenInput = document.getElementById('tokenInput');
   const tokenInputInline = document.getElementById('tokenInputInline');
   const tokenStatus = document.getElementById('tokenStatus');
+  const inlineStatus = document.getElementById('inlineStatus');
   const genStatus = document.getElementById('genStatus');
   const generateBtn = document.getElementById('generateBtn');
+  const loginBtn = document.getElementById('loginBtn');
+  const loginInlineBtn = document.getElementById('loginInlineBtn');
   const modelSelect = document.getElementById('modelSelect');
   const nanoBananaHint = document.getElementById('nanoBananaHint');
+
+  // Signs the user in with just their acko.tech email (no password — the
+  // backend's /auth/login only checks the domain) and immediately mints a
+  // personal access token for them, so they never have to visit the web
+  // app's API Tokens panel and copy/paste anything by hand.
+  async function doLogin(email, statusEl, btn) {
+    if (!email) { setStatus(statusEl, 'Enter your acko.tech email first.', 'error'); return; }
+    if (btn) btn.disabled = true;
+    setStatus(statusEl, 'Signing in…');
+    try {
+      const loginRes = await fetch(`${API_BASE}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const loginData = await loginRes.json();
+      if (!loginRes.ok) throw new Error(loginData.error || 'Sign-in failed.');
+
+      setStatus(statusEl, 'Creating plugin token…');
+      const tokenRes = await fetch(`${API_BASE}/account/tokens/create`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-session-token': loginData.token },
+        body: JSON.stringify({ label: 'Figma plugin' }),
+      });
+      const tokenData = await tokenRes.json();
+      if (!tokenRes.ok) throw new Error(tokenData.error || 'Could not create a token.');
+
+      setStatus(statusEl, 'Saving…');
+      post({ type: 'save-token', token: tokenData.token });
+    } catch (err) {
+      setStatus(statusEl, err.message || String(err), 'error');
+    } finally {
+      if (btn) btn.disabled = false;
+    }
+  }
 
   function setStatus(el, text, kind) {
     el.textContent = text || '';
@@ -146,6 +197,14 @@
     nanoBananaHint.style.display = modelSelect.value === 'nano_banana_2' ? '' : 'none';
   });
 
+  loginBtn.addEventListener('click', () => {
+    doLogin(emailInput.value.trim().toLowerCase(), tokenStatus, loginBtn);
+  });
+
+  loginInlineBtn.addEventListener('click', () => {
+    doLogin(emailInputInline.value.trim().toLowerCase(), inlineStatus, loginInlineBtn);
+  });
+
   document.getElementById('saveTokenBtn').addEventListener('click', () => {
     console.log('[ACKO Gen] Save token clicked');
     const token = tokenInput.value.trim();
@@ -157,6 +216,7 @@
   document.getElementById('saveTokenInlineBtn').addEventListener('click', () => {
     const token = tokenInputInline.value.trim();
     if (!token) return;
+    setStatus(inlineStatus, 'Saving…');
     post({ type: 'save-token', token });
   });
 
@@ -234,9 +294,12 @@
       currentToken = message.token || '';
       showForm(!!currentToken);
     } else if (message.type === 'token-saved') {
+      emailInput.value = '';
+      emailInputInline.value = '';
       tokenInput.value = '';
       tokenInputInline.value = '';
       setStatus(tokenStatus, 'Saved.', 'success');
+      setStatus(inlineStatus, 'Saved.', 'success');
       post({ type: 'request-token' });
     } else if (message.type === 'inserted') {
       setStatus(genStatus, 'Added to canvas.', 'success');

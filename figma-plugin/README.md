@@ -27,22 +27,27 @@ calls to ACKO Gen's backend at all, so it wasn't an option here.
 3. Select `figma-plugin/manifest.json` from this repo.
 4. It now shows up under **Plugins → Development → ACKO Gen** in any file.
 
-## Get a personal access token (one-time)
+## Sign in (one-time per machine)
 
-1. Go to `https://acko-gen.vercel.app` and sign in with your `@acko.tech`
-   email.
-2. Click **API Tokens** in the sidebar → give it a label → **Generate
-   token**.
-3. Copy the token (starts with `acko_pat_...`) — it's only shown once.
+1. Run the plugin (**Plugins → Development → ACKO Gen**).
+2. Enter your `@acko.tech` email and click **Sign in** — no password needed,
+   the backend only checks the email domain.
+3. The plugin signs you in and creates a personal access token for you
+   automatically, then saves it locally. You won't need to do this again on
+   this machine unless you switch accounts.
+
+If you'd rather use a token you already generated yourself from the web
+app's **API Tokens** panel, expand **Already have a token? Paste it
+instead** and paste it there.
 
 ## Use it
 
-1. Run the plugin (**Plugins → Development → ACKO Gen**).
-2. Paste your token, click **Save token** (one-time per machine).
-3. Describe the scene, pick Model / Ratio / Moment / Product, click
+1. Describe the scene, pick Model / Ratio / Moment / Product, click
    **Generate image**.
-4. The finished image appears as a new rectangle near your current
+2. The finished image appears as a new rectangle near your current
    viewport, already selected.
+3. To switch accounts or replace a token later, expand **Switch account or
+   change token** at the bottom of the panel.
 
 ## Known limitation
 
