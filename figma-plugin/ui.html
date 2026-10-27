@@ -220,6 +220,64 @@
     post({ type: 'save-token', token });
   });
 
+  // Calls one /mcp tool and returns its result, throwing on a transport
+  // error, a JSON-RPC error, or result.isError.
+  async function callMcp(name, args) {
+    const res = await fetch(`${API_BASE}/mcp`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${currentToken}`,
+      },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: Date.now(),
+        method: 'tools/call',
+        params: { name, arguments: args },
+      }),
+    });
+    if (!res.ok) {
+      throw new Error(`Request failed (HTTP ${res.status}). Check your token and try again.`);
+    }
+    const data = await res.json();
+    if (data.error) {
+      throw new Error(data.error.message || 'Request failed.');
+    }
+    const result = data.result || {};
+    if (result.isError) {
+      const textItem = (result.content || []).find((c) => c.type === 'text');
+      throw new Error((textItem && textItem.text) || 'Request failed.');
+    }
+    return result;
+  }
+
+  function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  // Nano Banana 2 can take 30-90s — far longer than any single Vercel
+  // function is allowed to run (10s on Hobby). Rather than one blocking
+  // call, this starts the job (fast) then polls a separate fast status
+  // check from here, in the browser, where there's no such time limit.
+  async function generateNanoBanana(scene, ratio, moment, product) {
+    const started = await callMcp('start_acko_nano_banana_generation', { scene, ratio, moment, product });
+    const taskId = started.task_id;
+    const prompt = started.prompt;
+    if (!taskId) throw new Error('No task_id returned.');
+
+    const MAX_POLLS = 40;
+    const POLL_MS = 3000;
+    for (let i = 0; i < MAX_POLLS; i++) {
+      setStatus(genStatus, `Generating… (~${i * 3}s so far, can take up to 90s)`);
+      await sleep(POLL_MS);
+      const checked = await callMcp('check_acko_nano_banana_generation', {
+        task_id: taskId, scene, prompt, ratio, moment, product,
+      });
+      if (checked.status === 'completed') return checked;
+    }
+    throw new Error('Timed out waiting for Nano Banana 2.');
+  }
+
   generateBtn.addEventListener('click', async () => {
     const scene = document.getElementById('sceneInput').value.trim();
     if (!scene) { setStatus(genStatus, 'Describe a scene first.', 'error'); return; }
@@ -231,39 +289,14 @@
     const product = document.getElementById('productSelect').value;
 
     generateBtn.disabled = true;
-    setStatus(genStatus, model === 'nano_banana_2' ? 'Generating… this can take up to 90s.' : 'Generating…');
+    setStatus(genStatus, model === 'nano_banana_2' ? 'Starting generation…' : 'Generating…');
 
     try {
-      const res = await fetch(`${API_BASE}/mcp`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${currentToken}`,
-        },
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          id: Date.now(),
-          method: 'tools/call',
-          params: {
-            name: 'generate_acko_image',
-            arguments: { scene, model, ratio, moment, product },
-          },
-        }),
-      });
+      const result = model === 'nano_banana_2'
+        ? await generateNanoBanana(scene, ratio, moment, product)
+        : await callMcp('generate_acko_image', { scene, model, ratio, moment, product });
 
-      if (!res.ok) {
-        throw new Error(`Request failed (HTTP ${res.status}). Check your token and try again.`);
-      }
-      const data = await res.json();
-      if (data.error) {
-        throw new Error(data.error.message || 'Request failed.');
-      }
-      const content = (data.result && data.result.content) || [];
-      if (data.result && data.result.isError) {
-        const textItem = content.find((c) => c.type === 'text');
-        throw new Error((textItem && textItem.text) || 'Generation failed.');
-      }
-      const imageItem = content.find((c) => c.type === 'image');
+      const imageItem = (result.content || []).find((c) => c.type === 'image');
       if (!imageItem || !imageItem.data) {
         throw new Error('No image returned.');
       }

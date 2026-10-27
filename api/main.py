@@ -584,7 +584,11 @@ class handler(BaseHTTPRequestHandler):
         if method == "tools/list":
             # Harmless to expose without auth — same spirit as showing UI to any
             # signed-in user before gating the actual (billable) action below.
-            self.send_json(200, {"jsonrpc": "2.0", "id": id_, "result": {"tools": [acko_mcp_server.TOOL]}})
+            self.send_json(200, {"jsonrpc": "2.0", "id": id_, "result": {"tools": [
+                acko_mcp_server.TOOL,
+                acko_mcp_server.TOOL_START_NANO_BANANA,
+                acko_mcp_server.TOOL_CHECK_NANO_BANANA,
+            ]}})
             return
 
         if method == "tools/call":
@@ -601,78 +605,173 @@ class handler(BaseHTTPRequestHandler):
 
             name = params.get("name")
             args = params.get("arguments") or {}
-            if name != "generate_acko_image":
-                self.send_json(200, {"jsonrpc": "2.0", "id": id_,
-                                      "error": {"code": -32601, "message": f"Unknown tool: {name}"}})
-                return
 
-            # Same permission gate as the web UI — a valid token proves identity
-            # only; this call is what actually costs money.
-            perm_ok, perm_err = require_permission(email, user_store.IMAGE_GEN_ALLOWED)
-            if not perm_ok:
+            if name == "generate_acko_image":
+                # Same permission gate as the web UI — a valid token proves identity
+                # only; this call is what actually costs money.
+                perm_ok, perm_err = require_permission(email, user_store.IMAGE_GEN_ALLOWED)
+                if not perm_ok:
+                    self.send_json(200, {"jsonrpc": "2.0", "id": id_, "result": {
+                        "content": [{"type": "text", "text": perm_err["error"]}],
+                        "isError": True,
+                    }})
+                    return
+
+                if not check_mcp_rate_limit(email):
+                    self.send_json(200, {"jsonrpc": "2.0", "id": id_, "result": {
+                        "content": [{"type": "text", "text":
+                            f"Rate limit reached (max {MCP_RATE_LIMIT_PER_HOUR} images/hour). Try again later."}],
+                        "isError": True,
+                    }})
+                    return
+
+                scene = str(args.get("scene", ""))
+                model = str(args.get("model", "magnific"))
+                prompt = acko_mcp_server.build_prompt(
+                    scene, args.get("moment", "care"), args.get("product", "general"),
+                    args.get("skin_tone", ""), args.get("region", ""), args.get("age", ""),
+                    args.get("life_stage", ""),
+                )
+                try:
+                    if model == "nano_banana_2":
+                        # Blocks this request's thread for up to ~2 minutes (job
+                        # creation + polling). Fine for a long-lived MCP client
+                        # (e.g. Claude Desktop) but NOT safe to call from a
+                        # browser/Vercel request capped at ~10s — those use
+                        # start_acko_nano_banana_generation /
+                        # check_acko_nano_banana_generation below instead.
+                        b64, _meta = acko_mcp_server.generate_nano_banana(
+                            prompt, args.get("ratio", "16:9"), args.get("resolution", "2K"),
+                            api_key=MAGNIFIC_KEY,
+                        )
+                    else:
+                        b64, _meta = acko_mcp_server.generate_magnific(
+                            prompt, args.get("ratio", "16:9"), float(args.get("guidance", 1.2)),
+                            args.get("seed"), api_key=MAGNIFIC_KEY,
+                        )
+                except Exception as e:
+                    self.send_json(200, {"jsonrpc": "2.0", "id": id_, "result": {
+                        "content": [{"type": "text", "text": f"Generation failed: {e}"}],
+                        "isError": True,
+                    }})
+                    return
+
+                # Best-effort — an MCP-originated image should be as visible/auditable
+                # to admins as a web-app one, but a save hiccup shouldn't fail the call.
+                try:
+                    saved = save_generated_bytes(base64.b64decode(b64), mime="image/png", kind="mcp-generate", email=email)
+                    history_store.add_history_row(
+                        email, saved["url"], "image/png", kind="mcp-generate",
+                        prompt=scene, full_prompt=prompt, model=model,
+                        ratio=args.get("ratio", "16:9"), resolution=args.get("resolution", ""),
+                        product=str(args.get("product", "general")),
+                    )
+                except Exception as ex:
+                    print(f"  MCP save-to-gallery failed (non-fatal): {ex}")
+
                 self.send_json(200, {"jsonrpc": "2.0", "id": id_, "result": {
-                    "content": [{"type": "text", "text": perm_err["error"]}],
-                    "isError": True,
+                    "content": [
+                        {"type": "text", "text": f"ACKO image generated for {email} · scene: {scene}"},
+                        {"type": "image", "data": b64, "mimeType": "image/png"},
+                    ],
                 }})
                 return
 
-            if not check_mcp_rate_limit(email):
-                self.send_json(200, {"jsonrpc": "2.0", "id": id_, "result": {
-                    "content": [{"type": "text", "text":
-                        f"Rate limit reached (max {MCP_RATE_LIMIT_PER_HOUR} images/hour). Try again later."}],
-                    "isError": True,
-                }})
-                return
+            if name == "start_acko_nano_banana_generation":
+                # Same gates as generate_acko_image — this is what actually
+                # costs money and consumes quota; check_* below (pure polling)
+                # doesn't re-check either.
+                perm_ok, perm_err = require_permission(email, user_store.IMAGE_GEN_ALLOWED)
+                if not perm_ok:
+                    self.send_json(200, {"jsonrpc": "2.0", "id": id_, "result": {
+                        "content": [{"type": "text", "text": perm_err["error"]}],
+                        "isError": True,
+                    }})
+                    return
 
-            scene = str(args.get("scene", ""))
-            model = str(args.get("model", "magnific"))
-            prompt = acko_mcp_server.build_prompt(
-                scene, args.get("moment", "care"), args.get("product", "general"),
-                args.get("skin_tone", ""), args.get("region", ""), args.get("age", ""),
-                args.get("life_stage", ""),
-            )
-            try:
-                if model == "nano_banana_2":
-                    # Blocks this request's thread for up to ~2 minutes (job
-                    # creation + polling) — safe under ThreadingHTTPServer
-                    # (doesn't freeze other users), but a calling MCP client
-                    # with a shorter tool-call timeout may see this fail even
-                    # though generation succeeds server-side. Accepted tradeoff.
-                    b64, _meta = acko_mcp_server.generate_nano_banana(
+                if not check_mcp_rate_limit(email):
+                    self.send_json(200, {"jsonrpc": "2.0", "id": id_, "result": {
+                        "content": [{"type": "text", "text":
+                            f"Rate limit reached (max {MCP_RATE_LIMIT_PER_HOUR} images/hour). Try again later."}],
+                        "isError": True,
+                    }})
+                    return
+
+                scene = str(args.get("scene", ""))
+                prompt = acko_mcp_server.build_prompt(
+                    scene, args.get("moment", "care"), args.get("product", "general"),
+                    args.get("skin_tone", ""), args.get("region", ""), args.get("age", ""),
+                )
+                try:
+                    task_id = acko_mcp_server.start_nano_banana(
                         prompt, args.get("ratio", "16:9"), args.get("resolution", "2K"),
                         api_key=MAGNIFIC_KEY,
                     )
-                else:
-                    b64, _meta = acko_mcp_server.generate_magnific(
-                        prompt, args.get("ratio", "16:9"), float(args.get("guidance", 1.2)),
-                        args.get("seed"), api_key=MAGNIFIC_KEY,
-                    )
-            except Exception as e:
+                except Exception as e:
+                    self.send_json(200, {"jsonrpc": "2.0", "id": id_, "result": {
+                        "content": [{"type": "text", "text": f"Could not start generation: {e}"}],
+                        "isError": True,
+                    }})
+                    return
+
+                # task_id is opaque/stateless on our side (Magnific tracks the job,
+                # we don't) — the caller must echo back scene/prompt/ratio/etc. on
+                # check_acko_nano_banana_generation rather than us remembering them.
                 self.send_json(200, {"jsonrpc": "2.0", "id": id_, "result": {
-                    "content": [{"type": "text", "text": f"Generation failed: {e}"}],
-                    "isError": True,
+                    "content": [{"type": "text", "text": f"Generation started (task_id={task_id})."}],
+                    "status": "pending", "task_id": task_id, "prompt": prompt,
                 }})
                 return
 
-            # Best-effort — an MCP-originated image should be as visible/auditable
-            # to admins as a web-app one, but a save hiccup shouldn't fail the call.
-            try:
-                saved = save_generated_bytes(base64.b64decode(b64), mime="image/png", kind="mcp-generate", email=email)
-                history_store.add_history_row(
-                    email, saved["url"], "image/png", kind="mcp-generate",
-                    prompt=scene, full_prompt=prompt, model=model,
-                    ratio=args.get("ratio", "16:9"), resolution=args.get("resolution", ""),
-                    product=str(args.get("product", "general")),
-                )
-            except Exception as ex:
-                print(f"  MCP save-to-gallery failed (non-fatal): {ex}")
+            if name == "check_acko_nano_banana_generation":
+                task_id = str(args.get("task_id", ""))
+                if not task_id:
+                    self.send_json(200, {"jsonrpc": "2.0", "id": id_, "result": {
+                        "content": [{"type": "text", "text": "Missing task_id."}],
+                        "isError": True,
+                    }})
+                    return
 
-            self.send_json(200, {"jsonrpc": "2.0", "id": id_, "result": {
-                "content": [
-                    {"type": "text", "text": f"ACKO image generated for {email} · scene: {scene}"},
-                    {"type": "image", "data": b64, "mimeType": "image/png"},
-                ],
-            }})
+                try:
+                    status, b64 = acko_mcp_server.check_nano_banana(task_id, api_key=MAGNIFIC_KEY)
+                except Exception as e:
+                    self.send_json(200, {"jsonrpc": "2.0", "id": id_, "result": {
+                        "content": [{"type": "text", "text": f"Generation failed: {e}"}],
+                        "isError": True,
+                    }})
+                    return
+
+                if status == "pending":
+                    self.send_json(200, {"jsonrpc": "2.0", "id": id_, "result": {
+                        "content": [{"type": "text", "text": "Still generating…"}],
+                        "status": "pending",
+                    }})
+                    return
+
+                scene = str(args.get("scene", ""))
+                prompt = str(args.get("prompt", "")) or scene
+                try:
+                    saved = save_generated_bytes(base64.b64decode(b64), mime="image/png", kind="mcp-generate", email=email)
+                    history_store.add_history_row(
+                        email, saved["url"], "image/png", kind="mcp-generate",
+                        prompt=scene, full_prompt=prompt, model="nano_banana_2",
+                        ratio=args.get("ratio", "16:9"), resolution=args.get("resolution", ""),
+                        product=str(args.get("product", "general")),
+                    )
+                except Exception as ex:
+                    print(f"  MCP save-to-gallery failed (non-fatal): {ex}")
+
+                self.send_json(200, {"jsonrpc": "2.0", "id": id_, "result": {
+                    "status": "completed",
+                    "content": [
+                        {"type": "text", "text": f"ACKO image generated for {email} · scene: {scene}"},
+                        {"type": "image", "data": b64, "mimeType": "image/png"},
+                    ],
+                }})
+                return
+
+            self.send_json(200, {"jsonrpc": "2.0", "id": id_,
+                                  "error": {"code": -32601, "message": f"Unknown tool: {name}"}})
             return
 
         self.send_json(200, {"jsonrpc": "2.0", "id": id_,

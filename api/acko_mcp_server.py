@@ -276,7 +276,13 @@ def generate_magnific(prompt, ratio, guidance=1.2, seed=None, api_key=None):
 
 
 # ── NANO BANANA 2 via Magnific (async, returns URL) ───────────────────────────
-def generate_nano_banana(prompt, ratio, resolution="2K", api_key=None):
+def start_nano_banana(prompt, ratio, resolution="2K", api_key=None):
+    """Submits the generation job and returns immediately with a task_id —
+    does not wait for completion. Use check_nano_banana(task_id) to poll.
+    Split out from the old blocking generate_nano_banana() because a single
+    Vercel function invocation can run for at most ~10 seconds (Hobby plan),
+    far less than the 30-90s Nano Banana can take — job creation alone is
+    fast and fits comfortably within that limit."""
     headers = {
         "Content-Type":       "application/json",
         "x-magnific-api-key": api_key or MAGNIFIC_KEY,
@@ -291,29 +297,49 @@ def generate_nano_banana(prompt, ratio, resolution="2K", api_key=None):
     task_id = (created.get("data") or {}).get("task_id")
     if not task_id:
         raise RuntimeError("No task_id returned from Nano Banana.")
+    return task_id
 
+
+def check_nano_banana(task_id, api_key=None):
+    """One fast status check (not a blocking loop) — returns ("pending", None)
+    while still running, ("completed", base64_png) once done, or raises on
+    failure. Callers (the /mcp check tool, or generate_nano_banana below) are
+    responsible for calling this repeatedly, spaced out over time."""
+    headers = {
+        "Content-Type":       "application/json",
+        "x-magnific-api-key": api_key or MAGNIFIC_KEY,
+    }
     poll_url = f"{NANO_BANANA_URL}/{task_id}"
+    result = http_get(poll_url, headers)
+    status = (result.get("data") or {}).get("status")
+    if status == "COMPLETED":
+        urls = (result.get("data") or {}).get("generated") or []
+        if not urls:
+            raise RuntimeError("Completed but no image URLs returned.")
+        b64 = fetch_image_as_base64(urls[0])
+        return "completed", b64
+    if status == "FAILED":
+        raise RuntimeError("Nano Banana generation failed.")
+    return "pending", None
+
+
+def generate_nano_banana(prompt, ratio, resolution="2K", api_key=None):
+    """Blocking convenience wrapper (job creation + in-process polling loop)
+    kept for the synchronous generate_acko_image tool and any MCP client
+    without its own polling loop (e.g. Claude Desktop/Cursor calling this
+    file locally, not through Vercel's 10s-capped function). Blocks inline
+    for up to ~2 minutes — fine for a long-lived process, NOT safe to call
+    from a single Vercel request, which is why the Figma plugin uses
+    start_nano_banana()/check_nano_banana() instead (see main.py's
+    start_acko_nano_banana_generation / check_acko_nano_banana_generation
+    tools)."""
+    task_id = start_nano_banana(prompt, ratio, resolution, api_key=api_key)
     for _ in range(POLL_MAX):
         time.sleep(POLL_INTERVAL)
-        result = http_get(poll_url, headers)
-        status = (result.get("data") or {}).get("status")
-        if status == "COMPLETED":
-            urls = (result.get("data") or {}).get("generated") or []
-            if not urls:
-                raise RuntimeError("Completed but no image URLs returned.")
-            b64 = fetch_image_as_base64(urls[0])
+        status, b64 = check_nano_banana(task_id, api_key=api_key)
+        if status == "completed":
             return b64, {}
-        if status == "FAILED":
-            raise RuntimeError("Nano Banana generation failed.")
     raise RuntimeError("Timed out waiting for Nano Banana 2.")
-
-# NOTE: generate_nano_banana() blocks inline for up to ~2 minutes (job creation
-# + polling) when called from /mcp's tools/call. This is safe from freezing the
-# whole app (main.py runs a ThreadingHTTPServer, so this only ties up one
-# request's thread), but a calling MCP client with a shorter tool-call timeout
-# than the job takes may see the call fail even though generation still
-# succeeds server-side. Accepted tradeoff — a job-id/poll-tool pair would avoid
-# that but is real additional infrastructure, not built here.
 
 
 # ── TOOL DEFINITION ───────────────────────────────────────────────────────────
@@ -403,6 +429,115 @@ TOOL = {
                 "default":     1.2,
                 "description": "Guidance scale 0.8–1.5",
             },
+        },
+    },
+}
+
+
+# ── Async Nano Banana 2 tool pair ──────────────────────────────────────────
+# A single Vercel function invocation is capped at ~10 seconds (Hobby plan),
+# but Nano Banana 2 itself can take 30-90s. generate_acko_image's
+# model="nano_banana_2" path still blocks inline for any client willing to
+# hold the connection open that long (e.g. Claude Desktop), but a browser-side
+# caller like the Figma plugin needs to poll instead — these two tools expose
+# that as start-then-check so no single request ever runs longer than a job
+# submission or one status check.
+_NANO_BANANA_SHARED_PROPERTIES = {
+    "ratio": {
+        "type":        "string",
+        "enum":        ["16:9", "4:5", "9:16", "1:1", "4:3", "3:4", "3:2"],
+        "default":     "16:9",
+        "description": "Output aspect ratio",
+    },
+    "resolution": {
+        "type":        "string",
+        "enum":        ["1K", "2K", "4K"],
+        "default":     "2K",
+        "description": "Output resolution.",
+    },
+    "moment": {
+        "type":        "string",
+        "enum":        ["pre-purchase", "active-life", "care", "reassurance", "internal-brand"],
+        "default":     "care",
+        "description": "Insurance moment — sets mood and expression",
+    },
+    "product": {
+        "type":        "string",
+        "enum":        ["motor", "health", "travel", "home", "general"],
+        "default":     "general",
+        "description": "Which ACKO insurance vertical's standard backdrop to use.",
+    },
+}
+
+TOOL_START_NANO_BANANA = {
+    "name":        "start_acko_nano_banana_generation",
+    "description": (
+        "Start an ACKO brand-compliant image generation using Nano Banana 2. "
+        "Returns a task_id immediately WITHOUT waiting for the image — call "
+        "check_acko_nano_banana_generation with that task_id (and the same "
+        "scene/ratio/moment/product you passed here) every few seconds until "
+        "it reports status 'completed' or 'failed'. Generation typically "
+        "takes 30-90 seconds. Use this instead of generate_acko_image's "
+        "nano_banana_2 option when the caller can't hold a single request "
+        "open that long (e.g. a browser)."
+    ),
+    "inputSchema": {
+        "type":       "object",
+        "required":   ["scene"],
+        "properties": {
+            "scene": {
+                "type":        "string",
+                "description": "Plain-language description of the scene to generate.",
+            },
+            **_NANO_BANANA_SHARED_PROPERTIES,
+            "skin_tone": {
+                "type": "string",
+                "enum": ["", "fair-skinned", "wheatish-skinned", "medium brown-skinned", "dark brown-skinned"],
+                "default": "",
+            },
+            "region": {
+                "type": "string",
+                "enum": ["", "North Indian", "South Indian", "East Indian", "West Indian", "Northeast Indian"],
+                "default": "",
+            },
+            "age": {
+                "type": "string",
+                "enum": ["", "mid-twenties", "early thirties", "mid-forties", "late fifties", "elderly, sixties+"],
+                "default": "",
+            },
+        },
+    },
+}
+
+TOOL_CHECK_NANO_BANANA = {
+    "name":        "check_acko_nano_banana_generation",
+    "description": (
+        "Check the status of a Nano Banana 2 generation started with "
+        "start_acko_nano_banana_generation. Pass back the same scene/ratio/"
+        "moment/product AND the exact 'prompt' value returned by that start "
+        "call (not rebuilt — the backdrop can be picked randomly, so "
+        "rebuilding it here could record a different prompt than what was "
+        "actually generated) — needed to save the finished image to the "
+        "gallery once it's done. Keep calling this every few seconds while "
+        "status is 'pending'."
+    ),
+    "inputSchema": {
+        "type":       "object",
+        "required":   ["task_id", "scene"],
+        "properties": {
+            "task_id": {
+                "type":        "string",
+                "description": "The task_id returned by start_acko_nano_banana_generation.",
+            },
+            "scene": {
+                "type":        "string",
+                "description": "The same scene text passed to start_acko_nano_banana_generation.",
+            },
+            "prompt": {
+                "type":        "string",
+                "description": "The exact 'prompt' value returned by start_acko_nano_banana_generation.",
+            },
+            **_NANO_BANANA_SHARED_PROPERTIES,
         },
     },
 }
