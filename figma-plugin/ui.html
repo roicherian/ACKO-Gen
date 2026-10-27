@@ -68,6 +68,7 @@
   </div>
   <div id="promptTabEnhanced" style="display:none">
     <textarea id="enhancedBody" placeholder="Switch here to preview the full built prompt, or type your own — this exact text is sent instead of being rebuilt from Scene/settings below."></textarea>
+    <div class="status" id="enhancedStatus"></div>
   </div>
 
   <div class="row">
@@ -225,6 +226,7 @@
   const promptTabEnhanced = document.getElementById('promptTabEnhanced');
   const ptabPromptBtn = document.getElementById('ptabPromptBtn');
   const ptabEnhancedBtn = document.getElementById('ptabEnhancedBtn');
+  const enhancedStatus = document.getElementById('enhancedStatus');
   const diversitySelectIds = ['momentSelect', 'productSelect', 'skinToneSelect', 'regionSelect', 'ageSelect', 'lifeStageSelect'];
 
   // Mirrors the web app's Enhanced tab: once opened (or hand-edited), the
@@ -246,14 +248,27 @@
   async function refreshEnhancedPrompt() {
     if (enhancedUserEdited) return;
     const scene = sceneInput.value.trim();
-    if (!scene) { enhancedBody.value = ''; return; }
+    if (!scene) {
+      enhancedBody.value = '';
+      setStatus(enhancedStatus, 'Type a scene on the Prompt tab first.');
+      return;
+    }
+    if (!currentToken) {
+      setStatus(enhancedStatus, 'Save a personal access token first.', 'error');
+      return;
+    }
+    setStatus(enhancedStatus, 'Building preview…');
     try {
       const result = await callMcp('build_acko_prompt', collectDiversityArgs({ scene }));
-      if (!enhancedUserEdited) enhancedBody.value = result.prompt || '';
+      console.log('[ACKO Gen] build_acko_prompt result:', result);
+      if (enhancedUserEdited) return;
+      enhancedBody.value = result.prompt || '';
+      setStatus(enhancedStatus, result.prompt ? '' : 'No prompt returned.', result.prompt ? '' : 'error');
     } catch (err) {
-      // Non-fatal — leave whatever was already in the box. The user can
-      // still type their own prompt by hand even if the preview call fails.
+      console.log('[ACKO Gen] build_acko_prompt failed:', err.message || err);
+      setStatus(enhancedStatus, `Preview failed: ${err.message || err}. You can still type your own prompt here.`, 'error');
     }
+    resize();
   }
 
   function setPromptTab(tab) {
@@ -268,7 +283,10 @@
 
   ptabPromptBtn.addEventListener('click', () => setPromptTab('prompt'));
   ptabEnhancedBtn.addEventListener('click', () => setPromptTab('enhanced'));
-  enhancedBody.addEventListener('input', () => { enhancedUserEdited = true; });
+  enhancedBody.addEventListener('input', () => {
+    enhancedUserEdited = true;
+    setStatus(enhancedStatus, '');
+  });
   diversitySelectIds.forEach((id) => {
     document.getElementById(id).addEventListener('change', refreshEnhancedPrompt);
   });
