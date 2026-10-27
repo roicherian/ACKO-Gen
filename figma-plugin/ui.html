@@ -32,7 +32,6 @@
     --purple-400: #9B8FF6;
     --purple-500: #7A62F0;
     --purple-600: #6841E6;
-    --purple-900: #3E2290;
     --grad: linear-gradient(135deg, var(--purple-500) 0%, var(--purple-400) 100%);
     --bg: #0F0F10;
     --card: #141414;
@@ -42,6 +41,7 @@
     --text: #F5F5F5;
     --text-primary: #FBFBFB;
     --muted: #8F8E92;
+    --ring: #3E2290;
     --red: #F87171;
     --green: #4ADE80;
     --r-sm: 10px;
@@ -49,6 +49,23 @@
     --shadow-xs: 0 1px 2px rgba(0,0,0,.2);
     --shadow-md: 0 2px 8px rgba(0,0,0,.32);
     --shadow-lg: 0 2px 16px 4px rgba(0,0,0,.36);
+  }
+  /* Light variant — same primitives/purple accent as the dark (default)
+     theme above, re-mapped to light surfaces. The web app itself is
+     dark-only, so this is derived rather than mirrored from it. */
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --bg: #FFFFFF;
+    --card: #F5F5F5;
+    --card-hover: #EBEBEB;
+    --border: #E0E0E1;
+    --border-subtle: #EBEBEB;
+    --text: #242324;
+    --text-primary: #0A0A0A;
+    --muted: #7A7B7D;
+    --ring: #EAEAFD;
+    --red: #DC2626;
+    --green: #16A34A;
   }
   * { box-sizing: border-box; }
   body {
@@ -66,7 +83,7 @@
   }
   input::placeholder, textarea::placeholder { color: var(--muted); }
   input:focus, textarea:focus, select:focus {
-    outline: none; border-color: var(--purple-500); box-shadow: 0 0 0 3px var(--purple-900);
+    outline: none; border-color: var(--purple-500); box-shadow: 0 0 0 3px var(--ring);
   }
   textarea { resize: vertical; min-height: 64px; }
   .row { display: flex; gap: 8px; }
@@ -82,17 +99,6 @@
     background: transparent; color: var(--purple-400); border: 1px solid var(--purple-600); box-shadow: none;
   }
   button.secondary:hover:not(:disabled) { background: var(--card-hover); box-shadow: none; transform: none; }
-  .tabrow {
-    display: flex; gap: 2px; margin-top: 14px; padding: 3px;
-    background: rgba(255,255,255,.04); border: 1px solid var(--border-subtle); border-radius: 999px;
-  }
-  .tabbtn {
-    flex: 1; margin-top: 0; padding: 7px 10px; font: 600 11px/1.2 var(--font-family);
-    border: none; border-radius: 999px; background: transparent; color: var(--muted);
-    cursor: pointer; box-shadow: none; transition: background .15s, color .15s;
-  }
-  .tabbtn:hover:not(.active) { color: var(--text); transform: none; box-shadow: none; }
-  .tabbtn.active { background: var(--card); color: var(--purple-400); box-shadow: var(--shadow-xs); }
   .status { margin-top: 10px; min-height: 16px; color: var(--muted); font-size: 11.5px; }
   .status.error { color: var(--red); }
   .status.success { color: var(--green); }
@@ -110,12 +116,28 @@
   }
   .btn-enhance-inline:hover { border-color: var(--purple-500); color: var(--purple-400); transform: none; box-shadow: var(--shadow-xs); }
   .btn-enhance-inline svg { width: 12px; height: 12px; flex-shrink: 0; }
+  .header-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+  .theme-toggle-btn {
+    width: 28px; height: 28px; margin: 0; padding: 0; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--card); border: 1px solid var(--border); border-radius: 999px;
+    color: var(--muted); box-shadow: var(--shadow-xs); transition: color .15s, border-color .15s;
+  }
+  .theme-toggle-btn:hover { color: var(--purple-400); border-color: var(--purple-500); box-shadow: var(--shadow-xs); transform: none; }
+  .theme-toggle-btn svg { width: 15px; height: 15px; }
 </style>
 </head>
 <body>
 
-<h1>ACKO Gen</h1>
-<p class="sub">Generate a brand-compliant image and drop it onto the canvas.</p>
+<div class="header-row">
+  <div>
+    <h1>ACKO Gen</h1>
+    <p class="sub">Generate a brand-compliant image and drop it onto the canvas.</p>
+  </div>
+  <button type="button" class="theme-toggle-btn" id="themeToggleBtn" title="Switch to light mode">
+    <svg id="themeToggleIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
 
 <div id="tokenGate">
   <label for="emailInput">Sign in with your acko.tech email</label>
@@ -132,24 +154,14 @@
 </div>
 
 <div id="genForm" style="display:none">
-  <div class="tabrow">
-    <button type="button" class="tabbtn active" id="ptabPromptBtn">Prompt</button>
-    <button type="button" class="tabbtn" id="ptabEnhancedBtn">Enhanced</button>
+  <div class="prompt-input-wrap">
+    <textarea id="sceneInput" placeholder="A woman reviewing her insurance policy on her phone at a cafe"></textarea>
+    <button type="button" class="btn-enhance-inline" id="enhanceInlineBtn" title="Enhance prompt">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      Enhance
+    </button>
   </div>
-
-  <div id="promptTabPrompt">
-    <div class="prompt-input-wrap">
-      <textarea id="sceneInput" placeholder="A woman reviewing her insurance policy on her phone at a cafe"></textarea>
-      <button type="button" class="btn-enhance-inline" id="enhanceInlineBtn" title="Enhance prompt">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-        Enhance
-      </button>
-    </div>
-  </div>
-  <div id="promptTabEnhanced" style="display:none">
-    <textarea id="enhancedBody" placeholder="Switch here to preview the full built prompt, or type your own — this exact text is sent instead of being rebuilt from Scene/settings below."></textarea>
-    <div class="status" id="enhancedStatus"></div>
-  </div>
+  <div class="status" id="promptStatus"></div>
 
   <div class="row">
     <div>
@@ -288,18 +300,27 @@
   const loginBtn = document.getElementById('loginBtn');
   const loginInlineBtn = document.getElementById('loginInlineBtn');
   const sceneInput = document.getElementById('sceneInput');
-  const enhancedBody = document.getElementById('enhancedBody');
-  const promptTabPrompt = document.getElementById('promptTabPrompt');
-  const promptTabEnhanced = document.getElementById('promptTabEnhanced');
-  const ptabPromptBtn = document.getElementById('ptabPromptBtn');
-  const ptabEnhancedBtn = document.getElementById('ptabEnhancedBtn');
-  const enhancedStatus = document.getElementById('enhancedStatus');
-  const diversitySelectIds = ['momentSelect', 'productSelect', 'skinToneSelect', 'regionSelect', 'ageSelect', 'lifeStageSelect'];
+  const promptStatus = document.getElementById('promptStatus');
+  const themeToggleBtn = document.getElementById('themeToggleBtn');
+  const themeToggleIcon = document.getElementById('themeToggleIcon');
 
-  // Mirrors the web app's Enhanced tab: once opened (or hand-edited), the
-  // full built prompt is sent as-is instead of being rebuilt from Scene +
-  // the settings below — same "enhText || buildPrompt(scene)" rule.
-  let enhancedUserEdited = false;
+  const SUN_PATHS = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+  const MOON_PATHS = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+  let currentTheme = 'dark';
+
+  function applyTheme(theme) {
+    currentTheme = theme === 'light' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    // Icon shows the theme a click switches TO, not the current one.
+    themeToggleIcon.innerHTML = currentTheme === 'light' ? MOON_PATHS : SUN_PATHS;
+    themeToggleBtn.title = currentTheme === 'light' ? 'Switch to dark mode' : 'Switch to light mode';
+  }
+
+  themeToggleBtn.addEventListener('click', () => {
+    const next = currentTheme === 'light' ? 'dark' : 'light';
+    applyTheme(next);
+    post({ type: 'save-theme', theme: next });
+  });
 
   function collectDiversityArgs(extra) {
     return Object.assign({
@@ -312,51 +333,37 @@
     }, extra || {});
   }
 
-  async function refreshEnhancedPrompt() {
-    if (enhancedUserEdited) return;
+  // Once Enhance has filled the Scene box with the full built prompt, that
+  // exact text (edits included) is sent as-is instead of being rebuilt from
+  // Scene + settings — same "enhText || buildPrompt(scene)" rule the web
+  // app uses, just collapsed into one box instead of a separate tab.
+  // Clearing the box resets this, so a fresh plain scene gets built normally.
+  let promptIsEnhanced = false;
+
+  async function enhancePrompt() {
     const scene = sceneInput.value.trim();
-    if (!scene) {
-      enhancedBody.value = '';
-      setStatus(enhancedStatus, 'Type a scene on the Prompt tab first.');
-      return;
-    }
-    if (!currentToken) {
-      setStatus(enhancedStatus, 'Save a personal access token first.', 'error');
-      return;
-    }
-    setStatus(enhancedStatus, 'Building preview…');
+    if (!scene) { setStatus(promptStatus, 'Describe a scene first.', 'error'); return; }
+    if (!currentToken) { setStatus(promptStatus, 'Save a personal access token first.', 'error'); return; }
+    setStatus(promptStatus, 'Enhancing…');
     try {
       const result = await callMcp('build_acko_prompt', collectDiversityArgs({ scene }));
       console.log('[ACKO Gen] build_acko_prompt result:', result);
-      if (enhancedUserEdited) return;
-      enhancedBody.value = result.prompt || '';
-      setStatus(enhancedStatus, result.prompt ? '' : 'No prompt returned.', result.prompt ? '' : 'error');
+      sceneInput.value = result.prompt || scene;
+      promptIsEnhanced = true;
+      setStatus(promptStatus, result.prompt ? 'Enhanced — edit freely, this exact text will be used.' : 'No prompt returned.', result.prompt ? 'success' : 'error');
     } catch (err) {
       console.log('[ACKO Gen] build_acko_prompt failed:', err.message || err);
-      setStatus(enhancedStatus, `Preview failed: ${err.message || err}. You can still type your own prompt here.`, 'error');
+      setStatus(promptStatus, `Enhance failed: ${err.message || err}`, 'error');
     }
     resize();
   }
 
-  function setPromptTab(tab) {
-    const isEnhanced = tab === 'enhanced';
-    promptTabPrompt.style.display = isEnhanced ? 'none' : '';
-    promptTabEnhanced.style.display = isEnhanced ? '' : 'none';
-    ptabPromptBtn.classList.toggle('active', !isEnhanced);
-    ptabEnhancedBtn.classList.toggle('active', isEnhanced);
-    if (isEnhanced) refreshEnhancedPrompt();
-    resize();
-  }
-
-  ptabPromptBtn.addEventListener('click', () => setPromptTab('prompt'));
-  ptabEnhancedBtn.addEventListener('click', () => setPromptTab('enhanced'));
-  document.getElementById('enhanceInlineBtn').addEventListener('click', () => setPromptTab('enhanced'));
-  enhancedBody.addEventListener('input', () => {
-    enhancedUserEdited = true;
-    setStatus(enhancedStatus, '');
-  });
-  diversitySelectIds.forEach((id) => {
-    document.getElementById(id).addEventListener('change', refreshEnhancedPrompt);
+  document.getElementById('enhanceInlineBtn').addEventListener('click', enhancePrompt);
+  sceneInput.addEventListener('input', () => {
+    if (!sceneInput.value.trim()) {
+      promptIsEnhanced = false;
+      setStatus(promptStatus, '');
+    }
   });
 
   // Signs the user in with just their acko.tech email (no password — the
@@ -495,7 +502,7 @@
 
     const ratio = document.getElementById('ratioSelect').value;
     const resolution = document.getElementById('resolutionSelect').value;
-    const promptOverride = enhancedBody.value.trim() || undefined;
+    const promptOverride = promptIsEnhanced ? scene : undefined;
     const args = collectDiversityArgs({ scene, ratio, resolution, prompt_override: promptOverride });
 
     generateBtn.disabled = true;
@@ -548,10 +555,13 @@
     } else if (message.type === 'error') {
       showError(message.message);
       generateBtn.disabled = false;
+    } else if (message.type === 'theme') {
+      applyTheme(message.theme || 'dark');
     }
   };
 
   post({ type: 'request-token' });
+  post({ type: 'request-theme' });
   resize();
 </script>
 </body>

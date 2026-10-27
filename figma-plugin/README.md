@@ -42,15 +42,20 @@ instead** and paste it there.
 
 ## Use it
 
-1. Describe the scene (or switch to the **Enhanced** tab to preview/edit the
-   full built prompt before generating), pick Ratio / Resolution / Moment /
-   Product / Diversity axes, click **Generate image**.
-2. Generation runs on Nano Banana 2 and typically takes 30–90 seconds — the
+1. Describe the scene. Click **Enhance** (top-right of the box) to replace it
+   with the full built prompt — style, lighting, anatomy rules and all —
+   which you can then edit freely; whatever's in the box at generate time is
+   sent exactly as-is. Skip it and your plain scene gets built automatically.
+2. Pick Ratio / Resolution / Moment / Product / Diversity axes, click
+   **Generate image**.
+3. Generation runs on Nano Banana 2 and typically takes 30–90 seconds — the
    status line counts up while it polls.
-3. The finished image appears as a new rectangle near your current
+4. The finished image appears as a new rectangle near your current
    viewport, already selected.
-4. To switch accounts or replace a token later, expand **Switch account or
+5. To switch accounts or replace a token later, expand **Switch account or
    change token** at the bottom of the panel.
+6. The sun/moon icon (top-right) switches between dark and light theme —
+   your choice is remembered per machine.
 
 ## Why Nano Banana 2 only
 

@@ -72,6 +72,17 @@ figma.ui.onmessage = async (message) => {
       return;
     }
 
+    if (message.type === "request-theme") {
+      const theme = await figma.clientStorage.getAsync("acko_theme");
+      figma.ui.postMessage({ type: "theme", theme: theme || "dark" });
+      return;
+    }
+
+    if (message.type === "save-theme") {
+      await figma.clientStorage.setAsync("acko_theme", message.theme || "dark");
+      return;
+    }
+
     if (message.type === "insert-image") {
       const { width, height } = await insertGeneratedImage(
         message.base64,
