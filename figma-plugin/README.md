@@ -42,20 +42,25 @@ instead** and paste it there.
 
 ## Use it
 
-1. Describe the scene, pick Model / Ratio / Moment / Product, click
-   **Generate image**.
-2. The finished image appears as a new rectangle near your current
+1. Describe the scene (or switch to the **Enhanced** tab to preview/edit the
+   full built prompt before generating), pick Ratio / Resolution / Moment /
+   Product / Diversity axes, click **Generate image**.
+2. Generation runs on Nano Banana 2 and typically takes 30–90 seconds — the
+   status line counts up while it polls.
+3. The finished image appears as a new rectangle near your current
    viewport, already selected.
-3. To switch accounts or replace a token later, expand **Switch account or
+4. To switch accounts or replace a token later, expand **Switch account or
    change token** at the bottom of the panel.
 
-## Known limitation
+## Why Nano Banana 2 only
 
-**Nano Banana 2** can take 30–90 seconds per generation and may time out on
-Vercel's free Hobby plan (10-second function limit) — the same documented
-limitation as the MCP/Claude Code setup. **Magnific** (the default) is fast
-and reliable; only switch models if you're specifically testing Nano Banana
-and expect it might fail.
+The plugin generates exclusively via Nano Banana 2 (Magnific was dropped —
+not needed for this workflow). Nano Banana 2's own API is job-based (submit,
+get a task_id, poll for status), so the plugin starts the job and polls a
+separate fast status check from the browser instead of holding one request
+open — this is what lets a 30-90s generation work within Vercel's ~10s
+function limit (see `start_acko_nano_banana_generation` /
+`check_acko_nano_banana_generation` in `api/acko_mcp_server.py`).
 
 ## Publishing privately to the Acko org
 

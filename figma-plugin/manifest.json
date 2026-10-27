@@ -1,11 +1,13 @@
 {
   "name": "ACKO Gen",
-  "id": "acko-gen-figma-plugin-local",
+  "id": "1696848330202211243",
   "api": "1.0.0",
   "main": "code.js",
   "ui": "ui.html",
   "editorType": ["figma"],
+  "documentAccess": "dynamic-page",
   "networkAccess": {
-    "allowedDomains": ["https://acko-gen.vercel.app"]
+    "allowedDomains": ["https://acko-gen.vercel.app", "https://acko-cms.ackoassets.com"],
+    "reasoning": "acko-gen.vercel.app is the plugin's own backend (auth, prompt, generation). acko-cms.ackoassets.com hosts the EuclidCircular font files used to match the ACKO web app's branding."
   }
 }
