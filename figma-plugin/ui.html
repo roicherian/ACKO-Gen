@@ -99,6 +99,17 @@
   details { margin-top: 16px; border-top: 1px solid var(--border-subtle); padding-top: 10px; }
   summary { cursor: pointer; font: 600 11.5px/1 var(--font-family); color: var(--muted); }
   .hint { color: var(--muted); font-size: 11px; margin-top: 6px; }
+  .prompt-input-wrap { position: relative; }
+  .prompt-input-wrap textarea { padding-top: 34px; }
+  .btn-enhance-inline {
+    position: absolute; top: 8px; right: 8px; width: auto; margin: 0; padding: 5px 9px;
+    display: flex; align-items: center; gap: 4px;
+    font: 600 10.5px/1 var(--font-family); color: var(--purple-400);
+    background: var(--card); border: 1px solid var(--border); border-radius: 999px;
+    box-shadow: var(--shadow-xs); cursor: pointer; transition: border-color .15s, color .15s;
+  }
+  .btn-enhance-inline:hover { border-color: var(--purple-500); color: var(--purple-400); transform: none; box-shadow: var(--shadow-xs); }
+  .btn-enhance-inline svg { width: 12px; height: 12px; flex-shrink: 0; }
 </style>
 </head>
 <body>
@@ -127,7 +138,13 @@
   </div>
 
   <div id="promptTabPrompt">
-    <textarea id="sceneInput" placeholder="A woman reviewing her insurance policy on her phone at a cafe"></textarea>
+    <div class="prompt-input-wrap">
+      <textarea id="sceneInput" placeholder="A woman reviewing her insurance policy on her phone at a cafe"></textarea>
+      <button type="button" class="btn-enhance-inline" id="enhanceInlineBtn" title="Enhance prompt">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Enhance
+      </button>
+    </div>
   </div>
   <div id="promptTabEnhanced" style="display:none">
     <textarea id="enhancedBody" placeholder="Switch here to preview the full built prompt, or type your own — this exact text is sent instead of being rebuilt from Scene/settings below."></textarea>
@@ -333,6 +350,7 @@
 
   ptabPromptBtn.addEventListener('click', () => setPromptTab('prompt'));
   ptabEnhancedBtn.addEventListener('click', () => setPromptTab('enhanced'));
+  document.getElementById('enhanceInlineBtn').addEventListener('click', () => setPromptTab('enhanced'));
   enhancedBody.addEventListener('input', () => {
     enhancedUserEdited = true;
     setStatus(enhancedStatus, '');
