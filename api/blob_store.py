@@ -11,8 +11,10 @@ read the way the previous Backblaze setup required.
 import os
 import uuid
 
-import boto3
-from botocore.config import Config
+# boto3/botocore are imported lazily inside _get_client(), not here — importing
+# them eagerly at module load adds multiple seconds to every cold start (even
+# for requests like /auth/login or an OPTIONS preflight that never touch
+# storage at all), since main.py imports this module unconditionally.
 
 SUPABASE_S3_ENDPOINT = os.environ.get("SUPABASE_S3_ENDPOINT", "")  # e.g. https://<project-ref>.supabase.co/storage/v1/s3
 SUPABASE_S3_REGION = os.environ.get("SUPABASE_S3_REGION", "")  # e.g. ap-southeast-1
@@ -40,6 +42,8 @@ def _get_client():
             "bucket (set to Public) and an S3 access key under Project "
             "Settings → Storage → S3 Connection."
         )
+    import boto3
+    from botocore.config import Config
     _client = boto3.client(
         "s3",
         endpoint_url=SUPABASE_S3_ENDPOINT,
