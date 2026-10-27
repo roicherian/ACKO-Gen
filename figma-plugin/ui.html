@@ -116,6 +116,16 @@
   }
   .btn-enhance-inline:hover { border-color: var(--purple-500); color: var(--purple-400); transform: none; box-shadow: var(--shadow-xs); }
   .btn-enhance-inline svg { width: 12px; height: 12px; flex-shrink: 0; }
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; cursor: pointer; margin-top: 2px; }
+  .toggle-text { flex: 1; }
+  .toggle-title { font: 600 12px/1.3 var(--font-family); color: var(--text); }
+  .toggle-desc { font-size: 10.5px; color: var(--muted); margin-top: 2px; }
+  .switch { position: relative; display: inline-block; width: 36px; height: 20px; flex-shrink: 0; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .switch-track { position: absolute; inset: 0; border-radius: 100px; background: var(--border); transition: background .18s; }
+  .switch-thumb { position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .18s; }
+  .switch input:checked + .switch-track { background: var(--grad); }
+  .switch input:checked + .switch-track .switch-thumb { transform: translateX(16px); }
   .header-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
   .theme-toggle-btn {
     width: 28px; height: 28px; margin: 0; padding: 0; flex-shrink: 0;
@@ -187,7 +197,7 @@
   </div>
 
   <div class="row">
-    <div>
+    <div id="momentGroup">
       <label for="momentSelect">Moment</label>
       <select id="momentSelect">
         <option value="care" selected>Care</option>
@@ -210,6 +220,40 @@
   </div>
 
   <details open>
+    <summary>Advanced settings</summary>
+    <label class="toggle-row" for="noCharCheckbox">
+      <div class="toggle-text">
+        <div class="toggle-title">No Characters</div>
+        <div class="toggle-desc">Exclude all people — generate an object, product or environment-only scene.</div>
+      </div>
+      <span class="switch">
+        <input type="checkbox" id="noCharCheckbox">
+        <span class="switch-track"><span class="switch-thumb"></span></span>
+      </span>
+    </label>
+    <label for="cameraAngleSelect">Camera Angle</label>
+    <select id="cameraAngleSelect">
+      <option value="" selected>Eye Level</option>
+      <option value="low-angle">Low Angle</option>
+      <option value="high-angle">High Angle</option>
+      <option value="birds-eye">Bird's Eye</option>
+      <option value="worms-eye">Worm's Eye</option>
+      <option value="over-shoulder">Over-the-Shoulder</option>
+      <option value="close-up">Close-Up</option>
+      <option value="extreme-close-up">Extreme Close-Up</option>
+      <option value="medium-shot">Medium Shot</option>
+      <option value="wide-shot">Wide / Establishing</option>
+      <option value="dutch-angle">Dutch Angle</option>
+      <option value="pov">POV</option>
+      <option value="three-quarter">Three-Quarter</option>
+      <option value="profile">Profile / Side</option>
+      <option value="front-on">Front-On</option>
+      <option value="aerial-drone">Aerial / Drone</option>
+      <option value="macro">Macro</option>
+    </select>
+  </details>
+
+  <details open id="diversityDetails">
     <summary>Diversity axes</summary>
     <div class="row">
       <div>
@@ -330,8 +374,23 @@
       region: document.getElementById('regionSelect').value,
       age: document.getElementById('ageSelect').value,
       life_stage: document.getElementById('lifeStageSelect').value,
+      camera_angle: document.getElementById('cameraAngleSelect').value,
+      no_characters: document.getElementById('noCharCheckbox').checked,
     }, extra || {});
   }
+
+  // Mirrors generate.html's toggleNoCharacters(): greys out the settings
+  // that stop applying once people are excluded from the frame.
+  const noCharCheckbox = document.getElementById('noCharCheckbox');
+  const momentGroup = document.getElementById('momentGroup');
+  const diversityDetails = document.getElementById('diversityDetails');
+  noCharCheckbox.addEventListener('change', () => {
+    const on = noCharCheckbox.checked;
+    [momentGroup, diversityDetails].forEach((el) => {
+      el.style.opacity = on ? '0.4' : '1';
+      el.style.pointerEvents = on ? 'none' : '';
+    });
+  });
 
   // Once Enhance has filled the Scene box with the full built prompt, that
   // exact text (edits included) is sent as-is instead of being rebuilt from

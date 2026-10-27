@@ -615,7 +615,8 @@ class handler(BaseHTTPRequestHandler):
                 prompt = acko_mcp_server.build_prompt(
                     scene, args.get("moment", "care"), args.get("product", "general"),
                     args.get("skin_tone", ""), args.get("region", ""), args.get("age", ""),
-                    args.get("life_stage", ""),
+                    args.get("life_stage", ""), args.get("camera_angle", ""),
+                    bool(args.get("no_characters", False)),
                 )
                 self.send_json(200, {"jsonrpc": "2.0", "id": id_, "result": {
                     "content": [{"type": "text", "text": prompt}],
@@ -648,7 +649,8 @@ class handler(BaseHTTPRequestHandler):
                 prompt = prompt_override or acko_mcp_server.build_prompt(
                     scene, args.get("moment", "care"), args.get("product", "general"),
                     args.get("skin_tone", ""), args.get("region", ""), args.get("age", ""),
-                    args.get("life_stage", ""),
+                    args.get("life_stage", ""), args.get("camera_angle", ""),
+                    bool(args.get("no_characters", False)),
                 )
                 try:
                     if model == "nano_banana_2":
@@ -720,7 +722,8 @@ class handler(BaseHTTPRequestHandler):
                 prompt = prompt_override or acko_mcp_server.build_prompt(
                     scene, args.get("moment", "care"), args.get("product", "general"),
                     args.get("skin_tone", ""), args.get("region", ""), args.get("age", ""),
-                    args.get("life_stage", ""),
+                    args.get("life_stage", ""), args.get("camera_angle", ""),
+                    bool(args.get("no_characters", False)),
                 )
                 try:
                     task_id = acko_mcp_server.start_nano_banana(

@@ -170,6 +170,38 @@ ANATOMY_RULE = (
     "no spare arm or leg."
 )
 
+# Mirrors generate.html's PHOTO_REALISM_RULE_OBJECT — same anti-"AI-generated"
+# intent as PHOTO_REALISM_RULE above, but without the people-specific language
+# (catchlights, skin pores) that doesn't apply to a no_characters still life.
+PHOTO_REALISM_RULE_OBJECT = (
+    "This must read as a genuine unretouched photograph captured on a real camera, not CGI or "
+    "a digital render — natural optical bokeh with soft round highlights, a faint natural "
+    "vignette, real material texture, wear and imperfections. Not illustrated, not airbrushed, "
+    "not uncannily clean or perfect."
+)
+
+# Mirrors generate.html's CAMERA_ANGLES.
+CAMERA_ANGLES = {
+    "": "eye-level angle",
+    "eye-level": "eye-level angle",
+    "low-angle": "low-angle shot looking up at the subject",
+    "high-angle": "high-angle shot looking down at the subject",
+    "birds-eye": "bird's-eye top-down view",
+    "worms-eye": "worm's-eye view from ground level looking up",
+    "over-shoulder": "over-the-shoulder framing",
+    "close-up": "close-up framing",
+    "extreme-close-up": "extreme close-up framing",
+    "medium-shot": "medium shot framing",
+    "wide-shot": "wide establishing shot",
+    "dutch-angle": "subtle Dutch tilted angle",
+    "pov": "first-person point-of-view framing",
+    "three-quarter": "three-quarter view",
+    "profile": "profile, side-on view",
+    "front-on": "front-on, straight-on framing",
+    "aerial-drone": "aerial drone shot from above",
+    "macro": "macro close-up shot",
+}
+
 NEGATIVE_PROMPT = (
     "posed, stiff, looking at camera, stock photo smile, "
     "plastic skin, airbrushed complexion, heavy makeup, "
@@ -202,10 +234,31 @@ def pick_scene(s, scene_text):
     return random.choice(scenes)["text"]
 
 
-def build_prompt(scene, moment, product, skin_tone="", region="", age="", life_stage=""):
-    mood     = MOOD_MAP.get(moment, MOOD_MAP["care"])
+def build_prompt(scene, moment, product, skin_tone="", region="", age="", life_stage="",
+                  camera_angle="", no_characters=False):
     s        = SETTING_MAP.get(product, SETTING_MAP["general"])
     scene_pick = pick_scene(s, scene)
+    cam = CAMERA_ANGLES.get(camera_angle, CAMERA_ANGLES[""])
+
+    if no_characters:
+        return " ".join([
+            f"Cinematic photorealistic still-life photograph, 16:9 widescreen, {cam}, "
+            "shot on 50mm lens at f/2.8, shallow depth of field.",
+            f"{scene}." if scene else "An object, product or environment relevant to the ACKO brand context.",
+            f"Setting: {scene_pick}.",
+            BACKGROUND_RULE,
+            PROPS_RULE + (f" ({s['props']}.)" if s["props"] else ""),
+            f"{s['light']}. Clean neutral whites, natural honest tones — bright modern commercial "
+            "photography, never dark, moody or oversaturated.",
+            "No characters — no people, no human figures, no hands, no faces anywhere in the "
+            "frame. Object, product or environment only, with room to breathe.",
+            "Soft diffused natural light, mostly neutral true-to-life color, only a subtle "
+            "20-30% touch of warmth — not golden hour, not amber or orange, no heavy color "
+            "cast, gentle film grain.",
+            PHOTO_REALISM_RULE_OBJECT,
+        ])
+
+    mood = MOOD_MAP.get(moment, MOOD_MAP["care"])
     subject = " ".join(filter(None, [
         skin_tone + "," if skin_tone else "",
         region or "Indian",
@@ -214,7 +267,7 @@ def build_prompt(scene, moment, product, skin_tone="", region="", age="", life_s
         f", {life_stage}" if life_stage else "",
     ]))
     return " ".join([
-        "Cinematic photorealistic lifestyle photograph, 16:9 widescreen, "
+        f"Cinematic photorealistic lifestyle photograph, 16:9 widescreen, {cam}, "
         "shot on 50mm prime lens at f/2.8 to f/4, shallow depth of field.",
         f"A {subject} — {scene}.",
         f"Setting: {scene_pick}.",
@@ -436,6 +489,20 @@ TOOL = {
                 "default": "",
                 "description": "Life stage for diversity",
             },
+            "camera_angle": {
+                "type": "string",
+                "enum": list(CAMERA_ANGLES.keys()),
+                "default": "",
+                "description": "Camera framing/angle. Empty or 'eye-level' is the default.",
+            },
+            "no_characters": {
+                "type": "boolean",
+                "default": False,
+                "description": "Exclude all people — generate an object, product or "
+                               "environment-only still life instead of a lifestyle photo "
+                               "with a person. When true, skin_tone/region/age/life_stage/"
+                               "moment are ignored.",
+            },
             "prompt_override": {
                 "type": "string",
                 "description": "If provided, used verbatim as the final prompt instead of building "
@@ -466,6 +533,8 @@ TOOL_BUILD_PROMPT = {
             "region":     TOOL["inputSchema"]["properties"]["region"],
             "age":        TOOL["inputSchema"]["properties"]["age"],
             "life_stage": TOOL["inputSchema"]["properties"]["life_stage"],
+            "camera_angle":  TOOL["inputSchema"]["properties"]["camera_angle"],
+            "no_characters": TOOL["inputSchema"]["properties"]["no_characters"],
         },
     },
 }
@@ -531,6 +600,8 @@ TOOL_START_NANO_BANANA = {
             "region":     TOOL["inputSchema"]["properties"]["region"],
             "age":        TOOL["inputSchema"]["properties"]["age"],
             "life_stage": TOOL["inputSchema"]["properties"]["life_stage"],
+            "camera_angle":    TOOL["inputSchema"]["properties"]["camera_angle"],
+            "no_characters":   TOOL["inputSchema"]["properties"]["no_characters"],
             "prompt_override": TOOL["inputSchema"]["properties"]["prompt_override"],
         },
     },
