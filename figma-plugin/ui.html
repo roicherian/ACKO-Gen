@@ -26,6 +26,10 @@
   }
   button:disabled { background: #b3b3b3; cursor: default; }
   button.secondary { background: transparent; color: #18a0fb; border: 1px solid #18a0fb; }
+  .tabrow { display: flex; gap: 6px; margin-top: 14px; }
+  .tabbtn { flex: 1; margin-top: 0; padding: 6px 8px; font: 600 11px/1.2 inherit;
+    border: 1px solid #d9d9d9; border-radius: 6px; background: #fff; color: #666; cursor: pointer; }
+  .tabbtn.active { background: #18a0fb; color: #fff; border-color: #18a0fb; }
   .status { margin-top: 10px; min-height: 16px; color: #666; }
   .status.error { color: #d1372c; }
   .status.success { color: #1a7f37; }
@@ -54,8 +58,17 @@
 </div>
 
 <div id="genForm" style="display:none">
-  <label for="sceneInput">Scene</label>
-  <textarea id="sceneInput" placeholder="A woman reviewing her insurance policy on her phone at a cafe"></textarea>
+  <div class="tabrow">
+    <button type="button" class="tabbtn active" id="ptabPromptBtn">Prompt</button>
+    <button type="button" class="tabbtn" id="ptabEnhancedBtn">Enhanced</button>
+  </div>
+
+  <div id="promptTabPrompt">
+    <textarea id="sceneInput" placeholder="A woman reviewing her insurance policy on her phone at a cafe"></textarea>
+  </div>
+  <div id="promptTabEnhanced" style="display:none">
+    <textarea id="enhancedBody" placeholder="Switch here to preview the full built prompt, or type your own — this exact text is sent instead of being rebuilt from Scene/settings below."></textarea>
+  </div>
 
   <div class="row">
     <div>
@@ -75,6 +88,17 @@
         <option value="4:3">4:3</option>
         <option value="3:4">3:4</option>
         <option value="3:2">3:2</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="row" id="resolutionRow" style="display:none">
+    <div>
+      <label for="resolutionSelect">Resolution</label>
+      <select id="resolutionSelect">
+        <option value="1K">1K</option>
+        <option value="2K" selected>2K</option>
+        <option value="4K">4K</option>
       </select>
     </div>
   </div>
@@ -101,6 +125,58 @@
       </select>
     </div>
   </div>
+
+  <details open>
+    <summary>Diversity axes</summary>
+    <div class="row">
+      <div>
+        <label for="skinToneSelect">Skin Tone</label>
+        <select id="skinToneSelect">
+          <option value="" selected>Auto</option>
+          <option value="fair-skinned">Fair</option>
+          <option value="wheatish-skinned">Wheatish</option>
+          <option value="medium brown-skinned">Medium Brown</option>
+          <option value="dark brown-skinned">Dark Brown</option>
+        </select>
+      </div>
+      <div>
+        <label for="regionSelect">Region</label>
+        <select id="regionSelect">
+          <option value="" selected>Any Indian</option>
+          <option value="North Indian">North Indian</option>
+          <option value="South Indian">South Indian</option>
+          <option value="East Indian">East Indian</option>
+          <option value="West Indian">West Indian</option>
+          <option value="Northeast Indian">Northeast Indian</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label for="ageSelect">Age</label>
+        <select id="ageSelect">
+          <option value="" selected>Any</option>
+          <option value="mid-twenties">Mid-twenties</option>
+          <option value="early thirties">Early thirties</option>
+          <option value="mid-forties">Mid-forties</option>
+          <option value="late fifties">Late fifties</option>
+          <option value="elderly, sixties+">60+</option>
+        </select>
+      </div>
+      <div>
+        <label for="lifeStageSelect">Life Stage</label>
+        <select id="lifeStageSelect">
+          <option value="" selected>Any</option>
+          <option value="young professional">Young Professional</option>
+          <option value="newly married couple">Newly Married</option>
+          <option value="parent with young child">Parent</option>
+          <option value="middle-aged homeowner">Homeowner</option>
+          <option value="senior citizen">Senior</option>
+        </select>
+      </div>
+    </div>
+  </details>
+
   <div class="hint" id="nanoBananaHint" style="display:none">Nano Banana 2 can take 30–90s and may time out on the deployment's free tier — Magnific is the reliable default.</div>
 
   <button id="generateBtn">Generate image</button>
@@ -142,6 +218,60 @@
   const loginInlineBtn = document.getElementById('loginInlineBtn');
   const modelSelect = document.getElementById('modelSelect');
   const nanoBananaHint = document.getElementById('nanoBananaHint');
+  const resolutionRow = document.getElementById('resolutionRow');
+  const sceneInput = document.getElementById('sceneInput');
+  const enhancedBody = document.getElementById('enhancedBody');
+  const promptTabPrompt = document.getElementById('promptTabPrompt');
+  const promptTabEnhanced = document.getElementById('promptTabEnhanced');
+  const ptabPromptBtn = document.getElementById('ptabPromptBtn');
+  const ptabEnhancedBtn = document.getElementById('ptabEnhancedBtn');
+  const diversitySelectIds = ['momentSelect', 'productSelect', 'skinToneSelect', 'regionSelect', 'ageSelect', 'lifeStageSelect'];
+
+  // Mirrors the web app's Enhanced tab: once opened (or hand-edited), the
+  // full built prompt is sent as-is instead of being rebuilt from Scene +
+  // the settings below — same "enhText || buildPrompt(scene)" rule.
+  let enhancedUserEdited = false;
+
+  function collectDiversityArgs(extra) {
+    return Object.assign({
+      moment: document.getElementById('momentSelect').value,
+      product: document.getElementById('productSelect').value,
+      skin_tone: document.getElementById('skinToneSelect').value,
+      region: document.getElementById('regionSelect').value,
+      age: document.getElementById('ageSelect').value,
+      life_stage: document.getElementById('lifeStageSelect').value,
+    }, extra || {});
+  }
+
+  async function refreshEnhancedPrompt() {
+    if (enhancedUserEdited) return;
+    const scene = sceneInput.value.trim();
+    if (!scene) { enhancedBody.value = ''; return; }
+    try {
+      const result = await callMcp('build_acko_prompt', collectDiversityArgs({ scene }));
+      if (!enhancedUserEdited) enhancedBody.value = result.prompt || '';
+    } catch (err) {
+      // Non-fatal — leave whatever was already in the box. The user can
+      // still type their own prompt by hand even if the preview call fails.
+    }
+  }
+
+  function setPromptTab(tab) {
+    const isEnhanced = tab === 'enhanced';
+    promptTabPrompt.style.display = isEnhanced ? 'none' : '';
+    promptTabEnhanced.style.display = isEnhanced ? '' : 'none';
+    ptabPromptBtn.classList.toggle('active', !isEnhanced);
+    ptabEnhancedBtn.classList.toggle('active', isEnhanced);
+    if (isEnhanced) refreshEnhancedPrompt();
+    resize();
+  }
+
+  ptabPromptBtn.addEventListener('click', () => setPromptTab('prompt'));
+  ptabEnhancedBtn.addEventListener('click', () => setPromptTab('enhanced'));
+  enhancedBody.addEventListener('input', () => { enhancedUserEdited = true; });
+  diversitySelectIds.forEach((id) => {
+    document.getElementById(id).addEventListener('change', refreshEnhancedPrompt);
+  });
 
   // Signs the user in with just their acko.tech email (no password — the
   // backend's /auth/login only checks the domain) and immediately mints a
@@ -194,7 +324,10 @@
   }
 
   modelSelect.addEventListener('change', () => {
-    nanoBananaHint.style.display = modelSelect.value === 'nano_banana_2' ? '' : 'none';
+    const isNanoBanana = modelSelect.value === 'nano_banana_2';
+    nanoBananaHint.style.display = isNanoBanana ? '' : 'none';
+    resolutionRow.style.display = isNanoBanana ? '' : 'none';
+    resize();
   });
 
   loginBtn.addEventListener('click', () => {
@@ -259,8 +392,8 @@
   // function is allowed to run (10s on Hobby). Rather than one blocking
   // call, this starts the job (fast) then polls a separate fast status
   // check from here, in the browser, where there's no such time limit.
-  async function generateNanoBanana(scene, ratio, moment, product) {
-    const started = await callMcp('start_acko_nano_banana_generation', { scene, ratio, moment, product });
+  async function generateNanoBanana(args) {
+    const started = await callMcp('start_acko_nano_banana_generation', args);
     const taskId = started.task_id;
     const prompt = started.prompt;
     if (!taskId) throw new Error('No task_id returned.');
@@ -270,31 +403,30 @@
     for (let i = 0; i < MAX_POLLS; i++) {
       setStatus(genStatus, `Generating… (~${i * 3}s so far, can take up to 90s)`);
       await sleep(POLL_MS);
-      const checked = await callMcp('check_acko_nano_banana_generation', {
-        task_id: taskId, scene, prompt, ratio, moment, product,
-      });
+      const checked = await callMcp('check_acko_nano_banana_generation', Object.assign({}, args, { task_id: taskId, prompt }));
       if (checked.status === 'completed') return checked;
     }
     throw new Error('Timed out waiting for Nano Banana 2.');
   }
 
   generateBtn.addEventListener('click', async () => {
-    const scene = document.getElementById('sceneInput').value.trim();
+    const scene = sceneInput.value.trim();
     if (!scene) { setStatus(genStatus, 'Describe a scene first.', 'error'); return; }
     if (!currentToken) { setStatus(genStatus, 'Save a personal access token first.', 'error'); return; }
 
     const model = modelSelect.value;
     const ratio = document.getElementById('ratioSelect').value;
-    const moment = document.getElementById('momentSelect').value;
-    const product = document.getElementById('productSelect').value;
+    const resolution = document.getElementById('resolutionSelect').value;
+    const promptOverride = enhancedBody.value.trim() || undefined;
+    const args = collectDiversityArgs({ scene, ratio, resolution, prompt_override: promptOverride });
 
     generateBtn.disabled = true;
     setStatus(genStatus, model === 'nano_banana_2' ? 'Starting generation…' : 'Generating…');
 
     try {
       const result = model === 'nano_banana_2'
-        ? await generateNanoBanana(scene, ratio, moment, product)
-        : await callMcp('generate_acko_image', { scene, model, ratio, moment, product });
+        ? await generateNanoBanana(args)
+        : await callMcp('generate_acko_image', Object.assign({ model }, args));
 
       const imageItem = (result.content || []).find((c) => c.type === 'image');
       if (!imageItem || !imageItem.data) {

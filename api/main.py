@@ -586,6 +586,7 @@ class handler(BaseHTTPRequestHandler):
             # signed-in user before gating the actual (billable) action below.
             self.send_json(200, {"jsonrpc": "2.0", "id": id_, "result": {"tools": [
                 acko_mcp_server.TOOL,
+                acko_mcp_server.TOOL_BUILD_PROMPT,
                 acko_mcp_server.TOOL_START_NANO_BANANA,
                 acko_mcp_server.TOOL_CHECK_NANO_BANANA,
             ]}})
@@ -605,6 +606,22 @@ class handler(BaseHTTPRequestHandler):
 
             name = params.get("name")
             args = params.get("arguments") or {}
+
+            if name == "build_acko_prompt":
+                # Free, no generation — lets a caller (the Figma plugin's
+                # "Enhanced" tab) preview/edit the exact prompt before paying
+                # for a real generation via prompt_override.
+                scene = str(args.get("scene", ""))
+                prompt = acko_mcp_server.build_prompt(
+                    scene, args.get("moment", "care"), args.get("product", "general"),
+                    args.get("skin_tone", ""), args.get("region", ""), args.get("age", ""),
+                    args.get("life_stage", ""),
+                )
+                self.send_json(200, {"jsonrpc": "2.0", "id": id_, "result": {
+                    "content": [{"type": "text", "text": prompt}],
+                    "prompt": prompt,
+                }})
+                return
 
             if name == "generate_acko_image":
                 # Same permission gate as the web UI — a valid token proves identity
@@ -627,7 +644,8 @@ class handler(BaseHTTPRequestHandler):
 
                 scene = str(args.get("scene", ""))
                 model = str(args.get("model", "magnific"))
-                prompt = acko_mcp_server.build_prompt(
+                prompt_override = str(args.get("prompt_override", "")).strip()
+                prompt = prompt_override or acko_mcp_server.build_prompt(
                     scene, args.get("moment", "care"), args.get("product", "general"),
                     args.get("skin_tone", ""), args.get("region", ""), args.get("age", ""),
                     args.get("life_stage", ""),
@@ -698,9 +716,11 @@ class handler(BaseHTTPRequestHandler):
                     return
 
                 scene = str(args.get("scene", ""))
-                prompt = acko_mcp_server.build_prompt(
+                prompt_override = str(args.get("prompt_override", "")).strip()
+                prompt = prompt_override or acko_mcp_server.build_prompt(
                     scene, args.get("moment", "care"), args.get("product", "general"),
                     args.get("skin_tone", ""), args.get("region", ""), args.get("age", ""),
+                    args.get("life_stage", ""),
                 )
                 try:
                     task_id = acko_mcp_server.start_nano_banana(

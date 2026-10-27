@@ -429,6 +429,43 @@ TOOL = {
                 "default":     1.2,
                 "description": "Guidance scale 0.8–1.5",
             },
+            "life_stage": {
+                "type": "string",
+                "enum": ["", "young professional", "newly married couple", "parent with young child",
+                         "middle-aged homeowner", "senior citizen"],
+                "default": "",
+                "description": "Life stage for diversity",
+            },
+            "prompt_override": {
+                "type": "string",
+                "description": "If provided, used verbatim as the final prompt instead of building "
+                               "one from scene/moment/product/etc — e.g. a user-edited prompt from "
+                               "build_acko_prompt.",
+            },
+        },
+    },
+}
+
+
+TOOL_BUILD_PROMPT = {
+    "name":        "build_acko_prompt",
+    "description": (
+        "Build (but do not generate) the full ACKO brand-compliant prompt for a scene — "
+        "the same prompt generate_acko_image / start_acko_nano_banana_generation would use. "
+        "Free, instant, no image is generated. Useful to preview or let a user edit the exact "
+        "prompt before generating — pass the (possibly edited) result back as 'prompt_override'."
+    ),
+    "inputSchema": {
+        "type":       "object",
+        "required":   ["scene"],
+        "properties": {
+            "scene":      {"type": "string", "description": "Plain-language scene description."},
+            "moment":     TOOL["inputSchema"]["properties"]["moment"],
+            "product":    TOOL["inputSchema"]["properties"]["product"],
+            "skin_tone":  TOOL["inputSchema"]["properties"]["skin_tone"],
+            "region":     TOOL["inputSchema"]["properties"]["region"],
+            "age":        TOOL["inputSchema"]["properties"]["age"],
+            "life_stage": TOOL["inputSchema"]["properties"]["life_stage"],
         },
     },
 }
@@ -490,21 +527,11 @@ TOOL_START_NANO_BANANA = {
                 "description": "Plain-language description of the scene to generate.",
             },
             **_NANO_BANANA_SHARED_PROPERTIES,
-            "skin_tone": {
-                "type": "string",
-                "enum": ["", "fair-skinned", "wheatish-skinned", "medium brown-skinned", "dark brown-skinned"],
-                "default": "",
-            },
-            "region": {
-                "type": "string",
-                "enum": ["", "North Indian", "South Indian", "East Indian", "West Indian", "Northeast Indian"],
-                "default": "",
-            },
-            "age": {
-                "type": "string",
-                "enum": ["", "mid-twenties", "early thirties", "mid-forties", "late fifties", "elderly, sixties+"],
-                "default": "",
-            },
+            "skin_tone":  TOOL["inputSchema"]["properties"]["skin_tone"],
+            "region":     TOOL["inputSchema"]["properties"]["region"],
+            "age":        TOOL["inputSchema"]["properties"]["age"],
+            "life_stage": TOOL["inputSchema"]["properties"]["life_stage"],
+            "prompt_override": TOOL["inputSchema"]["properties"]["prompt_override"],
         },
     },
 }
