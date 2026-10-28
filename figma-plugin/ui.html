@@ -175,6 +175,17 @@
 
   <div class="row">
     <div>
+      <label for="numImagesSelect">Number of images</label>
+      <select id="numImagesSelect">
+        <option value="1" selected>1 image</option>
+        <option value="2">2 images</option>
+        <option value="3">3 images</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="row">
+    <div>
       <label for="ratioSelect">Ratio</label>
       <select id="ratioSelect">
         <option value="16:9" selected>16:9</option>
@@ -537,21 +548,42 @@
   // function is allowed to run (10s on Hobby). Rather than one blocking
   // call, this starts the job (fast) then polls a separate fast status
   // check from here, in the browser, where there's no such time limit.
-  async function generateNanoBanana(args) {
-    const started = await callMcp('start_acko_nano_banana_generation', args);
-    const taskId = started.task_id;
-    const prompt = started.prompt;
-    if (!taskId) throw new Error('No task_id returned.');
+  // Starts `count` jobs in parallel (each is its own Magnific job/rate-limit
+  // slot) and polls all of them together, so N images take roughly the same
+  // wall-clock time as one, not N times as long.
+  async function generateNanoBananaBatch(args, count) {
+    const jobs = await Promise.all(
+      Array.from({ length: count }, () => callMcp('start_acko_nano_banana_generation', args))
+    );
+    const states = jobs.map((started) => {
+      if (!started.task_id) throw new Error('No task_id returned for one of the images.');
+      return { taskId: started.task_id, prompt: started.prompt, done: false, result: null, error: null };
+    });
 
     const MAX_POLLS = 40;
     const POLL_MS = 3000;
     for (let i = 0; i < MAX_POLLS; i++) {
-      setStatus(genStatus, `Generating… (~${i * 3}s so far, can take up to 90s)`);
+      const pending = states.filter((s) => !s.done);
+      if (pending.length === 0) break;
+      const doneCount = states.length - pending.length;
+      setStatus(genStatus, count > 1
+        ? `Generating… ${doneCount}/${states.length} done (~${i * 3}s so far)`
+        : `Generating… (~${i * 3}s so far, can take up to 90s)`);
       await sleep(POLL_MS);
-      const checked = await callMcp('check_acko_nano_banana_generation', Object.assign({}, args, { task_id: taskId, prompt }));
-      if (checked.status === 'completed') return checked;
+      await Promise.all(pending.map(async (s) => {
+        try {
+          const checked = await callMcp('check_acko_nano_banana_generation', Object.assign({}, args, { task_id: s.taskId, prompt: s.prompt }));
+          if (checked.status === 'completed') { s.done = true; s.result = checked; }
+        } catch (err) {
+          s.done = true;
+          s.error = err;
+        }
+      }));
     }
-    throw new Error('Timed out waiting for Nano Banana 2.');
+    states.forEach((s) => {
+      if (!s.done) { s.done = true; s.error = new Error('Timed out waiting for Nano Banana 2.'); }
+    });
+    return states;
   }
 
   generateBtn.addEventListener('click', async () => {
@@ -561,22 +593,27 @@
 
     const ratio = document.getElementById('ratioSelect').value;
     const resolution = document.getElementById('resolutionSelect').value;
+    const count = parseInt(document.getElementById('numImagesSelect').value, 10) || 1;
     const promptOverride = promptIsEnhanced ? scene : undefined;
     const args = collectDiversityArgs({ scene, ratio, resolution, prompt_override: promptOverride });
 
     generateBtn.disabled = true;
-    setStatus(genStatus, 'Starting generation…');
+    setStatus(genStatus, count > 1 ? `Starting ${count} generations…` : 'Starting generation…');
 
     try {
-      const result = await generateNanoBanana(args);
-
-      const imageItem = (result.content || []).find((c) => c.type === 'image');
-      if (!imageItem || !imageItem.data) {
-        throw new Error('No image returned.');
+      const states = await generateNanoBananaBatch(args, count);
+      const items = [];
+      states.forEach((s) => {
+        const imageItem = s.result && (s.result.content || []).find((c) => c.type === 'image');
+        if (imageItem && imageItem.data) items.push({ base64: imageItem.data, prompt: scene });
+      });
+      if (items.length === 0) {
+        const firstError = states.find((s) => s.error);
+        throw new Error((firstError && (firstError.error.message || String(firstError.error))) || 'No image returned.');
       }
 
-      setStatus(genStatus, 'Adding to canvas…');
-      post({ type: 'insert-image', base64: imageItem.data, ratio, prompt: scene });
+      setStatus(genStatus, items.length < count ? `Adding ${items.length}/${count} images to canvas…` : 'Adding to canvas…');
+      post({ type: 'insert-images', items, ratio });
     } catch (err) {
       setStatus(genStatus, err.message || String(err), 'error');
       generateBtn.disabled = false;
@@ -609,7 +646,7 @@
       setStatus(inlineStatus, 'Saved.', 'success');
       post({ type: 'request-token' });
     } else if (message.type === 'inserted') {
-      setStatus(genStatus, 'Added to canvas.', 'success');
+      setStatus(genStatus, message.count > 1 ? `Added ${message.count} images to canvas.` : 'Added to canvas.', 'success');
       generateBtn.disabled = false;
     } else if (message.type === 'error') {
       showError(message.message);

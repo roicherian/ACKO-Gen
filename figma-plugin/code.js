@@ -26,27 +26,33 @@ function base64ToUint8Array(base64) {
   return binary;
 }
 
-async function insertGeneratedImage(base64, ratioLabel, promptText) {
-  const bytes = base64ToUint8Array(base64);
-  const image = figma.createImage(bytes);
+// Lays out one or more generated images as a horizontal row centered on the
+// current viewport, so a multi-image generation doesn't stack every result
+// exactly on top of the others — each item is {base64, prompt}.
+async function insertGeneratedImages(items, ratioLabel) {
   const { width, height } = ratioToSize(ratioLabel);
-
-  const rect = figma.createRectangle();
-  rect.resize(width, height);
-  rect.fills = [{ type: "IMAGE", scaleMode: "FILL", imageHash: image.hash }];
-  rect.name = promptText ? `ACKO Gen: ${promptText.slice(0, 60)}` : "ACKO Gen image";
-
-  // Place near the viewport center rather than the page origin, so it lands
-  // where the user is actually looking.
+  const gap = Math.round(width * 0.08);
+  const totalWidth = items.length * width + (items.length - 1) * gap;
   const center = figma.viewport.center;
-  rect.x = Math.round(center.x - width / 2);
-  rect.y = Math.round(center.y - height / 2);
+  const startX = Math.round(center.x - totalWidth / 2);
+  const y = Math.round(center.y - height / 2);
 
-  figma.currentPage.appendChild(rect);
-  figma.currentPage.selection = [rect];
-  figma.viewport.scrollAndZoomIntoView([rect]);
+  const rects = items.map((item, i) => {
+    const bytes = base64ToUint8Array(item.base64);
+    const image = figma.createImage(bytes);
+    const rect = figma.createRectangle();
+    rect.resize(width, height);
+    rect.fills = [{ type: "IMAGE", scaleMode: "FILL", imageHash: image.hash }];
+    rect.name = item.prompt ? `ACKO Gen: ${item.prompt.slice(0, 60)}` : "ACKO Gen image";
+    rect.x = startX + i * (width + gap);
+    rect.y = y;
+    figma.currentPage.appendChild(rect);
+    return rect;
+  });
 
-  return { width, height };
+  figma.currentPage.selection = rects;
+  figma.viewport.scrollAndZoomIntoView(rects);
+  return { width, height, count: rects.length };
 }
 
 figma.ui.onmessage = async (message) => {
@@ -83,13 +89,12 @@ figma.ui.onmessage = async (message) => {
       return;
     }
 
-    if (message.type === "insert-image") {
-      const { width, height } = await insertGeneratedImage(
-        message.base64,
-        message.ratio,
-        message.prompt
+    if (message.type === "insert-images") {
+      const { width, height, count } = await insertGeneratedImages(
+        message.items || [],
+        message.ratio
       );
-      figma.ui.postMessage({ type: "inserted", width, height });
+      figma.ui.postMessage({ type: "inserted", width, height, count });
       return;
     }
   } catch (err) {
